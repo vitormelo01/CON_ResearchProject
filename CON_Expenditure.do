@@ -1,3 +1,7 @@
+*-------------------------------------------------------------------------------
+* Estimating the Impact of Certificate of Need Laws on Expenditure: A Synthetic Control Approach
+* ------------------------------------------------------------------------------
+
 clear 
 cd "D:\Research\CONandHealthSpending\Data\Health_Spending_Data"
 
@@ -455,8 +459,6 @@ save CON_Expenditure_withControl5.dta, replace
 /*
 clear 
 use CON_Expenditure_withControl5.dta
-
-
 
 keep if alwayscon==1 | repeal_y=="1985"
 * By changing repeal_y, we can look at diffferent diff-in-diffs
