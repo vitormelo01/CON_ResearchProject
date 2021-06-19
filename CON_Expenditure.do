@@ -3,7 +3,10 @@
 * ------------------------------------------------------------------------------
 
 clear 
-cd "D:\Research\CONandHealthSpending\Data\Health_Spending_Data"
+global Direcotry "G:\.shortcut-targets-by-id\1edN2qVL2RC0ppHpBtMtzuVfemRQhdw1v\CON_Laws\Data"
+cd $Directory
+
+global controls "income_pcp_adj pop_density unemp_rate top1_adj gini prop_age_25to45_bsy prop_age_45to65_bsy prop_age_over65_bsy prop_bach_degree_bsy prop_male_bsy prop_married_bsy prop_white_bsy"
 
 *-------------------------------------------------------------------------------
 * Total Health Expenditure - Clean up
@@ -109,7 +112,7 @@ gen spending_pcp =.
 replace spending_pcp = spending/pop
 drop group
 drop region_name
-save Exp1, replace
+save CON_Expenditure.dta, replace
 
 *-------------------------------------------------------------------------------
 * Loading CPI and adjusting health spendging levels for inflation (2015 prices)
@@ -119,7 +122,7 @@ clear
 insheet using "CPI_2015Prices.csv"
 
 * Merging data with Exp. per capita data
-merge m:m year using Exp1.dta
+merge m:m year using CON_Expenditure.dta
 drop if _merge==1
        // only year 1960-1979 and 2015-2019 did not match
 
@@ -132,7 +135,7 @@ drop spending
 drop spending_pcp
 drop _merge 
 sort year id
-save Exp2, replace
+save CON_Expenditure.dta, replace
 
 *-------------------------------------------------------------------------------
 * Merging Con data with cleaned Expenditure
@@ -145,28 +148,11 @@ reshape long con, i(id) j(year)
 drop v43
 save CON_Data, replace
 
-merge 1:m year id using Exp2.dta
+merge 1:m year id using CON_Expenditure.dta
 
 * Droping Louisiana because it did not have CON laws until 1991 and then implemented it, so it does not work with our model
 drop _merge 
-save CON_Expenditure_Cleaned, replace
-
-*-------------------------------------------------------------------------------
-* Initial Diff in Diff Analysis 
-* ------------------------------------------------------------------------------
-
-keep if alwayscon==1 | repeal_y=="1989"
-* By changing repeal_y, we can look at diffferent diff-in-diffs
-gen treat=.
-replace treat=0 if alwayscon==1
-replace treat=1 if alwayscon==0
-
-gen period = .
-replace period = 1 if year>=1984
-replace period = 0 if period==.
-gen treat_period = treat*period
-
-reg spending treat period treat_period pop
+save CON_Expenditure.dta, replace
 
 *-------------------------------------------------------------------------------
 * Merging with Income per Capita Data
@@ -205,10 +191,10 @@ drop income_pcp
 drop _merge 
 sort year id
 
-merge 1:m year id using CON_Expenditure_Cleaned.dta
+merge 1:m year id using CON_Expenditure.dta
 drop if _merge==1
 drop _merge
-save CON_Expenditure_withControl1, replace
+save CON_Expenditure.dta, replace
 
 * ------------------------------------------------------------------------------
 * Merging with Gini Coefficients Data
@@ -278,11 +264,11 @@ rename Year year
 keep year id gini
 
 * Merging with current data
-merge 1:m year id using CON_Expenditure_withControl1.dta
+merge 1:m year id using CON_Expenditure.dta
 drop if _merge==1
 drop _merge
 
-save CON_Expenditure_withControl2.dta, replace
+save CON_Expenditure.dta, replace
 
 * ------------------------------------------------------------------------------
 * Merging with Income Shares Data
@@ -353,11 +339,11 @@ rename Year year
 drop number state
 
 * Merging with current data
-merge 1:m year id using CON_Expenditure_withControl2.dta
+merge 1:m year id using CON_Expenditure.dta
 drop if _merge==1
 drop _merge
 
-save CON_Expenditure_withControl3.dta, replace
+save CON_Expenditure.dta, replace
 
 * ------------------------------------------------------------------------------
 * Merging with Unemployment Rate data
@@ -374,11 +360,11 @@ rename u unemp_rate
 drop if id==0
 
 * Merging with current data
-merge 1:m year id using CON_Expenditure_withControl3.dta
+merge 1:m year id using CON_Expenditure.dta
 drop if _merge==1
 drop _merge
 
-save CON_Expenditure_withControl4.dta, replace
+save CON_Expenditure.dta, replace
 
 * ------------------------------------------------------------------------------
 * Merging with Population Density
@@ -446,32 +432,20 @@ replace id = 56 if state=="Wyoming"
 }
 
 keep id landarea
-merge 1:m id using CON_Expenditure_withControl4.dta
+merge 1:m id using CON_Expenditure.dta
 drop _merge
 
 gen pop_density = pop/landarea
 
-save CON_Expenditure_withControl5.dta, replace
-
 * ------------------------------------------------------------------------------
-* Initial Diff-in-Diff with controls
+* Merging with Demographic Controls - ASEC
 * ------------------------------------------------------------------------------
-/*
-clear 
-use CON_Expenditure_withControl5.dta
 
-keep if alwayscon==1 | repeal_y=="1985"
-* By changing repeal_y, we can look at diffferent diff-in-diffs
-gen treat=.
-replace treat=0 if alwayscon==1
-replace treat=1 if alwayscon==0
+rename id state
+merge m:1 state year using ASEC_1980-2014_State.dta
 
-gen period = .
-replace period = 1 if year>=1984
-replace period = 0 if period==.
-gen treat_period = treat*period
-
-reg spending treat period treat_period white black hispanic asian unemp_rate top1_adj gini pop_density income_pcp_adj */
+rename state id
+save CON_Expenditure.dta, replace
 
 * ------------------------------------------------------------------------------
 * Initial Synthetic Control Estimates
@@ -489,78 +463,21 @@ reg spending treat period treat_period white black hispanic asian unemp_rate top
 10 = Nursing Home Care 
 */
 
-* Wisconsin Synthetic Control Analysis
-clear 
-use CON_Expenditure_withControl5.dta
-
-keep if code == 3
-
-tsset id year
-
-keep if alwayscon==1 | repeal_y=="2000"
-
-*spending_pcp_adj(1999) spending_pcp_adj(1998) spending_pcp_adj(1997) spending_pcp_adj(1996) spending_pcp_adj(1995) spending_pcp_adj(1995) spending_pcp_adj(1994) spending_pcp_adj(1993) spending_pcp_adj(1992) spending_pcp_adj(1991)
-
-synth spending_pcp_adj income_pcp_adj pop_density unemp_rate top1_adj gini spending_pcp_adj(1990) spending_pcp_adj(1989) spending_pcp_adj(1988) spending_pcp_adj(1987) spending_pcp_adj(1986) spending_pcp_adj(1985) spending_pcp_adj(1984) spending_pcp_adj(1983) spending_pcp_adj(1982) spending_pcp_adj(1981) spending_pcp_adj(1980), trunit(55) trperiod(2000) nested fig
-
-synth spending_pcp_adj income_pcp_adj pop_density unemp_rate top1_adj gini spending_pcp_adj(1999) spending_pcp_adj(1992) spending_pcp_adj(1985) spending_pcp_adj(1980), trunit(55) trperiod(2000) nested fig
-
-* Indiana Synthetic Control Analysis
-clear 
-use CON_Expenditure_withControl5.dta
-
-keep if code == 3
-
-tsset id year
-
-keep if alwayscon==1 | repeal_y=="1999"
-
-synth spending_pcp_adj income_pcp_adj pop_density unemp_rate top1_adj gini spending_pcp_adj(1989) spending_pcp_adj(1988) spending_pcp_adj(1987) spending_pcp_adj(1986) spending_pcp_adj(1985) spending_pcp_adj(1984) spending_pcp_adj(1983) spending_pcp_adj(1982) spending_pcp_adj(1981) spending_pcp_adj(1980), trunit(18) trperiod(1999) nested fig
-
-synth spending_pcp_adj income_pcp_adj pop_density unemp_rate top1_adj gini spending_pcp_adj(1998) spending_pcp_adj(1992) spending_pcp_adj(1984) spending_pcp_adj(1980), trunit(18) trperiod(1999) nested fig
 
 * Pennsylvania Synthetic Control Analysis
 clear 
-use CON_Expenditure_withControl5.dta
+use CON_Expenditure.dta
 
-keep if code == 3
+keep if code == 1
 
 tsset id year
 
 keep if alwayscon==1 | repeal_y=="1996"
 
-synth spending_pcp_adj income_pcp_adj pop_density unemp_rate top1_adj gini spending_pcp_adj(1989) spending_pcp_adj(1988) spending_pcp_adj(1987) spending_pcp_adj(1986) spending_pcp_adj(1985) spending_pcp_adj(1984) spending_pcp_adj(1983) spending_pcp_adj(1982) spending_pcp_adj(1981) spending_pcp_adj(1980), trunit(42) trperiod(1996) nested fig
+synth spending_pcp_adj $controls spending_pcp_adj(1989) spending_pcp_adj(1988) spending_pcp_adj(1987) spending_pcp_adj(1986) spending_pcp_adj(1985) spending_pcp_adj(1984) spending_pcp_adj(1983) spending_pcp_adj(1982) spending_pcp_adj(1981) spending_pcp_adj(1980), trunit(42) trperiod(1996) nested fig
 
 synth spending_pcp_adj income_pcp_adj pop_density unemp_rate top1_adj gini spending_pcp_adj(1995) spending_pcp_adj(1990) spending_pcp_adj(1984), trunit(42) trperiod(1996) nested fig
 
-* North Dakota Synthetic Control Analysis
-clear 
-use CON_Expenditure_withControl5.dta
-
-keep if code == 3
-
-tsset id year
-
-keep if alwayscon==1 | repeal_y=="1995"
-
-synth spending_pcp_adj income_pcp_adj pop_density unemp_rate top1_adj gini spending_pcp_adj(1988) spending_pcp_adj(1987) spending_pcp_adj(1986) spending_pcp_adj(1985) spending_pcp_adj(1984) spending_pcp_adj(1983) spending_pcp_adj(1982) spending_pcp_adj(1981) spending_pcp_adj(1980), trunit(38) trperiod(1995) nested fig
-
-synth spending_pcp_adj income_pcp_adj pop_density unemp_rate top1_adj gini spending_pcp_adj(1994) spending_pcp_adj(1990) spending_pcp_adj(1984), trunit(38) trperiod(1995) nested fig
-
-*******synth_runner spending_pcp_adj income_pcp_adj pop_density unemp_rate top1_adj gini spending_pcp_adj(1994) spending_pcp_adj(1989) spending_pcp_adj(1983), trunit(38) trperiod(1995) nested
-
-/* Wyoming Synthetic Control Analysis
-clear 
-use CON_Expenditure_withControl5.dta
-
-tsset id year
-
-keep if alwayscon==1 | repeal_y=="1989"
-
-synth spending_pcp_adj income_pcp_adj pop_density unemp_rate top1_adj gini spending_pcp_adj(1988) spending_pcp_adj(1985) spending_pcp_adj(1982), trunit(56) trperiod(1989) nested fig
-
-****** 
-net install synth_runner, from(https://raw.github.com/bquistorff/synth_runner/master/) replace
 
 
 
