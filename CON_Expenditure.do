@@ -1,11 +1,14 @@
 *-------------------------------------------------------------------------------
 * Estimating the Impact of Certificate of Need Laws on Expenditure: A Synthetic Control Approach
 * ------------------------------------------------------------------------------
+clear
+
+* Setting Env Variables
+global directory: env HealthExpenditureDirectory
 
 * Setting Directory
-clear 
-global Directory "G:\.shortcut-targets-by-id\1edN2qVL2RC0ppHpBtMtzuVfemRQhdw1v\CON_Laws\Data"
-cd $Directory
+cd "$directory"
+
 
 * Setting Globals
 global controls "income_pcp_adj pop_density unemp_rate top1_adj gini prop_age_25to45_bsy prop_age_45to65_bsy prop_age_over65_bsy prop_bach_degree_bsy prop_male_bsy prop_married_bsy prop_white_bsy"
