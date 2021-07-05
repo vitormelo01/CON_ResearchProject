@@ -652,6 +652,8 @@ clear
 use CON_Expenditure.dta
 
 keep if code == 10
+save CON_NursingHome, replace
+
 
 tsset id year
 keep if alwaysconpa==1 | repeal_y=="1996"
