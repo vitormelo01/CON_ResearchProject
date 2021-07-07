@@ -3,6 +3,12 @@
 * ------------------------------------------------------------------------------
 clear
 
+
+
+**********
+
+
+
 * Setting Env Variables
 global directory: env HealthExpenditureDirectory
 
@@ -647,6 +653,21 @@ save CON_Expenditure.dta, replace
 10 = Nursing Home Care 
 */
 
+
+* ------------------------------------------------------------------------------
+* Preparing Data for Graphs from Synthetic control analysis
+* ------------------------------------------------------------------------------
+
+clear 
+use CON_Expenditure.dta
+
+replace total_exp = total_exp*1000
+replace medicare_exp = medicare_exp*1000
+replace medicaid_exp = medicaid_exp*1000
+
+save CON_Expenditure.dta, replace
+
+
 * ------------------------------------------------------------------------------
 * Pennsylvania Synthetic Control Analysis
 * ------------------------------------------------------------------------------
@@ -655,8 +676,6 @@ clear
 use CON_Expenditure.dta
 
 keep if code == 10
-save CON_NursingHome, replace
-
 
 tsset id year
 keep if alwaysconpa==1 | repeal_y=="1996"
@@ -664,17 +683,34 @@ keep if alwaysconpa==1 | repeal_y=="1996"
 *   ---Total Expenditure Analysis---
 
 *synth total_exp $controls total_exp(1995) total_exp(1990) total_exp(1984), trunit(42) trperiod(1996) nested fig
-synth total_exp $controls total_exp(1989) total_exp(1988) total_exp(1987) total_exp(1986) total_exp(1985) total_exp(1984) total_exp(1983) total_exp(1982) total_exp(1981) total_exp(1980), trunit(42) trperiod(1995) nested fig
+synth total_exp $controls total_exp(1989) total_exp(1988) total_exp(1987) total_exp(1986) total_exp(1985) total_exp(1984) total_exp(1983) total_exp(1982) total_exp(1981) total_exp(1980), trunit(42) trperiod(1996) nested fig
 
 *   ---Medicaid Expenditure Analysis---
 
-*synth medicaid_exp $controls medicaid_exp(1995) medicaid_exp(1990) medicaid_exp(1984), trunit(42) trperiod(1996) nested fig
+synth medicaid_exp $controls medicaid_exp(1995) medicaid_exp(1990) medicaid_exp(1984), trunit(42) trperiod(1996) nested fig
 synth medicaid_exp $controls medicaid_exp(1989) medicaid_exp(1988) medicaid_exp(1987) medicaid_exp(1986) medicaid_exp(1985) medicaid_exp(1984) medicaid_exp(1983) medicaid_exp(1982) medicaid_exp(1981) medicaid_exp(1980), trunit(42) trperiod(1995) nested fig
 
 *   ---Medicare Expenditure Analysis---
 
 *synth medicare_exp $controls medicare_exp(1995) medicare_exp(1990) medicare_exp(1984), trunit(42) trperiod(1996) nested fig
 synth medicare_exp $controls medicare_exp(1988) medicare_exp(1987) medicare_exp(1986) medicare_exp(1985) medicare_exp(1984) medicare_exp(1983) medicare_exp(1982) medicare_exp(1981) medicare_exp(1980), trunit(42) trperiod(1995) nested fig
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 * ------------------------------------------------------------------------------
 * North Dakota Synthetic Control Analysis
