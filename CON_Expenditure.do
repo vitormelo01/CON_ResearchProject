@@ -3,12 +3,6 @@
 * ------------------------------------------------------------------------------
 clear
 
-
-
-**********
-
-
-
 * Setting Env Variables
 global directory: env HealthExpenditureDirectory
 
