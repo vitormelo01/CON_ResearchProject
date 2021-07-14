@@ -670,8 +670,8 @@ save CON_Expenditure.dta, replace
 clear
 
 local Exp_code "1 1 1 10 10 10 6 6 6 3 3 3 2 2 2"
-local Exp_code_name_one " "Health" "Health" "Health" "Nursing Home" "Nursing Home" "Nursing Home" "Home Care" "Home Care" "Home Care" "Physician and Clinical" "Physician and Clinical" "Physician and Clinical" "Hospital" "Hospital" "Hospital" "
-local Exp_code_name_two " "Total_Health" "Total_Health" "Total_Health" "Nursing_Home" "Nursing_Home" "Nursing_Home" "Home_Care" "Home_Care" "Home_Care" "Physician" "Physician" "Physician" "
+local Exp_code_name_one " "Health" "Health" "Health" "Nursing Home" "Nursing Home" "Nursing Home" "Home Care" "Home Care" "Home Care" "Physician and Clinical Services" "Physician and Clinical Services" "Physician and Clinical Services" "Hospital" "Hospital" "Hospital" "
+local Exp_code_name_two " "Total_Health" "Total_Health" "Total_Health" "Nursing_Home" "Nursing_Home" "Nursing_Home" "Home_Care" "Home_Care" "Home_Care" "Physician" "Physician" "Physician" "Hospital" "Hospital" "Hospital" "
 local Exp_type " "total_exp" "medicaid_exp" "medicare_exp" "total_exp" "medicaid_exp" "medicare_exp" "total_exp" "medicaid_exp" "medicare_exp" "total_exp" "medicaid_exp" "medicare_exp" "total_exp" "medicaid_exp" "medicare_exp" "
 local Exp_type_name " "Total" "Medicaid" "Medicare" "Total" "Medicaid" "Medicare" "Total" "Medicaid" "Medicare" "Total" "Medicaid" "Medicare" "Total" "Medicaid" "Medicare" "
 
@@ -685,6 +685,7 @@ forvalues i = 1/15 {
 		
 	*load fresh data
 	use CON_Expenditure.dta, clear
+	replace medicare_exp = 0.01 if medicare_exp == 0	/* to avoid the unstable or asymmetric Hessian error */
 	
 	*Restrict to PA and Control States by expenditure type
 	keep if code == `exp_code'
@@ -718,7 +719,7 @@ forvalues i = 1/15 {
 		,
 		leg(lab(1 "Pennsylvania") lab(2 "Synthetic Pennsylvania") size(medsmall) order(1 2) pos(11) ring(0) cols(1))
 		xtitle("Year") xlab(1980[4]2014, grid glcolor(gs15))
-		ytitle("`exp_type_name' `exp_code_name_one' Expenditure Per Cap. (1000 $)") ylab(, grid glcolor(gs15))
+		ytitle("`exp_type_name' `exp_code_name_one' Expenditure ($1000 p.c.)") ylab(, grid glcolor(gs15))
 		graphregion(color(white)) bgcolor(white) plotregion(color(white));
 	# delimit cr
 	graph export CON_Expenditure_PA\Figures\\`exp_code_name_two'_`exp_type'_Trends.pdf, replace
@@ -730,7 +731,7 @@ forvalues i = 1/15 {
 		,
 		legend(off)
 		xtitle("Year") xlab(1980[4]2014, grid glcolor(gs15))
-		ytitle("Gap in `exp_type_name' `exp_code_name_one' Expenditure Per Capita (1000 $)") ysc(r(-.4 .4)) ylab(-.4(.2).4, grid glcolor(gs15))
+		ytitle("Gap in `exp_type_name' `exp_code_name_one' Expenditure ($1000 p.c.)") ysc(r(-.2 .2)) ylab(-.2(.1).2, grid glcolor(gs15))
 		graphregion(color(white)) bgcolor(white) plotregion(color(white));
 	# delimit cr
 	graph export CON_Expenditure_PA\Figures\\`exp_code_name_two'_`exp_type'_Gaps.pdf, replace
