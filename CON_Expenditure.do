@@ -675,7 +675,7 @@ local Exp_code_name_two " "Total_Health" "Total_Health" "Total_Health" "Nursing_
 local Exp_type " "total_exp" "medicaid_exp" "medicare_exp" "total_exp" "medicaid_exp" "medicare_exp" "total_exp" "medicaid_exp" "medicare_exp" "total_exp" "medicaid_exp" "medicare_exp" "total_exp" "medicaid_exp" "medicare_exp" "
 local Exp_type_name " "Total" "Medicaid" "Medicare" "Total" "Medicaid" "Medicare" "Total" "Medicaid" "Medicare" "Total" "Medicaid" "Medicare" "Total" "Medicaid" "Medicare" "
 
-forvalues i = 1/1 {
+forvalues i = 1/15 {
 	*setting up local macros to refer to the current element in the parallel lists being looped through
 	local exp_code : word `i' of `Exp_code'
 	local exp_code_name_one : word `i' of `Exp_code_name_one'
