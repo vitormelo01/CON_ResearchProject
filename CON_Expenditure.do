@@ -666,10 +666,81 @@ save CON_Expenditure.dta, replace
 * Pennsylvania Synthetic Control Analysis
 * ------------------------------------------------------------------------------
 
-clear 
+*   ---Trend and Gap Graphs---
+clear
+
+local Exp_code "1 1 1 10 10 10 6 6 6 3 3 3 2 2 2"
+local Exp_code_name_one " "Health" "Health" "Health" "Nursing Home" "Nursing Home" "Nursing Home" "Home Care" "Home Care" "Home Care" "Physician and Clinical" "Physician and Clinical" "Physician and Clinical" "Hospital" "Hospital" "Hospital" "
+local Exp_code_name_two " "Total_Health" "Total_Health" "Total_Health" "Nursing_Home" "Nursing_Home" "Nursing_Home" "Home_Care" "Home_Care" "Home_Care" "Physician" "Physician" "Physician" "
+local Exp_type " "total_exp" "medicaid_exp" "medicare_exp" "total_exp" "medicaid_exp" "medicare_exp" "total_exp" "medicaid_exp" "medicare_exp" "total_exp" "medicaid_exp" "medicare_exp" "total_exp" "medicaid_exp" "medicare_exp" "
+local Exp_type_name " "Total" "Medicaid" "Medicare" "Total" "Medicaid" "Medicare" "Total" "Medicaid" "Medicare" "Total" "Medicaid" "Medicare" "Total" "Medicaid" "Medicare" "
+
+forvalues i = 1/1 {
+	*setting up local macros to refer to the current element in the parallel lists being looped through
+	local exp_code : word `i' of `Exp_code'
+	local exp_code_name_one : word `i' of `Exp_code_name_one'
+	local exp_code_name_two : word `i' of `Exp_code_name_two'
+	local exp_type : word `i' of `Exp_type'
+	local exp_type_name : word `i' of `Exp_type_name'
+		
+	*load fresh data
+	use CON_Expenditure.dta, clear
+	
+	*Restrict to PA and Control States by expenditure type
+	keep if code == `exp_code'
+	keep if alwaysconpa==1 | repeal_y=="1996"
+	
+	*declare data as a time series with year as time variable (required for synth command)
+	tsset id year
+		
+	*Create synthetic control
+	# delimit
+		quietly synth `exp_type' $controls 
+		`exp_type'(1989) `exp_type'(1988) `exp_type'(1987) `exp_type'(1986) `exp_type'(1985) 
+		`exp_type'(1984) `exp_type'(1983) `exp_type'(1982) `exp_type'(1981) `exp_type'(1980), 
+		trunit(42) trperiod(1996) nested
+		keep(CON_Expenditure_PA\Synth_Output\synth_`exp_code_name_two'_`exp_type'.dta, replace);
+	# delimit cr
+	
+	*Process synthetic control output
+	use CON_Expenditure_PA\Synth_Output\synth_`exp_code_name_two'_`exp_type'.dta, clear
+	rename _time year
+	gen alpha = _Y_treated - _Y_synthetic
+	keep year _Y_* alpha
+	drop if missing(year)
+	save CON_Expenditure_PA\Synth_Output\synth_`exp_code_name_two'_`exp_type'.dta, replace
+	
+	*Trend graphs
+	# delimit
+	twoway
+		(line _Y_treated year, lwidth(medthick) lcolor(black) xline(1995, lwidth(thick) lcolor(gs10)) )
+		(line _Y_synthetic year, lwidth(medthick) lpattern(dash) lcolor(black))
+		,
+		leg(lab(1 "Pennsylvania") lab(2 "Synthetic Pennsylvania") size(medsmall) order(1 2) pos(11) ring(0) cols(1))
+		xtitle("Year") xlab(1980[4]2014, grid glcolor(gs15))
+		ytitle("`exp_type_name' `exp_code_name_one' Expenditure Per Cap. (1000 $)") ylab(, grid glcolor(gs15))
+		graphregion(color(white)) bgcolor(white) plotregion(color(white));
+	# delimit cr
+	graph export CON_Expenditure_PA\Figures\\`exp_code_name_two'_`exp_type'_Trends.pdf, replace
+	
+	*Gap graphs
+	# delimit
+	twoway
+		(line alpha year, lwidth(medthick) lcolor(black) xline(1995, lwidth(thick) lcolor(gs10)) yline(0, lwidth(thick) lcolor(gs10)))
+		,
+		legend(off)
+		xtitle("Year") xlab(1980[4]2014, grid glcolor(gs15))
+		ytitle("Gap in `exp_type_name' `exp_code_name_one' Expenditure Per Capita (1000 $)") ysc(r(-.4 .4)) ylab(-.4(.2).4, grid glcolor(gs15))
+		graphregion(color(white)) bgcolor(white) plotregion(color(white));
+	# delimit cr
+	graph export CON_Expenditure_PA\Figures\\`exp_code_name_two'_`exp_type'_Gaps.pdf, replace
+}
+
+
+
 use CON_Expenditure.dta
 
-keep if code == 10
+keep if code == 1
 
 tsset id year
 keep if alwaysconpa==1 | repeal_y=="1996"
