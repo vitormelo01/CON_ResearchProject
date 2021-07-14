@@ -1,6 +1,6 @@
 # Is Pennsylvania Paying the Bills for Other States? The Impact of Certificate-of-Need Laws on Medicaid Expenditure.
 
-### Background:
+### Background: 
 
 Certificate-of-need (CON) laws impose bureaucratic costs to healthcare providers in 35 American states. These regulations require healthcare providers planning on opening a new healthcare facility, expanding a current facility, or purchasing medical equipment to first show to a regulatory body that their region needs the service. Pennsylvania (PA) revoked all its CON laws in 1996. 
 
@@ -26,5 +26,9 @@ N/A
 
 ### Conclusion:
 
-N/A
+N/A *** 
+
+
+
+
 
