@@ -718,8 +718,8 @@ forvalues i = 1/15 {
 		(line _Y_synthetic year, lwidth(medthick) lpattern(dash) lcolor(black))
 		,
 		leg(lab(1 "Pennsylvania") lab(2 "Synthetic Pennsylvania") size(medsmall) order(1 2) pos(11) ring(0) cols(1))
-		xtitle("Year") xlab(1980[4]2014, grid glcolor(gs15))
-		ytitle("`exp_type_name' `exp_code_name_one' Expenditure ($1000 p.c.)") ylab(, grid glcolor(gs15))
+		xtitle("Year") xlab(1980[5]2014, grid glcolor(gs15))
+		ytitle("`exp_type_name' `exp_code_name_one' Expenditure Per Capita") ylab(, grid glcolor(gs15))
 		graphregion(color(white)) bgcolor(white) plotregion(color(white));
 	# delimit cr
 	graph export CON_Expenditure_PA\Figures\\`exp_code_name_two'_`exp_type'_Trends.pdf, replace
@@ -730,8 +730,8 @@ forvalues i = 1/15 {
 		(line alpha year, lwidth(medthick) lcolor(black) xline(1995, lwidth(thick) lcolor(gs10)) yline(0, lwidth(thick) lcolor(gs10)))
 		,
 		legend(off)
-		xtitle("Year") xlab(1980[4]2014, grid glcolor(gs15))
-		ytitle("Gap in `exp_type_name' `exp_code_name_one' Expenditure ($1000 p.c.)") ysc(r(-.2 .2)) ylab(-.2(.1).2, grid glcolor(gs15))
+		xtitle("Year") xlab(1980[5]2014, grid glcolor(gs15))
+		ytitle("Gap in `exp_type_name' `exp_code_name_one' Expenditure Per Capita") ysc(r(-300 300)) ylab(-300(150)300, grid glcolor(gs15))
 		graphregion(color(white)) bgcolor(white) plotregion(color(white));
 	# delimit cr
 	graph export CON_Expenditure_PA\Figures\\`exp_code_name_two'_`exp_type'_Gaps.pdf, replace
