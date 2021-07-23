@@ -1117,6 +1117,130 @@ graph export "CON_Expenditure_PA\Figures\Nursing_Home_medicaid_exp_rmspe_histogr
 
 
 *   ---Placebo Graph and Exact P-value - Medicare Nursing Home---
+local statelist "1 2 5 9 10 11 12 13 15 17 19 21 23 24 25 26 28 29 30 31 32 33 34 36 37 39 40 41 42 44 45 47 50 51 53 54 55"
+foreach i of local statelist {
+	*load fresh data
+	use CON_Expenditure.dta, clear
+
+	*Restrict to PA and Control States
+	keep if code == 10 /* nusing home spending */
+	keep if alwaysconpa==1 | repeal_y=="1996"
+
+	*declare data as a time series with year as time variable (required for synth command)
+	tsset id year
+
+	*Create synthetic control
+	# delimit
+	quietly synth medicare_exp $controls
+	medicare_exp(1989) medicare_exp(1988) medicare_exp(1987) medicare_exp(1986) medicare_exp(1985)
+	medicare_exp(1984) medicare_exp(1983) medicare_exp(1982) medicare_exp(1981) medicare_exp(1980),
+	trunit(`i') trperiod(1996) nested
+	keep(CON_Expenditure_PA\Placebos\Nursing_Home_Medicare\synth_nursing_home_medicare_`i'.dta, replace);
+	# delimit cr
+
+	*Process synthetic control output
+	use CON_Expenditure_PA\Placebos\Nursing_Home_Medicare\synth_nursing_home_medicare_`i'.dta, clear
+	rename _Y_treated _Y_treated_`i'
+	rename _Y_synthetic _Y_synthetic_`i'
+	rename _time year
+	gen alpha`i' = _Y_treated_`i' - _Y_synthetic_`i'
+	keep year _Y_* alpha`i'
+	drop if missing(year)
+	save CON_Expenditure_PA\Placebos\Nursing_Home_Medicare\synth_nursing_home_medicare_`i'.dta, replace
+}
+*merge all synth data sets
+use CON_Expenditure_PA\Placebos\Nursing_Home_Medicare\synth_nursing_home_medicare_1.dta, clear
+local statelist2  "2 5 9 10 11 12 13 15 17 19 21 23 24 25 26 28 29 30 31 32 33 34 36 37 39 40 41 42 44 45 47 50 51 53 54 55"
+foreach i of local statelist2 {
+    merge 1:1 year using CON_Expenditure_PA\Placebos\Nursing_Home_Medicare\synth_nursing_home_medicare_`i'.dta, nogenerate    
+}
+save CON_Expenditure_PA\Placebos\Nursing_Home_Medicare\synth_nursing_home_medicare_all.dta, replace
+*create figure
+use CON_Expenditure_PA\Placebos\Nursing_Home_Medicare\synth_nursing_home_medicare_all.dta, clear
+keep alpha* year
+reshape long alpha, i(year) j(state)
+# delimit
+twoway
+	(line alpha year if state == 1, lcolor(gs10))
+	(line alpha year if state == 2, lcolor(gs10))
+	(line alpha year if state == 5, lcolor(gs10))
+	(line alpha year if state == 9, lcolor(gs10))
+	(line alpha year if state == 10, lcolor(gs10))
+	(line alpha year if state == 11, lcolor(gs10))
+	(line alpha year if state == 12, lcolor(gs10))
+	(line alpha year if state == 13, lcolor(gs10))
+	(line alpha year if state == 15, lcolor(gs10))
+	(line alpha year if state == 17, lcolor(gs10))
+	(line alpha year if state == 19, lcolor(gs10))
+	(line alpha year if state == 21, lcolor(gs10))
+	(line alpha year if state == 23, lcolor(gs10))
+	(line alpha year if state == 24, lcolor(gs10))
+	(line alpha year if state == 25, lcolor(gs10))
+	(line alpha year if state == 26, lcolor(gs10))
+	(line alpha year if state == 28, lcolor(gs10))
+	(line alpha year if state == 29, lcolor(gs10))
+	(line alpha year if state == 30, lcolor(gs10))
+	(line alpha year if state == 31, lcolor(gs10))
+	(line alpha year if state == 32, lcolor(gs10))
+	(line alpha year if state == 33, lcolor(gs10))
+	(line alpha year if state == 34, lcolor(gs10))
+	(line alpha year if state == 36, lcolor(gs10))
+	(line alpha year if state == 37, lcolor(gs10))
+	(line alpha year if state == 39, lcolor(gs10))
+	(line alpha year if state == 40, lcolor(gs10))
+	(line alpha year if state == 41, lcolor(gs10))
+	(line alpha year if state == 44, lcolor(gs10))
+	(line alpha year if state == 45, lcolor(gs10))
+	(line alpha year if state == 47, lcolor(gs10))
+	(line alpha year if state == 50, lcolor(gs10))
+	(line alpha year if state == 51, lcolor(gs10))
+	(line alpha year if state == 53, lcolor(gs10))
+	(line alpha year if state == 54, lcolor(gs10))
+	(line alpha year if state == 55, lcolor(gs10))
+	(line alpha year if state == 42, lwidth(thick) lcolor(black) 
+	xline(1995, lwidth(thick) lcolor(maroon)) yline(0, lwidth(thick) lcolor(maroon)))
+	,
+	leg(lab(37 "Pennsylvania") lab(1 "Control States") size(medsmall) pos(11) order(37 1) ring(0) cols(1))
+	xtitle("Year") xlab(1980[2]2014, grid glcolor(gs15) angle(45))
+	ytitle("Gap in Medicare Nursing Home Expenditure Per Capita") ylab(, grid glcolor(gs15))
+	graphregion(color(white)) bgcolor(white) plotregion(color(white));
+# delimit cr
+graph export "CON_Expenditure_PA\Figures\Nursing_Home_medicare_exp_Gaps_with_Placebos.pdf", replace
+*Exact p-value based on post/pre RMSPE & histogram of RMSPEs
+use CON_Expenditure_PA\Placebos\Nursing_Home_Medicare\synth_nursing_home_medicare_all.dta, clear
+keep alpha* year
+reshape long alpha, i(year) j(state)
+gen alpha_sqrd = alpha*alpha
+bysort state: egen pre_mspe = mean(alpha_sqrd) if year <= 1995
+bysort state: egen post_mspe = mean(alpha_sqrd) if year > 1995
+gen pre_rmspe = sqrt(pre_mspe)
+gen post_rmspe = sqrt(post_mspe)
+local statelist "1 2 5 9 10 11 12 13 15 17 19 21 23 24 25 26 28 29 30 31 32 33 34 36 37 39 40 41 42 44 45 47 50 51 53 54 55"
+foreach i of local statelist {
+    sum pre_rmspe if state == `i'
+	replace pre_rmspe = r(mean) if state == `i'
+	sum post_rmspe if state == `i'
+	replace post_rmspe = r(mean) if state == `i'
+}
+sort state year
+gen post_pre_rmspe_ratio = post_rmspe/pre_rmspe
+duplicates drop state, force
+gsort -post_pre_rmspe_ratio
+gen rank = _n
+gen pvalue = rank/_N if state == 42
+list pvalue if state == 42
+# delimit
+twoway
+	(hist post_pre_rmspe_ratio if state == 42, bin(10) frequency bcolor(maroon) barw(1))
+	(hist post_pre_rmspe_ratio if state != 42, bin(10) frequency bcolor(gs10) barw(1))
+	,
+	leg(lab(1 "Pennsylvania") size(medsmall) pos(1) order(1) ring(0) cols(1))
+	xtitle("Post/Pre Root Mean Squared Prediction Error")
+	ylab(, nogrid)
+	graphregion(color(white)) bgcolor(white) plotregion(color(white));
+# delimit cr
+graph export "CON_Expenditure_PA\Figures\Nursing_Home_medicare_exp_rmspe_histogram.pdf", replace
+
 
 *   ---Placebo Graph and Exact P-value - Medicaid Home Health---
 
