@@ -722,7 +722,7 @@ twoway
 	(line _Y_synthetic year, lwidth(medthick) lpattern(dash) lcolor(black))
 	,
 	leg(lab(1 "Pennsylvania") lab(2 "Synthetic Pennsylvania") size(medsmall) order(1 2) pos(11) ring(0) cols(1))
-	xtitle("Year") xlab(1992[2]2014, grid glcolor(gs15) angle(45))
+	xtitle("Year") xlab(1990[2]2014, grid glcolor(gs15) angle(45))
 	ytitle("Quantity of Nursing Homes Per Capita") ylab(, grid glcolor(gs15))
 	graphregion(color(white)) bgcolor(white) plotregion(color(white));
 # delimit cr
@@ -734,7 +734,7 @@ twoway
 	(line alpha year, lwidth(medthick) lcolor(black) xline(1995, lwidth(thick) lcolor(gs10)) yline(0, lwidth(thick) lcolor(gs10)))
 	,
 	legend(off)
-	xtitle("Year") xlab(1992[2]2014, grid glcolor(gs15) angle(45))
+	xtitle("Year") xlab(1990[2]2014, grid glcolor(gs15) angle(45))
 	ytitle("Gap in Quantity of Nursing Homes Per Capita") ysc(r(-.6 .6)) ylab(-.6(.3).6, grid glcolor(gs15))
 	graphregion(color(white)) bgcolor(white) plotregion(color(white));
 # delimit cr
@@ -785,7 +785,7 @@ reshape long alpha, i(year) j(state)
 twoway
 	(line alpha year if state == 1, lcolor(gs10))
 	(line alpha year if state == 2, lcolor(gs10))
-	(line alpha year if state == 5, lcolor(gs10))
+	/*(line alpha year if state == 5, lcolor(gs10))*/
 	(line alpha year if state == 9, lcolor(gs10))
 	(line alpha year if state == 10, lcolor(gs10))
 	(line alpha year if state == 11, lcolor(gs10))
@@ -822,7 +822,7 @@ twoway
 	(line alpha year if state == 42, lwidth(thick) lcolor(black) 
 	xline(1995, lwidth(thick) lcolor(maroon)) yline(0, lwidth(thick) lcolor(maroon)))
 	,
-	leg(lab(37 "Pennsylvania") lab(1 "Control States") size(medsmall) pos(11) order(37 1) ring(0) cols(1))
+	leg(lab(36 "Pennsylvania") lab(1 "Control States") size(medsmall) pos(11) order(36 1) ring(0) cols(1))
 	xtitle("Year") xlab(1990[2]2014, grid glcolor(gs15) angle(45))
 	ytitle("Gap in Quantity of Nursing Homes Per Capita") ylab(, grid glcolor(gs15))
 	graphregion(color(white)) bgcolor(white) plotregion(color(white));
@@ -865,8 +865,185 @@ graph export "CON_Nursing_PA\Figures\Q_SkilledNursingHomes_pcp_rmspe_histogram.p
 
 
 
-*   ---Skilled Nursing home Beds---
-synth Q_SkilledNursingHomeBeds_pcp $controls Q_SkilledNursingHomeBeds_pcp(1993) Q_SkilledNursingHomeBeds_pcp(1992) Q_SkilledNursingHomeBeds_pcp(1991), trunit(42) trperiod(1996) nested fig
+*   ---Skilled Nursing home beds - Trend and Gap Graphs---	
+clear
+use CON_NursingHome.dta
+
+* Setting Globals
+global controls "income_pcp_adj pop_density unemp_rate top1_adj gini prop_age_25to45_bsy prop_age_45to65_bsy prop_age_over65_bsy prop_bach_degree_bsy prop_male_bsy prop_married_bsy prop_white_bsy"
+
+*Declare data as a time series with year as time variable (required for synth command) 
+tsset id year
+
+*Restrict to PA and Control States
+keep if alwaysconpa==1 | repeal_y=="1996"
+		
+*Create synthetic control
+# delimit
+	synth Q_SkilledNursingHomeBeds_pcp $controls 
+	Q_SkilledNursingHomeBeds_pcp(1993) Q_SkilledNursingHomeBeds_pcp(1992) Q_SkilledNursingHomeBeds_pcp(1991), 
+	trunit(42) trperiod(1996) nested
+	keep(CON_Nursing_PA\Synth_Output\synth_Q_SkilledNursingHomeBeds_pcp.dta, replace);
+# delimit cr
+	
+*Process synthetic control output
+use CON_Nursing_PA\Synth_Output\synth_Q_SkilledNursingHomeBeds_pcp.dta, clear
+rename _time year
+gen alpha = _Y_treated - _Y_synthetic
+keep year _Y_* alpha
+drop if missing(year)
+save CON_Nursing_PA\Synth_Output\synth_Q_SkilledNursingHomeBeds_pcp.dta, replace
+	
+*Trend graph
+# delimit
+twoway
+	(line _Y_treated year, lwidth(medthick) lcolor(black) xline(1995, lwidth(thick) lcolor(gs10)) )
+	(line _Y_synthetic year, lwidth(medthick) lpattern(dash) lcolor(black))
+	,
+	leg(lab(1 "Pennsylvania") lab(2 "Synthetic Pennsylvania") size(medsmall) order(1 2) pos(11) ring(0) cols(1))
+	xtitle("Year") xlab(1990[2]2014, grid glcolor(gs15) angle(45))
+	ytitle("Quantity of Nursing Home Beds Per Capita") ylab(, grid glcolor(gs15))
+	graphregion(color(white)) bgcolor(white) plotregion(color(white));
+# delimit cr
+graph export CON_Nursing_PA\Figures\Q_SkilledNursingHomeBeds_pcp_Trends.pdf, replace
+	
+*Gap graphs
+# delimit
+twoway
+	(line alpha year, lwidth(medthick) lcolor(black) xline(1995, lwidth(thick) lcolor(gs10)) yline(0, lwidth(thick) lcolor(gs10)))
+	,
+	legend(off)
+	xtitle("Year") xlab(1990[2]2014, grid glcolor(gs15) angle(45))
+	ytitle("Gap in Quantity of Nursing Home Beds Per Capita") ysc(r(-5 25)) ylab(-5(5)25, grid glcolor(gs15))
+	graphregion(color(white)) bgcolor(white) plotregion(color(white));
+# delimit cr
+graph export CON_Nursing_PA\Figures\Q_SkilledNursingHomeBeds_pcp_Gaps.pdf, replace
+
+*   ---Skilled Nursing home beds - Placebo Graph and Exact P-value ---
+local statelist "1 2 5 9 10 11 12 13 15 17 19 21 23 24 25 26 28 29 30 31 32 33 34 36 37 39 40 41 42 44 45 47 50 51 53 54 55"
+foreach i of local statelist {
+	*load fresh data
+	use CON_NursingHome.dta, clear
+
+	*Restrict to PA and Control States
+	keep if alwaysconpa==1 | repeal_y=="1996"
+
+	*Declare data as a time series with year as time variable (required for synth command)
+	tsset id year
+
+	*Create synthetic control
+	# delimit
+		quietly synth Q_SkilledNursingHomeBeds_pcp $controls 
+		Q_SkilledNursingHomeBeds_pcp(1993) Q_SkilledNursingHomeBeds_pcp(1992) Q_SkilledNursingHomeBeds_pcp(1991), 
+		trunit(`i') trperiod(1996) nested
+		keep(CON_Nursing_PA\Placebos\Nursing_Home_Beds\synth_Q_SkilledNursingHomeBeds_pcp_`i'.dta, replace);
+	# delimit cr
+
+	*Process synthetic control output
+	use CON_Nursing_PA\Placebos\Nursing_Home_Beds\synth_Q_SkilledNursingHomeBeds_pcp_`i'.dta, clear
+	rename _Y_treated _Y_treated_`i'
+	rename _Y_synthetic _Y_synthetic_`i'
+	rename _time year
+	gen alpha`i' = _Y_treated_`i' - _Y_synthetic_`i'
+	keep year _Y_* alpha`i'
+	drop if missing(year)
+	save CON_Nursing_PA\Placebos\Nursing_Home_Beds\synth_Q_SkilledNursingHomeBeds_pcp_`i'.dta, replace
+}
+*merge all synth data sets
+use CON_Nursing_PA\Placebos\Nursing_Home_Beds\synth_Q_SkilledNursingHomeBeds_pcp_1.dta, clear
+local statelist2  "2 5 9 10 11 12 13 15 17 19 21 23 24 25 26 28 29 30 31 32 33 34 36 37 39 40 41 42 44 45 47 50 51 53 54 55"
+foreach i of local statelist2 {
+    merge 1:1 year using CON_Nursing_PA\Placebos\Nursing_Home_Beds\synth_Q_SkilledNursingHomeBeds_pcp_`i'.dta, nogenerate    
+}
+save CON_Nursing_PA\Placebos\Nursing_Home_Beds\synth_Q_SkilledNursingHomeBeds_pcp_all.dta, replace
+*create figure
+use CON_Nursing_PA\Placebos\Nursing_Home_Beds\synth_Q_SkilledNursingHomeBeds_pcp_all.dta, clear
+keep alpha* year
+reshape long alpha, i(year) j(state)
+# delimit
+twoway
+	(line alpha year if state == 1, lcolor(gs10))
+	(line alpha year if state == 2, lcolor(gs10))
+	/*(line alpha year if state == 5, lcolor(gs10))*/
+	(line alpha year if state == 9, lcolor(gs10))
+	(line alpha year if state == 10, lcolor(gs10))
+	(line alpha year if state == 11, lcolor(gs10))
+	(line alpha year if state == 12, lcolor(gs10))
+	(line alpha year if state == 13, lcolor(gs10))
+	(line alpha year if state == 15, lcolor(gs10))
+	(line alpha year if state == 17, lcolor(gs10))
+	(line alpha year if state == 19, lcolor(gs10))
+	(line alpha year if state == 21, lcolor(gs10))
+	(line alpha year if state == 23, lcolor(gs10))
+	(line alpha year if state == 24, lcolor(gs10))
+	(line alpha year if state == 25, lcolor(gs10))
+	(line alpha year if state == 26, lcolor(gs10))
+	(line alpha year if state == 28, lcolor(gs10))
+	(line alpha year if state == 29, lcolor(gs10))
+	(line alpha year if state == 30, lcolor(gs10))
+	(line alpha year if state == 31, lcolor(gs10))
+	(line alpha year if state == 32, lcolor(gs10))
+	(line alpha year if state == 33, lcolor(gs10))
+	(line alpha year if state == 34, lcolor(gs10))
+	(line alpha year if state == 36, lcolor(gs10))
+	(line alpha year if state == 37, lcolor(gs10))
+	(line alpha year if state == 39, lcolor(gs10))
+	(line alpha year if state == 40, lcolor(gs10))
+	(line alpha year if state == 41, lcolor(gs10))
+	(line alpha year if state == 44, lcolor(gs10))
+	(line alpha year if state == 45, lcolor(gs10))
+	(line alpha year if state == 47, lcolor(gs10))
+	(line alpha year if state == 50, lcolor(gs10))
+	(line alpha year if state == 51, lcolor(gs10))
+	(line alpha year if state == 53, lcolor(gs10))
+	(line alpha year if state == 54, lcolor(gs10))
+	(line alpha year if state == 55, lcolor(gs10))
+	(line alpha year if state == 42, lwidth(thick) lcolor(black) 
+	xline(1995, lwidth(thick) lcolor(maroon)) yline(0, lwidth(thick) lcolor(maroon)))
+	,
+	leg(lab(36 "Pennsylvania") lab(1 "Control States") size(medsmall) pos(11) order(36 1) ring(0) cols(1))
+	xtitle("Year") xlab(1990[2]2014, grid glcolor(gs15) angle(45))
+	ytitle("Gap in Quantity of Nursing Home Beds Per Capita") ylab(, grid glcolor(gs15))
+	graphregion(color(white)) bgcolor(white) plotregion(color(white));
+# delimit cr
+graph export "CON_Nursing_PA\Figures\Q_SkilledNursingHomeBeds_pcp_Gaps_with_Placebos.pdf", replace
+*Exact p-value based on post/pre RMSPE & histogram of RMSPEs
+use CON_Nursing_PA\Placebos\Nursing_Home_Beds\synth_Q_SkilledNursingHomeBeds_pcp_all.dta, clear
+keep alpha* year
+reshape long alpha, i(year) j(state)
+gen alpha_sqrd = alpha*alpha
+bysort state: egen pre_mspe = mean(alpha_sqrd) if year <= 1995
+bysort state: egen post_mspe = mean(alpha_sqrd) if year > 1995
+gen pre_rmspe = sqrt(pre_mspe)
+gen post_rmspe = sqrt(post_mspe)
+local statelist "1 2 5 9 10 11 12 13 15 17 19 21 23 24 25 26 28 29 30 31 32 33 34 36 37 39 40 41 42 44 45 47 50 51 53 54 55"
+foreach i of local statelist {
+    sum pre_rmspe if state == `i'
+	replace pre_rmspe = r(mean) if state == `i'
+	sum post_rmspe if state == `i'
+	replace post_rmspe = r(mean) if state == `i'
+}
+sort state year
+gen post_pre_rmspe_ratio = post_rmspe/pre_rmspe
+duplicates drop state, force
+gsort -post_pre_rmspe_ratio
+gen rank = _n
+gen pvalue = rank/_N if state == 42
+list pvalue if state == 42
+# delimit
+twoway
+	(hist post_pre_rmspe_ratio if state == 42, bin(10) frequency bcolor(maroon) barw(1))
+	(hist post_pre_rmspe_ratio if state != 42, bin(10) frequency bcolor(gs10) barw(1))
+	,
+	leg(lab(1 "Pennsylvania") size(medsmall) pos(1) order(1) ring(0) cols(1))
+	xtitle("Post/Pre Root Mean Squared Prediction Error")
+	ylab(, nogrid)
+	graphregion(color(white)) bgcolor(white) plotregion(color(white));
+# delimit cr
+graph export "CON_Nursing_PA\Figures\Q_SkilledNursingHomeBeds_pcp_rmspe_histogram.pdf", replace
+
+
+
 
 
 
