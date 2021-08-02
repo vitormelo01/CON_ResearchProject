@@ -644,7 +644,6 @@ save CON_NursingHome, replace
 * ------------------------------------------------------------------------------
 * Merging with Nursing home/bed quantity data
 * ------------------------------------------------------------------------------
-drop _merge
 merge 1:1 id year using NursingHomeQuantity.dta
 drop if _merge==1
 drop if _merge==2
@@ -696,13 +695,17 @@ tsset id year
 keep if alwaysconpa==1 | repeal_y=="1996"
 
 *   ---Skilled Nursing home quantity---
-synth Q_SkilledNursingHomes_pcp $controls Q_SkilledNursingHomes_pcp(1993) Q_SkilledNursingHomes_pcp(1992) Q_SkilledNursingHomes_pcp(1991), trunit(42) trperiod(1996) nested fig
+synth Q_SkilledNursingHomes_pcp $controls Q_SkilledNursingHomes_pcp(1995) Q_SkilledNursingHomes_pcp(1993)  Q_SkilledNursingHomes_pcp(1993) Q_SkilledNursingHomes_pcp(1992) Q_SkilledNursingHomes_pcp(1991), trunit(42) trperiod(1996) nested fig
 
 *   ---Skilled Nursing home Beds---
+synth Q_SkilledNursingHomeBeds_pcp $controls Q_SkilledNursingHomeBeds_pcp(1995) Q_SkilledNursingHomeBeds_pcp(1994)  Q_SkilledNursingHomeBeds_pcp(1993) Q_SkilledNursingHomeBeds_pcp(1992) Q_SkilledNursingHomeBeds_pcp(1991), trunit(42) trperiod(1996) nested fig
+
 synth Q_SkilledNursingHomeBeds_pcp $controls Q_SkilledNursingHomeBeds_pcp(1993) Q_SkilledNursingHomeBeds_pcp(1992) Q_SkilledNursingHomeBeds_pcp(1991), trunit(42) trperiod(1996) nested fig
 
+ 
 
-
+sort id year
+keep id year name Q_SkilledNursingHomeBeds_pcp
 
 
 

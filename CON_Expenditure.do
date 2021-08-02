@@ -1623,7 +1623,7 @@ graph export "CON_Expenditure_PA\Figures\Hospital_medicaid_exp_rmspe_histogram.p
 
 
 
-
+clear
 use CON_Expenditure.dta
 
 keep if code == 1
