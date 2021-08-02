@@ -8,7 +8,7 @@
 clear 
 
 * Setting Env Variables
-global directory: env HealthExpenditureDirectory
+global directory: env Combined_CON_Directory
 
 * Setting Directory
 cd "$directory"
