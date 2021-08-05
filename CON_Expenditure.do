@@ -1631,6 +1631,20 @@ keep if code == 1
 tsset id year
 keep if alwaysconpa==1 | repeal_y=="1996"
 
+* Counting the number of states in the dataset
+drop x
+egen x = group(id)
+sum x
+
+* Dropping states that border PA
+drop if id==11
+drop if name==  "West Virginia" 
+drop if name== "Delaware" 
+drop if name== "Ohio" 
+drop if name== "New York" 
+drop if name== "New Jersey" 
+drop if name== "Maryland" 
+
 *   ---Total Expenditure Analysis---
 
 *synth total_exp $controls total_exp(1995) total_exp(1990) total_exp(1984), trunit(42) trperiod(1996) nested fig

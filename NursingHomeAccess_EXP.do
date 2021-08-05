@@ -697,12 +697,31 @@ tsset id year
 
 *Restrict to PA and Control States
 keep if alwaysconpa==1 | repeal_y=="1996"
+
+
+* Counting the number of states in the dataset
+egen x = group(id)
+sum x
+
+* Dropping states that border PA
+drop if id==11
+drop if name==  "West Virginia" 
+drop if name== "Delaware" 
+drop if name== "Ohio" 
+drop if name== "New York" 
+drop if name== "New Jersey" 
+drop if name== "Maryland" 
+
+* Testing results
+synth Q_SkilledNursingHomes_pcp $controls Q_SkilledNursingHomes_pcp(1993) Q_SkilledNursingHomes_pcp(1992) Q_SkilledNursingHomes_pcp(1991), trunit(42) trperiod(1996) nested
+
+
+
+
 		
 *Create synthetic control
 # delimit
-	synth Q_SkilledNursingHomes_pcp $controls 
-	Q_SkilledNursingHomes_pcp(1993) Q_SkilledNursingHomes_pcp(1992) Q_SkilledNursingHomes_pcp(1991), 
-	trunit(42) trperiod(1996) nested
+	synth Q_SkilledNursingHomes_pcp $controls Q_SkilledNursingHomes_pcp(1993) Q_SkilledNursingHomes_pcp(1992) Q_SkilledNursingHomes_pcp(1991), trunit(42) trperiod(1996) nested
 	keep(CON_Nursing_PA\Synth_Output\synth_Q_SkilledNursingHomes_pcp.dta, replace);
 # delimit cr
 	
