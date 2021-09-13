@@ -670,14 +670,15 @@ save CON_NursingHome, replace
 * Creating per capita depedent variables and data clean up
 * ------------------------------------------------------------------------------
 
+replace pop = pop*1000
 drop if year<=1990
 
-gen Q_NursingHomes_pcp = Q_NursingHomes/pop*100
-gen Q_NursingHomeBeds_pcp = Q_NursingHomeBeds/pop*100
-gen Q_SkilledNursingHomes_pcp = Q_SkilledNursingHomes/pop*100
-gen Q_SkilledNursingHomeBeds_pcp = Q_SkilledNursingHomeBeds/pop*100
+gen Q_NursingHomes_pcp = Q_NursingHomes/pop*100000
+gen Q_NursingHomeBeds_pcp = Q_NursingHomeBeds/pop*100000
+gen Q_SkilledNursingHomes_pcp = Q_SkilledNursingHomes/pop*100000
+gen Q_SkilledNursingHomeBeds_pcp = Q_SkilledNursingHomeBeds/pop*100000
 drop Q_NursingHomes Q_NursingHomeBeds Q_SkilledNursingHomes Q_SkilledNursingHomeBeds
-
+"All variables are in per 100,000 citizens"
 save CON_NursingHome, replace
 
 
