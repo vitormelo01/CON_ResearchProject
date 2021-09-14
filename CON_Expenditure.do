@@ -672,7 +672,7 @@ clear
 *Total Expenditure
 local Outcome " "total_exp" "medicaid_exp" "Q_SkilledNursingHomes_pcp" "Q_SkilledNursingHomeBeds_pcp" "
 local Output " "nursing_home_tot_exp" "nursing_home_medicaid_exp" "q_nursing_homes" "q_nursing_home_beds" "
-local Ytitle " "Total Nursing Home Expenditure Per Capita" "Nursing Home Medicaid Expenditure Per Capita" "Quantity of Nursing Homes Per Capita" "Quantity of Nursing Home Beds Per Capita"
+local Ytitle " "Total Nursing Home Expenditure Per Capita" "Nursing Home Medicaid Expenditure Per Capita" "Quantity of Nursing Homes Per 100,000" "Quantity of Nursing Home Beds Per 100,000" "
 forvalues i = 1/1 {
 	*setting up local macros to refer to the current element in the parallel lists being looped through
 	local outcome : word `i' of `Outcome'
@@ -723,7 +723,7 @@ forvalues i = 1/1 {
 *Medicaid Expenditure
 local Outcome " "total_exp" "medicaid_exp" "Q_SkilledNursingHomes_pcp" "Q_SkilledNursingHomeBeds_pcp" "
 local Output " "nursing_home_tot_exp" "nursing_home_medicaid_exp" "q_nursing_homes" "q_nursing_home_beds" "
-local Ytitle " "Total Nursing Home Expenditure Per Capita" "Nursing Home Medicaid Expenditure Per Capita" "Quantity of Nursing Homes Per Capita" "Quantity of Nursing Home Beds Per Capita"
+local Ytitle " "Total Nursing Home Expenditure Per Capita" "Nursing Home Medicaid Expenditure Per Capita" "Quantity of Nursing Homes Per 100,000" "Quantity of Nursing Home Beds Per 100,000" "
 forvalues i = 2/2 {
 	*setting up local macros to refer to the current element in the parallel lists being looped through
 	local outcome : word `i' of `Outcome'
@@ -774,7 +774,7 @@ forvalues i = 2/2 {
 *Quantity of Nursing Homes
 local Outcome " "total_exp" "medicaid_exp" "Q_SkilledNursingHomes_pcp" "Q_SkilledNursingHomeBeds_pcp" "
 local Output " "nursing_home_tot_exp" "nursing_home_medicaid_exp" "q_nursing_homes" "q_nursing_home_beds" "
-local Ytitle " "Total Nursing Home Expenditure Per Capita" "Nursing Home Medicaid Expenditure Per Capita" "Quantity of Nursing Homes Per Capita" "Quantity of Nursing Home Beds Per Capita"
+local Ytitle " "Total Nursing Home Expenditure Per Capita" "Nursing Home Medicaid Expenditure Per Capita" "Quantity of Nursing Homes Per 100,000" "Quantity of Nursing Home Beds Per 100,000" "
 forvalues i = 3/3 {
 	*setting up local macros to refer to the current element in the parallel lists being looped through
 	local outcome : word `i' of `Outcome'
@@ -822,7 +822,7 @@ forvalues i = 3/3 {
 *Quantity of Nursing Home Beds
 local Outcome " "total_exp" "medicaid_exp" "Q_SkilledNursingHomes_pcp" "Q_SkilledNursingHomeBeds_pcp" "
 local Output " "nursing_home_tot_exp" "nursing_home_medicaid_exp" "q_nursing_homes" "q_nursing_home_beds" "
-local Ytitle " "Total Nursing Home Expenditure Per Capita" "Nursing Home Medicaid Expenditure Per Capita" "Quantity of Nursing Homes Per Capita" "Quantity of Nursing Home Beds Per Capita"
+local Ytitle " "Total Nursing Home Expenditure Per Capita" "Nursing Home Medicaid Expenditure Per Capita" "Quantity of Nursing Homes Per 100,000" "Quantity of Nursing Home Beds Per 100,000" "
 forvalues i = 4/4 {
 	*setting up local macros to refer to the current element in the parallel lists being looped through
 	local outcome : word `i' of `Outcome'
@@ -1003,7 +1003,7 @@ clear
 *Total Expenditure
 local Outcome " "total_exp" "medicaid_exp" "Q_SkilledNursingHomes_pcp" "Q_SkilledNursingHomeBeds_pcp" "
 local Output " "nursing_home_tot_exp" "nursing_home_medicaid_exp" "q_nursing_homes" "q_nursing_home_beds" "
-local Ytitle " "Total Nursing Home Expenditure Per Capita" "Nursing Home Medicaid Expenditure Per Capita" "Quantity of Nursing Homes Per Capita" "Quantity of Nursing Home Beds Per Capita"
+local Ytitle " "Total Nursing Home Expenditure Per Capita" "Nursing Home Medicaid Expenditure Per Capita" "Quantity of Nursing Homes Per 100,000" "Quantity of Nursing Home Beds Per 100,000" "
 forvalues i = 1/1 {
 	*setting up local macros to refer to the current element in the parallel lists being looped through
 	local outcome : word `i' of `Outcome'
@@ -1054,7 +1054,7 @@ forvalues i = 1/1 {
 *Medicaid Expenditure
 local Outcome " "total_exp" "medicaid_exp" "Q_SkilledNursingHomes_pcp" "Q_SkilledNursingHomeBeds_pcp" "
 local Output " "nursing_home_tot_exp" "nursing_home_medicaid_exp" "q_nursing_homes" "q_nursing_home_beds" "
-local Ytitle " "Total Nursing Home Expenditure Per Capita" "Nursing Home Medicaid Expenditure Per Capita" "Quantity of Nursing Homes Per Capita" "Quantity of Nursing Home Beds Per Capita"
+local Ytitle " "Total Nursing Home Expenditure Per Capita" "Nursing Home Medicaid Expenditure Per Capita" "Quantity of Nursing Homes Per 100,000" "Quantity of Nursing Home Beds Per 100,000" "
 forvalues i = 2/2 {
 	*setting up local macros to refer to the current element in the parallel lists being looped through
 	local outcome : word `i' of `Outcome'
@@ -1105,7 +1105,7 @@ forvalues i = 2/2 {
 *Quantity of Nursing Homes
 local Outcome " "total_exp" "medicaid_exp" "Q_SkilledNursingHomes_pcp" "Q_SkilledNursingHomeBeds_pcp" "
 local Output " "nursing_home_tot_exp" "nursing_home_medicaid_exp" "q_nursing_homes" "q_nursing_home_beds" "
-local Ytitle " "Total Nursing Home Expenditure Per Capita" "Nursing Home Medicaid Expenditure Per Capita" "Quantity of Nursing Homes Per Capita" "Quantity of Nursing Home Beds Per Capita"
+local Ytitle " "Total Nursing Home Expenditure Per Capita" "Nursing Home Medicaid Expenditure Per Capita" "Quantity of Nursing Homes Per 100,000" "Quantity of Nursing Home Beds Per 100,000" "
 forvalues i = 3/3 {
 	*setting up local macros to refer to the current element in the parallel lists being looped through
 	local outcome : word `i' of `Outcome'
@@ -1153,7 +1153,7 @@ forvalues i = 3/3 {
 *Quantity of Nursing Home Beds
 local Outcome " "total_exp" "medicaid_exp" "Q_SkilledNursingHomes_pcp" "Q_SkilledNursingHomeBeds_pcp" "
 local Output " "nursing_home_tot_exp" "nursing_home_medicaid_exp" "q_nursing_homes" "q_nursing_home_beds" "
-local Ytitle " "Total Nursing Home Expenditure Per Capita" "Nursing Home Medicaid Expenditure Per Capita" "Quantity of Nursing Homes Per Capita" "Quantity of Nursing Home Beds Per Capita"
+local Ytitle " "Total Nursing Home Expenditure Per Capita" "Nursing Home Medicaid Expenditure Per Capita" "Quantity of Nursing Homes Per 100,000" "Quantity of Nursing Home Beds Per 100,000" "
 forvalues i = 4/4 {
 	*setting up local macros to refer to the current element in the parallel lists being looped through
 	local outcome : word `i' of `Outcome'
@@ -1212,7 +1212,7 @@ clear
 *Total Expenditure
 local Outcome " "total_exp" "medicaid_exp" "Q_SkilledNursingHomes_pcp" "Q_SkilledNursingHomeBeds_pcp" "
 local Output " "nursing_home_tot_exp" "nursing_home_medicaid_exp" "q_nursing_homes" "q_nursing_home_beds" "
-local Ytitle " "Total Nursing Home Expenditure Per Capita" "Nursing Home Medicaid Expenditure Per Capita" "Quantity of Nursing Homes Per Capita" "Quantity of Nursing Home Beds Per Capita"
+local Ytitle " "Total Nursing Home Expenditure Per Capita" "Nursing Home Medicaid Expenditure Per Capita" "Quantity of Nursing Homes Per 100,000" "Quantity of Nursing Home Beds Per 100,000" "
 forvalues i = 1/1 {
 	*setting up local macros to refer to the current element in the parallel lists being looped through
 	local outcome : word `i' of `Outcome'
@@ -1263,7 +1263,7 @@ forvalues i = 1/1 {
 *Medicaid Expenditure
 local Outcome " "total_exp" "medicaid_exp" "Q_SkilledNursingHomes_pcp" "Q_SkilledNursingHomeBeds_pcp" "
 local Output " "nursing_home_tot_exp" "nursing_home_medicaid_exp" "q_nursing_homes" "q_nursing_home_beds" "
-local Ytitle " "Total Nursing Home Expenditure Per Capita" "Nursing Home Medicaid Expenditure Per Capita" "Quantity of Nursing Homes Per Capita" "Quantity of Nursing Home Beds Per Capita"
+local Ytitle " "Total Nursing Home Expenditure Per Capita" "Nursing Home Medicaid Expenditure Per Capita" "Quantity of Nursing Homes Per 100,000" "Quantity of Nursing Home Beds Per 100,000" "
 forvalues i = 2/2 {
 	*setting up local macros to refer to the current element in the parallel lists being looped through
 	local outcome : word `i' of `Outcome'
@@ -1314,7 +1314,7 @@ forvalues i = 2/2 {
 *Quantity of Nursing Homes
 local Outcome " "total_exp" "medicaid_exp" "Q_SkilledNursingHomes_pcp" "Q_SkilledNursingHomeBeds_pcp" "
 local Output " "nursing_home_tot_exp" "nursing_home_medicaid_exp" "q_nursing_homes" "q_nursing_home_beds" "
-local Ytitle " "Total Nursing Home Expenditure Per Capita" "Nursing Home Medicaid Expenditure Per Capita" "Quantity of Nursing Homes Per Capita" "Quantity of Nursing Home Beds Per Capita"
+local Ytitle " "Total Nursing Home Expenditure Per Capita" "Nursing Home Medicaid Expenditure Per Capita" "Quantity of Nursing Homes Per 100,000" "Quantity of Nursing Home Beds Per 100,000" "
 forvalues i = 3/3 {
 	*setting up local macros to refer to the current element in the parallel lists being looped through
 	local outcome : word `i' of `Outcome'
@@ -1362,7 +1362,7 @@ forvalues i = 3/3 {
 *Quantity of Nursing Home Beds
 local Outcome " "total_exp" "medicaid_exp" "Q_SkilledNursingHomes_pcp" "Q_SkilledNursingHomeBeds_pcp" "
 local Output " "nursing_home_tot_exp" "nursing_home_medicaid_exp" "q_nursing_homes" "q_nursing_home_beds" "
-local Ytitle " "Total Nursing Home Expenditure Per Capita" "Nursing Home Medicaid Expenditure Per Capita" "Quantity of Nursing Homes Per Capita" "Quantity of Nursing Home Beds Per Capita"
+local Ytitle " "Total Nursing Home Expenditure Per Capita" "Nursing Home Medicaid Expenditure Per Capita" "Quantity of Nursing Homes Per 100,000" "Quantity of Nursing Home Beds Per 100,000" "
 forvalues i = 4/4 {
 	*setting up local macros to refer to the current element in the parallel lists being looped through
 	local outcome : word `i' of `Outcome'
