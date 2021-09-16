@@ -1558,7 +1558,7 @@ forvalues i = 4/4 {
 
 *   ---Placebo Graph and Exact P-value - Total Nursing Home Expenditure---
 *local statelist "1 2 5 10 11 12 13 15 17 19 21 23 24 25 26 28 29 30 31 32 33 34 36 37 38 39 40 41 44 45 47 50 51 53 54 55"
-local statelist "21 23 24 25 26 28 29"
+local statelist "32 33 34 36 37 38 39"
 foreach i of local statelist {
 	*load fresh data
 	use CON_Expenditure.dta, clear
@@ -2092,7 +2092,7 @@ forvalues i = 1/1 {
 		ytitle("`ytitle'") ylab(200[100]900, grid glcolor(gs15))
 		graphregion(color(white)) bgcolor(white) plotregion(color(white));
 	# delimit cr
-	graph export CON_Expenditure_IN\Figures\\`output'_Trends.pdf, replace
+	graph export CON_Expenditure_IN\Figures\\`output'_Trends_IN.pdf, replace
 }
 *Medicaid Expenditure
 local Outcome " "total_exp" "medicaid_exp" "Q_SkilledNursingHomes_pcp" "Q_SkilledNursingHomeBeds_pcp" "
@@ -2143,7 +2143,7 @@ forvalues i = 2/2 {
 		ytitle("`ytitle'") ylab(50[50]400, grid glcolor(gs15))
 		graphregion(color(white)) bgcolor(white) plotregion(color(white));
 	# delimit cr
-	graph export CON_Expenditure_IN\Figures\\`output'_Trends.pdf, replace
+	graph export CON_Expenditure_IN\Figures\\`output'_Trends_IN.pdf, replace
 }
 *Quantity of Nursing Homes
 local Outcome " "total_exp" "medicaid_exp" "Q_SkilledNursingHomes_pcp" "Q_SkilledNursingHomeBeds_pcp" "
@@ -2191,7 +2191,7 @@ forvalues i = 3/3 {
 		ytitle("`ytitle'") ylab(0[.2]1.6, grid glcolor(gs15))
 		graphregion(color(white)) bgcolor(white) plotregion(color(white));
 	# delimit cr
-	graph export CON_Expenditure_IN\Figures\\`output'_Trends.pdf, replace
+	graph export CON_Expenditure_IN\Figures\\`output'_Trends_IN.pdf, replace
 }
 *Quantity of Nursing Home Beds
 local Outcome " "total_exp" "medicaid_exp" "Q_SkilledNursingHomes_pcp" "Q_SkilledNursingHomeBeds_pcp" "
@@ -2239,8 +2239,484 @@ forvalues i = 4/4 {
 		ytitle("`ytitle'") ylab(0[10]80, grid glcolor(gs15))
 		graphregion(color(white)) bgcolor(white) plotregion(color(white));
 	# delimit cr
-	graph export CON_Expenditure_IN\Figures\\`output'_Trends.pdf, replace
+	graph export CON_Expenditure_IN\Figures\\`output'_Trends_IN.pdf, replace
 }
+
+
+*   ---Placebo Graph and Exact P-value - Total Nursing Home Expenditure---
+local statelist "1 2 5 10 11 12 13 15 17 18 19 21 23 24 25 26 28 29 30 31 32 33 34 36 37 39 40 41 44 45 47 50 51 53 54 55"
+foreach i of local statelist {
+	*load fresh data
+	use CON_Expenditure.dta, clear
+
+	*Restrict to IN and Control States
+	keep if code == 10
+	keep if alwaysconpa==1 | name == "Indiana"
+
+	*declare data as a time series with year as time variable (required for synth command)
+	tsset id year
+
+	*Create synthetic control
+	# delimit
+		quietly synth total_exp $controls 
+		total_exp(1989) total_exp(1988) total_exp(1987) total_exp(1986) total_exp(1985)  
+		total_exp(1984) total_exp(1983) total_exp(1982) total_exp(1981) total_exp(1980), 
+		trunit(`i') trperiod(1999) nested
+		keep(CON_Expenditure_IN\Placebos\Nursing_Home_Total_Exp\synth_total_nursing_home_exp_`i'.dta, replace);
+	# delimit cr
+
+	*Process synthetic control output
+	use CON_Expenditure_IN\Placebos\Nursing_Home_Total_Exp\synth_total_nursing_home_exp_`i'.dta, clear
+	rename _Y_treated _Y_treated_`i'
+	rename _Y_synthetic _Y_synthetic_`i'
+	rename _time year
+	gen alpha`i' = _Y_treated_`i' - _Y_synthetic_`i'
+	keep year _Y_* alpha`i'
+	drop if missing(year)
+	save CON_Expenditure_IN\Placebos\Nursing_Home_Total_Exp\synth_total_nursing_home_exp_`i'.dta, replace
+}
+*merge all synth data sets
+use CON_Expenditure_IN\Placebos\Nursing_Home_Total_Exp\synth_total_nursing_home_exp_1.dta, clear
+local statelist2  "2 5 10 11 12 13 15 17 18 19 21 23 24 25 26 28 29 30 31 32 33 34 36 37 39 40 41 44 45 47 50 51 53 54 55"
+foreach i of local statelist2 {
+    merge 1:1 year using CON_Expenditure_IN\Placebos\Nursing_Home_Total_Exp\synth_total_nursing_home_exp_`i'.dta, nogenerate    
+}
+save CON_Expenditure_IN\Placebos\Nursing_Home_Total_Exp\synth_total_nursing_home_exp_all.dta, replace
+*create figure
+use CON_Expenditure_IN\Placebos\Nursing_Home_Total_Exp\synth_total_nursing_home_exp_all.dta, clear
+keep alpha* year
+reshape long alpha, i(year) j(state)
+# delimit
+twoway
+	(line alpha year if state == 1, lcolor(gs12))
+	(line alpha year if state == 2, lcolor(gs12))
+	(line alpha year if state == 5, lcolor(gs12))
+	(line alpha year if state == 10, lcolor(gs12))
+	(line alpha year if state == 11, lcolor(gs12))
+	(line alpha year if state == 12, lcolor(gs12))
+	(line alpha year if state == 13, lcolor(gs12))
+	(line alpha year if state == 15, lcolor(gs12))
+	(line alpha year if state == 17, lcolor(gs12))
+	(line alpha year if state == 19, lcolor(gs12))
+	(line alpha year if state == 21, lcolor(gs12))
+	(line alpha year if state == 23, lcolor(gs12))
+	(line alpha year if state == 24, lcolor(gs12))
+	(line alpha year if state == 25, lcolor(gs12))
+	(line alpha year if state == 26, lcolor(gs12))
+	(line alpha year if state == 28, lcolor(gs12))
+	(line alpha year if state == 29, lcolor(gs12))
+	(line alpha year if state == 30, lcolor(gs12))
+	(line alpha year if state == 31, lcolor(gs12))
+	(line alpha year if state == 32, lcolor(gs12))
+	(line alpha year if state == 33, lcolor(gs12))
+	(line alpha year if state == 34, lcolor(gs12))
+	(line alpha year if state == 36, lcolor(gs12))
+	(line alpha year if state == 37, lcolor(gs12))
+	(line alpha year if state == 39, lcolor(gs12))
+	(line alpha year if state == 40, lcolor(gs12))
+	(line alpha year if state == 41, lcolor(gs12))
+	(line alpha year if state == 44, lcolor(gs12))
+	(line alpha year if state == 45, lcolor(gs12))
+	(line alpha year if state == 47, lcolor(gs12))
+	(line alpha year if state == 50, lcolor(gs12))
+	(line alpha year if state == 51, lcolor(gs12))
+	(line alpha year if state == 53, lcolor(gs12))
+	(line alpha year if state == 54, lcolor(gs12))
+	(line alpha year if state == 55, lcolor(gs12))
+	(line alpha year if state == 18, lwidth(thick) lcolor(black) 
+	xline(1998, lwidth(thick) lcolor(maroon)) yline(0, lwidth(thick) lcolor(maroon)))
+	,
+	leg(lab(36 "Indiana") lab(1 "Control States") size(medsmall) pos(11) order(36 1) ring(0) cols(1))
+	xtitle("Year") xlab(1980[2]2014, grid glcolor(gs15) angle(45))
+	ytitle("Gap in Total Nursing Home Expenditure Per Capita") ylab(, grid glcolor(gs15))
+	graphregion(color(white)) bgcolor(white) plotregion(color(white));
+# delimit cr
+graph export "CON_Expenditure_IN\Figures\nursing_home_tot_exp_Gaps_with_Placebos_IN.pdf", replace
+*Exact p-value based on post/pre RMSPE & histogram of RMSPEs
+use CON_Expenditure_IN\Placebos\Nursing_Home_Total_Exp\synth_total_nursing_home_exp_all.dta, clear
+keep alpha* year
+reshape long alpha, i(year) j(state)
+gen alpha_sqrd = alpha*alpha
+bysort state: egen pre_mspe = mean(alpha_sqrd) if year <= 1998
+bysort state: egen post_mspe = mean(alpha_sqrd) if year > 1998
+gen pre_rmspe = sqrt(pre_mspe)
+gen post_rmspe = sqrt(post_mspe)
+local statelist "1 2 5 10 11 12 13 15 17 18 19 21 23 24 25 26 28 29 30 31 32 33 34 36 37 39 40 41 44 45 47 50 51 53 54 55"
+foreach i of local statelist {
+    sum pre_rmspe if state == `i'
+	replace pre_rmspe = r(mean) if state == `i'
+	sum post_rmspe if state == `i'
+	replace post_rmspe = r(mean) if state == `i'
+}
+sort state year
+gen post_pre_rmspe_ratio = post_rmspe/pre_rmspe
+duplicates drop state, force
+gsort -post_pre_rmspe_ratio
+gen rank = _n
+gen pvalue = rank/_N if state == 18
+list pvalue if state == 18 /* P value = . */
+*Average post-intervention effect 
+use CON_Expenditure_IN\Placebos\Nursing_Home_Total_Exp\synth_total_nursing_home_exp_all.dta, clear
+keep alpha* year
+reshape long alpha, i(year) j(state)
+bysort state: egen ave_effect = mean(alpha) if year > 1998
+list ave_effect if state == 18 /* Ave. effect =  */
+
+
+*   ---Placebo Graph and Exact P-value - Nursing Home Medicaid Expenditure---
+local statelist "1 2 5 10 11 12 13 15 17 18 19 21 23 24 25 26 28 29 30 31 32 33 34 36 37 39 40 41 44 45 47 50 51 53 54 55"
+foreach i of local statelist {
+	*load fresh data
+	use CON_Expenditure.dta, clear
+
+	*Restrict to IN and Control States
+	keep if code == 10
+	keep if alwaysconpa==1 | name == "Indiana"
+
+	*declare data as a time series with year as time variable (required for synth command)
+	tsset id year
+
+	*Create synthetic control
+	# delimit
+		quietly synth medicaid_exp $controls 
+		medicaid_exp(1989) medicaid_exp(1988) medicaid_exp(1987) medicaid_exp(1986) medicaid_exp(1985) 
+		medicaid_exp(1984) medicaid_exp(1983) medicaid_exp(1982) medicaid_exp(1981) medicaid_exp(1980), 
+		trunit(`i') trperiod(1999) nested
+		keep(CON_Expenditure_IN\Placebos\Nursing_Home_Medicaid_Exp\synth_medicaid_nursing_home_exp_`i'.dta, replace);
+	# delimit cr
+
+	*Process synthetic control output
+	use CON_Expenditure_IN\Placebos\Nursing_Home_Medicaid_Exp\synth_medicaid_nursing_home_exp_`i'.dta, clear
+	rename _Y_treated _Y_treated_`i'
+	rename _Y_synthetic _Y_synthetic_`i'
+	rename _time year
+	gen alpha`i' = _Y_treated_`i' - _Y_synthetic_`i'
+	keep year _Y_* alpha`i'
+	drop if missing(year)
+	save CON_Expenditure_IN\Placebos\Nursing_Home_Medicaid_Exp\synth_medicaid_nursing_home_exp_`i'.dta, replace
+}
+*merge all synth data sets
+use CON_Expenditure_IN\Placebos\Nursing_Home_Medicaid_Exp\synth_medicaid_nursing_home_exp_1.dta, clear
+local statelist2  "2 5 10 11 12 13 15 17 18 19 21 23 24 25 26 28 29 30 31 32 33 34 36 37 39 40 41 44 45 47 50 51 53 54 55"
+foreach i of local statelist2 {
+    merge 1:1 year using CON_Expenditure_IN\Placebos\Nursing_Home_Medicaid_Exp\synth_medicaid_nursing_home_exp_`i'.dta, nogenerate    
+}
+save CON_Expenditure_IN\Placebos\Nursing_Home_Medicaid_Exp\synth_medicaid_nursing_home_exp_all.dta, replace
+*create figure
+use CON_Expenditure_IN\Placebos\Nursing_Home_Medicaid_Exp\synth_medicaid_nursing_home_exp_all.dta, clear
+keep alpha* year
+reshape long alpha, i(year) j(state)
+# delimit
+twoway
+	(line alpha year if state == 1, lcolor(gs12))
+	(line alpha year if state == 2, lcolor(gs12))
+	(line alpha year if state == 5, lcolor(gs12))
+	(line alpha year if state == 10, lcolor(gs12))
+	(line alpha year if state == 11, lcolor(gs12))
+	(line alpha year if state == 12, lcolor(gs12))
+	(line alpha year if state == 13, lcolor(gs12))
+	(line alpha year if state == 15, lcolor(gs12))
+	(line alpha year if state == 17, lcolor(gs12))
+	(line alpha year if state == 19, lcolor(gs12))
+	(line alpha year if state == 21, lcolor(gs12))
+	(line alpha year if state == 23, lcolor(gs12))
+	(line alpha year if state == 24, lcolor(gs12))
+	(line alpha year if state == 25, lcolor(gs12))
+	(line alpha year if state == 26, lcolor(gs12))
+	(line alpha year if state == 28, lcolor(gs12))
+	(line alpha year if state == 29, lcolor(gs12))
+	(line alpha year if state == 30, lcolor(gs12))
+	(line alpha year if state == 31, lcolor(gs12))
+	(line alpha year if state == 32, lcolor(gs12))
+	(line alpha year if state == 33, lcolor(gs12))
+	(line alpha year if state == 34, lcolor(gs12))
+	(line alpha year if state == 36, lcolor(gs12))
+	(line alpha year if state == 37, lcolor(gs12))
+	(line alpha year if state == 39, lcolor(gs12))
+	(line alpha year if state == 40, lcolor(gs12))
+	(line alpha year if state == 41, lcolor(gs12))
+	(line alpha year if state == 44, lcolor(gs12))
+	(line alpha year if state == 45, lcolor(gs12))
+	(line alpha year if state == 47, lcolor(gs12))
+	(line alpha year if state == 50, lcolor(gs12))
+	(line alpha year if state == 51, lcolor(gs12))
+	(line alpha year if state == 53, lcolor(gs12))
+	(line alpha year if state == 54, lcolor(gs12))
+	(line alpha year if state == 55, lcolor(gs12))
+	(line alpha year if state == 18, lwidth(thick) lcolor(black) 
+	xline(1998, lwidth(thick) lcolor(maroon)) yline(0, lwidth(thick) lcolor(maroon)))
+	,
+	leg(lab(36 "Indiana") lab(1 "Control States") size(medsmall) pos(11) order(36 1) ring(0) cols(1))
+	xtitle("Year") xlab(1980[2]2014, grid glcolor(gs15) angle(45))
+	ytitle("Gap in Nursing Home Medicaid Expenditure Per Capita") ylab(, grid glcolor(gs15))
+	graphregion(color(white)) bgcolor(white) plotregion(color(white));
+# delimit cr
+graph export "CON_Expenditure_IN\Figures\nursing_home_medicaid_exp_Gaps_with_Placebos_IN.pdf", replace
+*Exact p-value based on post/pre RMSPE & histogram of RMSPEs
+use CON_Expenditure_IN\Placebos\Nursing_Home_Medicaid_Exp\synth_medicaid_nursing_home_exp_all.dta, clear
+keep alpha* year
+reshape long alpha, i(year) j(state)
+gen alpha_sqrd = alpha*alpha
+bysort state: egen pre_mspe = mean(alpha_sqrd) if year <= 1998
+bysort state: egen post_mspe = mean(alpha_sqrd) if year > 1998
+gen pre_rmspe = sqrt(pre_mspe)
+gen post_rmspe = sqrt(post_mspe)
+local statelist "1 2 5 10 11 12 13 15 17 18 19 21 23 24 25 26 28 29 30 31 32 33 34 36 37 39 40 41 44 45 47 50 51 53 54 55"
+foreach i of local statelist {
+    sum pre_rmspe if state == `i'
+	replace pre_rmspe = r(mean) if state == `i'
+	sum post_rmspe if state == `i'
+	replace post_rmspe = r(mean) if state == `i'
+}
+sort state year
+gen post_pre_rmspe_ratio = post_rmspe/pre_rmspe
+duplicates drop state, force
+gsort -post_pre_rmspe_ratio
+gen rank = _n
+gen pvalue = rank/_N if state == 18
+list pvalue if state == 18 /* P value =  */
+*Average post-intervention effect 
+use CON_Expenditure_IN\Placebos\Nursing_Home_Medicaid_Exp\synth_medicaid_nursing_home_exp_all.dta, clear
+keep alpha* year
+reshape long alpha, i(year) j(state)
+bysort state: egen ave_effect = mean(alpha) if year > 1998
+list ave_effect if state == 18 /* Ave. effect =  */
+
+
+*   ---Placebo Graph and Exact P-value - Quantity of Nursing Homes---
+local statelist "1 2 5 10 11 12 13 15 17 18 19 21 23 24 25 26 28 29 30 31 32 33 34 36 37 39 40 41 44 45 47 50 51 53 54 55"
+foreach i of local statelist {
+	*load fresh data
+	use CON_NursingHome.dta, clear
+	
+	*Restrict to treated state and Control States by expenditure type
+	keep if alwaysconpa==1 | name == "Indiana"
+	
+	*declare data as a time series with year as time variable (required for synth command)
+	tsset id year
+
+	*Create synthetic control
+	# delimit
+		quietly synth Q_SkilledNursingHomes_pcp $controls 
+		Q_SkilledNursingHomes_pcp(1994) Q_SkilledNursingHomes_pcp(1993) Q_SkilledNursingHomes_pcp(1992) Q_SkilledNursingHomes_pcp(1991), 
+		trunit(`i') trperiod(1999) nested
+		keep(CON_Expenditure_IN\Placebos\Q_Nursing_Homes\synth_q_nursing_homes_`i'.dta, replace);
+	# delimit cr
+
+	*Process synthetic control output
+	use CON_Expenditure_IN\Placebos\Q_Nursing_Homes\synth_q_nursing_homes_`i'.dta, clear
+	rename _Y_treated _Y_treated_`i'
+	rename _Y_synthetic _Y_synthetic_`i'
+	rename _time year
+	gen alpha`i' = _Y_treated_`i' - _Y_synthetic_`i'
+	keep year _Y_* alpha`i'
+	drop if missing(year)
+	save CON_Expenditure_IN\Placebos\Q_Nursing_Homes\synth_q_nursing_homes_`i'.dta, replace
+}
+*merge all synth data sets
+use CON_Expenditure_IN\Placebos\Q_Nursing_Homes\synth_q_nursing_homes_1.dta, clear
+local statelist2  "2 5 10 11 12 13 15 17 18 19 21 23 24 25 26 28 29 30 31 32 33 34 36 37 39 40 41 44 45 47 50 51 53 54 55"
+foreach i of local statelist2 {
+    merge 1:1 year using CON_Expenditure_IN\Placebos\Q_Nursing_Homes\synth_q_nursing_homes_`i'.dta, nogenerate    
+}
+save CON_Expenditure_IN\Placebos\Q_Nursing_Homes\synth_q_nursing_homes_all.dta, replace
+*create figure
+use CON_Expenditure_IN\Placebos\Q_Nursing_Homes\synth_q_nursing_homes_all.dta, clear
+keep alpha* year
+reshape long alpha, i(year) j(state)
+# delimit
+twoway
+	(line alpha year if state == 1, lcolor(gs12))
+	(line alpha year if state == 2, lcolor(gs12))
+	(line alpha year if state == 5, lcolor(gs12))
+	(line alpha year if state == 10, lcolor(gs12))
+	(line alpha year if state == 11, lcolor(gs12))
+	(line alpha year if state == 12, lcolor(gs12))
+	(line alpha year if state == 13, lcolor(gs12))
+	(line alpha year if state == 15, lcolor(gs12))
+	(line alpha year if state == 17, lcolor(gs12))
+	(line alpha year if state == 19, lcolor(gs12))
+	(line alpha year if state == 21, lcolor(gs12))
+	(line alpha year if state == 23, lcolor(gs12))
+	(line alpha year if state == 24, lcolor(gs12))
+	(line alpha year if state == 25, lcolor(gs12))
+	(line alpha year if state == 26, lcolor(gs12))
+	(line alpha year if state == 28, lcolor(gs12))
+	(line alpha year if state == 29, lcolor(gs12))
+	(line alpha year if state == 30, lcolor(gs12))
+	(line alpha year if state == 31, lcolor(gs12))
+	(line alpha year if state == 32, lcolor(gs12))
+	(line alpha year if state == 33, lcolor(gs12))
+	(line alpha year if state == 34, lcolor(gs12))
+	(line alpha year if state == 36, lcolor(gs12))
+	(line alpha year if state == 37, lcolor(gs12))
+	(line alpha year if state == 39, lcolor(gs12))
+	(line alpha year if state == 40, lcolor(gs12))
+	(line alpha year if state == 41, lcolor(gs12))
+	(line alpha year if state == 44, lcolor(gs12))
+	(line alpha year if state == 45, lcolor(gs12))
+	(line alpha year if state == 47, lcolor(gs12))
+	(line alpha year if state == 50, lcolor(gs12))
+	(line alpha year if state == 51, lcolor(gs12))
+	(line alpha year if state == 53, lcolor(gs12))
+	(line alpha year if state == 54, lcolor(gs12))
+	(line alpha year if state == 55, lcolor(gs12))
+	(line alpha year if state == 18, lwidth(thick) lcolor(black) 
+	xline(1998, lwidth(thick) lcolor(maroon)) yline(0, lwidth(thick) lcolor(maroon)))
+	,
+	leg(lab(36 "Indiana") lab(1 "Control States") size(medsmall) pos(11) order(36 1) ring(0) cols(1))
+	xtitle("Year") xlab(1990[2]2014, grid glcolor(gs15) angle(45))
+	ytitle("Gap in Quantity of Nursing Homes Per 100,000") ylab(, grid glcolor(gs15))
+	graphregion(color(white)) bgcolor(white) plotregion(color(white));
+# delimit cr
+graph export "CON_Expenditure_IN\Figures\q_nursing_homes_Gaps_with_Placebos_IN.pdf", replace
+*Exact p-value based on post/pre RMSPE & histogram of RMSPEs
+use CON_Expenditure_IN\Placebos\Q_Nursing_Homes\synth_q_nursing_homes_all.dta, clear
+keep alpha* year
+reshape long alpha, i(year) j(state)
+gen alpha_sqrd = alpha*alpha
+bysort state: egen pre_mspe = mean(alpha_sqrd) if year <= 1998
+bysort state: egen post_mspe = mean(alpha_sqrd) if year > 1998
+gen pre_rmspe = sqrt(pre_mspe)
+gen post_rmspe = sqrt(post_mspe)
+local statelist "1 2 5 10 11 12 13 15 17 18 19 21 23 24 25 26 28 29 30 31 32 33 34 36 37 39 40 41 44 45 47 50 51 53 54 55"
+foreach i of local statelist {
+    sum pre_rmspe if state == `i'
+	replace pre_rmspe = r(mean) if state == `i'
+	sum post_rmspe if state == `i'
+	replace post_rmspe = r(mean) if state == `i'
+}
+sort state year
+gen post_pre_rmspe_ratio = post_rmspe/pre_rmspe
+duplicates drop state, force
+gsort -post_pre_rmspe_ratio
+gen rank = _n
+gen pvalue = rank/_N if state == 18
+list pvalue if state == 18 /* P value =  */
+*Average post-intervention effect 
+use CON_Expenditure_IN\Placebos\Q_Nursing_Homes\synth_q_nursing_homes_all.dta, clear
+keep alpha* year
+reshape long alpha, i(year) j(state)
+bysort state: egen ave_effect = mean(alpha) if year > 1998
+list ave_effect if state == 18 /* Ave. effect =  */
+
+
+*   ---Placebo Graph and Exact P-value - Quantity of Nursing Home Beds---
+local statelist "1 2 5 10 11 12 13 15 17 18 19 21 23 24 25 26 28 29 30 31 32 33 34 36 37 39 40 41 44 45 47 50 51 53 54 55"
+foreach i of local statelist {
+	*load fresh data
+	use CON_NursingHome.dta, clear
+	
+	*Restrict to treated state and Control States by expenditure type
+	keep if alwaysconpa==1 | name == "Indiana"
+	
+	*declare data as a time series with year as time variable (required for synth command)
+	tsset id year
+
+	*Create synthetic control
+	# delimit
+		quietly synth Q_SkilledNursingHomeBeds_pcp $controls 
+		Q_SkilledNursingHomeBeds_pcp(1994) Q_SkilledNursingHomeBeds_pcp(1993) Q_SkilledNursingHomeBeds_pcp(1992) Q_SkilledNursingHomeBeds_pcp(1991), 
+		trunit(`i') trperiod(1999) nested
+		keep(CON_Expenditure_IN\Placebos\Q_Nursing_Home_Beds\synth_q_nursing_home_beds_`i'.dta, replace);
+	# delimit cr
+
+	*Process synthetic control output
+	use CON_Expenditure_IN\Placebos\Q_Nursing_Home_Beds\synth_q_nursing_home_beds_`i'.dta, clear
+	rename _Y_treated _Y_treated_`i'
+	rename _Y_synthetic _Y_synthetic_`i'
+	rename _time year
+	gen alpha`i' = _Y_treated_`i' - _Y_synthetic_`i'
+	keep year _Y_* alpha`i'
+	drop if missing(year)
+	save CON_Expenditure_IN\Placebos\Q_Nursing_Home_Beds\synth_q_nursing_home_beds_`i'.dta, replace
+}
+*merge all synth data sets
+use CON_Expenditure_IN\Placebos\Q_Nursing_Home_Beds\synth_q_nursing_home_beds_1.dta, clear
+local statelist2  "2 5 10 11 12 13 15 17 18 19 21 23 24 25 26 28 29 30 31 32 33 34 36 37 39 40 41 44 45 47 50 51 53 54 55"
+foreach i of local statelist2 {
+    merge 1:1 year using CON_Expenditure_IN\Placebos\Q_Nursing_Home_Beds\synth_q_nursing_home_beds_`i'.dta, nogenerate    
+}
+save CON_Expenditure_IN\Placebos\Q_Nursing_Home_Beds\synth_q_nursing_home_beds_all.dta, replace
+*create figure
+use CON_Expenditure_IN\Placebos\Q_Nursing_Home_Beds\synth_q_nursing_home_beds_all.dta, clear
+keep alpha* year
+reshape long alpha, i(year) j(state)
+# delimit
+twoway
+	(line alpha year if state == 1, lcolor(gs12))
+	(line alpha year if state == 2, lcolor(gs12))
+	(line alpha year if state == 5, lcolor(gs12))
+	(line alpha year if state == 10, lcolor(gs12))
+	(line alpha year if state == 11, lcolor(gs12))
+	(line alpha year if state == 12, lcolor(gs12))
+	(line alpha year if state == 13, lcolor(gs12))
+	(line alpha year if state == 15, lcolor(gs12))
+	(line alpha year if state == 17, lcolor(gs12))
+	(line alpha year if state == 19, lcolor(gs12))
+	(line alpha year if state == 21, lcolor(gs12))
+	(line alpha year if state == 23, lcolor(gs12))
+	(line alpha year if state == 24, lcolor(gs12))
+	(line alpha year if state == 25, lcolor(gs12))
+	(line alpha year if state == 26, lcolor(gs12))
+	(line alpha year if state == 28, lcolor(gs12))
+	(line alpha year if state == 29, lcolor(gs12))
+	(line alpha year if state == 30, lcolor(gs12))
+	(line alpha year if state == 31, lcolor(gs12))
+	(line alpha year if state == 32, lcolor(gs12))
+	(line alpha year if state == 33, lcolor(gs12))
+	(line alpha year if state == 34, lcolor(gs12))
+	(line alpha year if state == 36, lcolor(gs12))
+	(line alpha year if state == 37, lcolor(gs12))
+	(line alpha year if state == 39, lcolor(gs12))
+	(line alpha year if state == 40, lcolor(gs12))
+	(line alpha year if state == 41, lcolor(gs12))
+	(line alpha year if state == 44, lcolor(gs12))
+	(line alpha year if state == 45, lcolor(gs12))
+	(line alpha year if state == 47, lcolor(gs12))
+	(line alpha year if state == 50, lcolor(gs12))
+	(line alpha year if state == 51, lcolor(gs12))
+	(line alpha year if state == 53, lcolor(gs12))
+	(line alpha year if state == 54, lcolor(gs12))
+	(line alpha year if state == 55, lcolor(gs12))
+	(line alpha year if state == 18, lwidth(thick) lcolor(black) 
+	xline(1998, lwidth(thick) lcolor(maroon)) yline(0, lwidth(thick) lcolor(maroon)))
+	,
+	leg(lab(36 "Indiana") lab(1 "Control States") size(medsmall) pos(11) order(36 1) ring(0) cols(1))
+	xtitle("Year") xlab(1990[2]2014, grid glcolor(gs15) angle(45))
+	ytitle("Gap in Quantity of Nursing Home Beds Per 100,000") ylab(, grid glcolor(gs15))
+	graphregion(color(white)) bgcolor(white) plotregion(color(white));
+# delimit cr
+graph export "CON_Expenditure_IN\Figures\q_nursing_home_beds_Gaps_with_Placebos_IN.pdf", replace
+*Exact p-value based on post/pre RMSPE & histogram of RMSPEs
+use CON_Expenditure_IN\Placebos\Q_Nursing_Home_Beds\synth_q_nursing_home_beds_all.dta, clear
+keep alpha* year
+reshape long alpha, i(year) j(state)
+gen alpha_sqrd = alpha*alpha
+bysort state: egen pre_mspe = mean(alpha_sqrd) if year <= 1998
+bysort state: egen post_mspe = mean(alpha_sqrd) if year > 1998
+gen pre_rmspe = sqrt(pre_mspe)
+gen post_rmspe = sqrt(post_mspe)
+local statelist "1 2 5 10 11 12 13 15 17 18 19 21 23 24 25 26 28 29 30 31 32 33 34 36 37 39 40 41 44 45 47 50 51 53 54 55"
+foreach i of local statelist {
+    sum pre_rmspe if state == `i'
+	replace pre_rmspe = r(mean) if state == `i'
+	sum post_rmspe if state == `i'
+	replace post_rmspe = r(mean) if state == `i'
+}
+sort state year
+gen post_pre_rmspe_ratio = post_rmspe/pre_rmspe
+duplicates drop state, force
+gsort -post_pre_rmspe_ratio
+gen rank = _n
+gen pvalue = rank/_N if state == 18
+list pvalue if state == 18 /* P value =  */
+*Average post-intervention effect 
+use CON_Expenditure_IN\Placebos\Q_Nursing_Home_Beds\synth_q_nursing_home_beds_all.dta, clear
+keep alpha* year
+reshape long alpha, i(year) j(state)
+bysort state: egen ave_effect = mean(alpha) if year > 1998
+list ave_effect if state == 18 /* Ave. effect =  */
 
 
 
