@@ -1003,6 +1003,12 @@ keep alpha* year
 reshape long alpha, i(year) j(state)
 bysort state: egen ave_effect = mean(alpha) if year > 1995
 list ave_effect if state == 42 /* Ave. effect = 123.57 */
+*mean of outcome variable in pre-treatment period for treated state
+use CON_Expenditure.dta, clear
+keep if code == 10
+gen byte pre_period = (year <= 1995)
+bysort name pre_period: egen total_exp_mean_pre_and_post = mean(total_exp)
+sum total_exp_mean_pre_and_post if name == "Pennsylvania" & pre_period == 1	/* baseline pre-treatment average = 361.02 */
 
 
 *   ---Placebo Graph and Exact P-value - Nursing Home Medicaid Expenditure---
@@ -1138,6 +1144,12 @@ keep alpha* year
 reshape long alpha, i(year) j(state)
 bysort state: egen ave_effect = mean(alpha) if year > 1995
 list ave_effect if state == 42 /* Ave. effect = 104.17 */
+*mean of outcome variable in pre-treatment period for treated state
+use CON_Expenditure.dta, clear
+keep if code == 10
+gen byte pre_period = (year <= 1995)
+bysort name pre_period: egen medicaid_exp_mean_pre_and_post = mean(medicaid_exp)
+sum medicaid_exp_mean_pre_and_post if name == "Pennsylvania" & pre_period == 1	/* baseline pre-treatment average = 145.56 */
 
 
 *   ---Placebo Graph and Exact P-value - Quantity of Nursing Homes---
@@ -1271,6 +1283,11 @@ keep alpha* year
 reshape long alpha, i(year) j(state)
 bysort state: egen ave_effect = mean(alpha) if year > 1995
 list ave_effect if state == 42 /* Ave. effect = 0.369 */
+*mean of outcome variable in pre-treatment period for treated state
+use CON_NursingHome.dta, clear
+gen byte pre_period = (year <= 1995)
+bysort name pre_period: egen Q_SkilledNH_pcp_mean_prepost = mean(Q_SkilledNursingHomes_pcp)
+sum Q_SkilledNH_pcp_mean_prepost if name == "Pennsylvania" & pre_period == 1	/* baseline pre-treatment average = .631 */
 
 
 *   ---Placebo Graph and Exact P-value - Quantity of Nursing Home Beds---
@@ -1407,6 +1424,11 @@ keep alpha* year
 reshape long alpha, i(year) j(state)
 bysort state: egen ave_effect = mean(alpha) if year > 1995
 list ave_effect if state == 42 /* Ave. effect = 12.12 */
+*mean of outcome variable in pre-treatment period for treated state
+use CON_NursingHome.dta, clear
+gen byte pre_period = (year <= 1995)
+bysort name pre_period: egen Q_SkilledNHBeds_pcp_mean_prepost = mean(Q_SkilledNursingHomeBeds_pcp)
+sum Q_SkilledNHBeds_pcp_mean_prepost if name == "Pennsylvania" & pre_period == 1	/* baseline pre-treatment average = 36.28 */
 
 
 
@@ -1745,13 +1767,19 @@ duplicates drop state, force
 gsort -post_pre_rmspe_ratio
 gen rank = _n
 gen pvalue = rank/_N if state == 38
-list pvalue if state == 38 /* P value = . */
+list pvalue if state == 38 /* P value = .222 */
 *Average post-intervention effect 
 use CON_Expenditure_ND\Placebos\Nursing_Home_Total_Exp\synth_total_nursing_home_exp_all.dta, clear
 keep alpha* year
 reshape long alpha, i(year) j(state)
 bysort state: egen ave_effect = mean(alpha) if year > 1994
-list ave_effect if state == 38 /* Ave. effect =  */
+list ave_effect if state == 38 /* Ave. effect = 37.72 */
+*mean of outcome variable in pre-treatment period for treated state
+use CON_Expenditure.dta, clear
+keep if code == 10
+gen byte pre_period = (year <= 1994)
+bysort name pre_period: egen total_exp_mean_pre_and_post = mean(total_exp)
+sum total_exp_mean_pre_and_post if name == "North Dakota" & pre_period == 1	/* baseline pre-treatment average = 414.59 */
 
 
 *   ---Placebo Graph and Exact P-value - Nursing Home Medicaid Expenditure---
@@ -1880,13 +1908,19 @@ duplicates drop state, force
 gsort -post_pre_rmspe_ratio
 gen rank = _n
 gen pvalue = rank/_N if state == 38
-list pvalue if state == 38 /* P value =  */
+list pvalue if state == 38 /* P value = .83 */
 *Average post-intervention effect 
 use CON_Expenditure_ND\Placebos\Nursing_Home_Medicaid_Exp\synth_medicaid_nursing_home_exp_all.dta, clear
 keep alpha* year
 reshape long alpha, i(year) j(state)
 bysort state: egen ave_effect = mean(alpha) if year > 1994
-list ave_effect if state == 38 /* Ave. effect =  */
+list ave_effect if state == 38 /* Ave. effect = -77.39 */
+*mean of outcome variable in pre-treatment period for treated state
+use CON_Expenditure.dta, clear
+keep if code == 10
+gen byte pre_period = (year <= 1994)
+bysort name pre_period: egen medicaid_exp_mean_pre_and_post = mean(medicaid_exp)
+sum medicaid_exp_mean_pre_and_post if name == "North Dakota" & pre_period == 1	/* baseline pre-treatment average = 140.84 */
 
 
 *   ---Placebo Graph and Exact P-value - Quantity of Nursing Homes---
@@ -2013,13 +2047,18 @@ duplicates drop state, force
 gsort -post_pre_rmspe_ratio
 gen rank = _n
 gen pvalue = rank/_N if state == 38
-list pvalue if state == 38 /* P value =  */
+list pvalue if state == 38 /* P value = .472 */
 *Average post-intervention effect 
 use CON_Expenditure_ND\Placebos\Q_Nursing_Homes\synth_q_nursing_homes_all.dta, clear
 keep alpha* year
 reshape long alpha, i(year) j(state)
 bysort state: egen ave_effect = mean(alpha) if year > 1994
-list ave_effect if state == 38 /* Ave. effect =  */
+list ave_effect if state == 38 /* Ave. effect = .214 */
+*mean of outcome variable in pre-treatment period for treated state
+use CON_NursingHome.dta, clear
+gen byte pre_period = (year <= 1994)
+bysort name pre_period: egen Q_SkilledNH_pcp_mean_prepost = mean(Q_SkilledNursingHomes_pcp)
+sum Q_SkilledNH_pcp_mean_prepost if name == "North Dakota" & pre_period == 1	/* baseline pre-treatment average = .078 */
 
 
 *   ---Placebo Graph and Exact P-value - Quantity of Nursing Home Beds---
@@ -2146,13 +2185,18 @@ duplicates drop state, force
 gsort -post_pre_rmspe_ratio
 gen rank = _n
 gen pvalue = rank/_N if state == 38
-list pvalue if state == 38 /* P value =  */
+list pvalue if state == 38 /* P value = .61 */
 *Average post-intervention effect 
 use CON_Expenditure_ND\Placebos\Q_Nursing_Home_Beds\synth_q_nursing_home_beds_all.dta, clear
 keep alpha* year
 reshape long alpha, i(year) j(state)
 bysort state: egen ave_effect = mean(alpha) if year > 1994
-list ave_effect if state == 38 /* Ave. effect =  */
+list ave_effect if state == 38 /* Ave. effect = 7.92 */
+*mean of outcome variable in pre-treatment period for treated state
+use CON_NursingHome.dta, clear
+gen byte pre_period = (year <= 1994)
+bysort name pre_period: egen Q_SkilledNHBeds_pcp_mean_prepost = mean(Q_SkilledNursingHomeBeds_pcp)
+sum Q_SkilledNHBeds_pcp_mean_prepost if name == "North Dakota" & pre_period == 1	/* baseline pre-treatment average = 1.64 */
 
 
 
@@ -2491,13 +2535,19 @@ duplicates drop state, force
 gsort -post_pre_rmspe_ratio
 gen rank = _n
 gen pvalue = rank/_N if state == 18
-list pvalue if state == 18 /* P value = . */
+list pvalue if state == 18 /* P value = .778 */
 *Average post-intervention effect 
 use CON_Expenditure_IN\Placebos\Nursing_Home_Total_Exp\synth_total_nursing_home_exp_all.dta, clear
 keep alpha* year
 reshape long alpha, i(year) j(state)
 bysort state: egen ave_effect = mean(alpha) if year > 1998
-list ave_effect if state == 18 /* Ave. effect =  */
+list ave_effect if state == 18 /* Ave. effect = -24.65 */
+*mean of outcome variable in pre-treatment period for treated state
+use CON_Expenditure.dta, clear
+keep if code == 10
+gen byte pre_period = (year <= 1998)
+bysort name pre_period: egen total_exp_mean_pre_and_post = mean(total_exp)
+sum total_exp_mean_pre_and_post if name == "Indiana" & pre_period == 1	/* baseline pre-treatment average = 385.26 */
 
 
 *   ---Placebo Graph and Exact P-value - Nursing Home Medicaid Expenditure---
@@ -2626,13 +2676,19 @@ duplicates drop state, force
 gsort -post_pre_rmspe_ratio
 gen rank = _n
 gen pvalue = rank/_N if state == 18
-list pvalue if state == 18 /* P value =  */
+list pvalue if state == 18 /* P value = .611 */
 *Average post-intervention effect 
 use CON_Expenditure_IN\Placebos\Nursing_Home_Medicaid_Exp\synth_medicaid_nursing_home_exp_all.dta, clear
 keep alpha* year
 reshape long alpha, i(year) j(state)
 bysort state: egen ave_effect = mean(alpha) if year > 1998
-list ave_effect if state == 18 /* Ave. effect =  */
+list ave_effect if state == 18 /* Ave. effect = -21.965 */
+*mean of outcome variable in pre-treatment period for treated state
+use CON_Expenditure.dta, clear
+keep if code == 10
+gen byte pre_period = (year <= 1998)
+bysort name pre_period: egen medicaid_exp_mean_pre_and_post = mean(medicaid_exp)
+sum medicaid_exp_mean_pre_and_post if name == "Indiana" & pre_period == 1	/* baseline pre-treatment average = 129.12 */
 
 
 *   ---Placebo Graph and Exact P-value - Quantity of Nursing Homes---
@@ -2759,13 +2815,18 @@ duplicates drop state, force
 gsort -post_pre_rmspe_ratio
 gen rank = _n
 gen pvalue = rank/_N if state == 18
-list pvalue if state == 18 /* P value =  */
+list pvalue if state == 18 /* P value = .0278 */
 *Average post-intervention effect 
 use CON_Expenditure_IN\Placebos\Q_Nursing_Homes\synth_q_nursing_homes_all.dta, clear
 keep alpha* year
 reshape long alpha, i(year) j(state)
 bysort state: egen ave_effect = mean(alpha) if year > 1998
-list ave_effect if state == 18 /* Ave. effect =  */
+list ave_effect if state == 18 /* Ave. effect = .276 */
+*mean of outcome variable in pre-treatment period for treated state
+use CON_NursingHome.dta, clear
+gen byte pre_period = (year <= 1998)
+bysort name pre_period: egen Q_SkilledNH_pcp_mean_prepost = mean(Q_SkilledNursingHomes_pcp)
+sum Q_SkilledNH_pcp_mean_prepost if name == "Indiana" & pre_period == 1	/* baseline pre-treatment average = .629 */
 
 
 *   ---Placebo Graph and Exact P-value - Quantity of Nursing Home Beds---
@@ -2892,13 +2953,18 @@ duplicates drop state, force
 gsort -post_pre_rmspe_ratio
 gen rank = _n
 gen pvalue = rank/_N if state == 18
-list pvalue if state == 18 /* P value =  */
+list pvalue if state == 18 /* P value = .0278 */
 *Average post-intervention effect 
 use CON_Expenditure_IN\Placebos\Q_Nursing_Home_Beds\synth_q_nursing_home_beds_all.dta, clear
 keep alpha* year
 reshape long alpha, i(year) j(state)
 bysort state: egen ave_effect = mean(alpha) if year > 1998
-list ave_effect if state == 18 /* Ave. effect =  */
+list ave_effect if state == 18 /* Ave. effect = 26.08 */
+*mean of outcome variable in pre-treatment period for treated state
+use CON_NursingHome.dta, clear
+gen byte pre_period = (year <= 1998)
+bysort name pre_period: egen Q_SkilledNHBeds_pcp_mean_prepost = mean(Q_SkilledNursingHomeBeds_pcp)
+sum Q_SkilledNHBeds_pcp_mean_prepost if name == "Indiana" & pre_period == 1	/* baseline pre-treatment average = 25.92 */
 
 
 
