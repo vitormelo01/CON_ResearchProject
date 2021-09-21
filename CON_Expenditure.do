@@ -909,56 +909,71 @@ foreach i of local statelist2 {
     merge 1:1 year using CON_Expenditure_PA\Placebos\Nursing_Home_Total_Exp\synth_total_nursing_home_exp_`i'.dta, nogenerate    
 }
 save CON_Expenditure_PA\Placebos\Nursing_Home_Total_Exp\synth_total_nursing_home_exp_all.dta, replace
-*create figure
+*create figures
 use CON_Expenditure_PA\Placebos\Nursing_Home_Total_Exp\synth_total_nursing_home_exp_all.dta, clear
 keep alpha* year
 reshape long alpha, i(year) j(state)
-# delimit
-twoway
-	(line alpha year if state == 1, lcolor(gs12))
-	(line alpha year if state == 2, lcolor(gs12))
-	(line alpha year if state == 5, lcolor(gs12))
-	(line alpha year if state == 10, lcolor(gs12))
-	(line alpha year if state == 11, lcolor(gs12))
-	(line alpha year if state == 12, lcolor(gs12))
-	(line alpha year if state == 13, lcolor(gs12))
-	(line alpha year if state == 15, lcolor(gs12))
-	(line alpha year if state == 17, lcolor(gs12))
-	(line alpha year if state == 19, lcolor(gs12))
-	(line alpha year if state == 21, lcolor(gs12))
-	(line alpha year if state == 23, lcolor(gs12))
-	(line alpha year if state == 24, lcolor(gs12))
-	(line alpha year if state == 25, lcolor(gs12))
-	(line alpha year if state == 26, lcolor(gs12))
-	(line alpha year if state == 28, lcolor(gs12))
-	(line alpha year if state == 29, lcolor(gs12))
-	(line alpha year if state == 30, lcolor(gs12))
-	(line alpha year if state == 31, lcolor(gs12))
-	(line alpha year if state == 32, lcolor(gs12))
-	(line alpha year if state == 33, lcolor(gs12))
-	(line alpha year if state == 34, lcolor(gs12))
-	(line alpha year if state == 36, lcolor(gs12))
-	(line alpha year if state == 37, lcolor(gs12))
-	(line alpha year if state == 39, lcolor(gs12))
-	(line alpha year if state == 40, lcolor(gs12))
-	(line alpha year if state == 41, lcolor(gs12))
-	(line alpha year if state == 44, lcolor(gs12))
-	(line alpha year if state == 45, lcolor(gs12))
-	(line alpha year if state == 47, lcolor(gs12))
-	(line alpha year if state == 50, lcolor(gs12))
-	(line alpha year if state == 51, lcolor(gs12))
-	(line alpha year if state == 53, lcolor(gs12))
-	(line alpha year if state == 54, lcolor(gs12))
-	(line alpha year if state == 55, lcolor(gs12))
-	(line alpha year if state == 42, lwidth(thick) lcolor(black) 
-	xline(1995, lwidth(thick) lcolor(maroon)) yline(0, lwidth(thick) lcolor(maroon)))
-	,
-	leg(lab(36 "Pennsylvania") lab(1 "Control States") size(medsmall) pos(11) order(36 1) ring(0) cols(1))
-	xtitle("Year") xlab(1980[2]2014, grid glcolor(gs15) angle(45))
-	ytitle("Gap in Total Nursing Home Expenditure Per Capita") ylab(, grid glcolor(gs15))
-	graphregion(color(white)) bgcolor(white) plotregion(color(white));
-# delimit cr
-graph export "CON_Expenditure_PA\Figures\nursing_home_tot_exp_Gaps_with_Placebos_PA.pdf", replace
+gen alpha_sqrd = alpha*alpha
+bysort state: egen pre_mspe = mean(alpha_sqrd) if year <= 1995
+gen pre_rmspe = sqrt(pre_mspe)
+local statelist "1 2 5 10 11 12 13 15 17 19 21 23 24 25 26 28 29 30 31 32 33 34 36 37 39 40 41 42 44 45 47 50 51 53 54 55"
+foreach i of local statelist {
+    sum pre_rmspe if state == `i'
+	replace pre_rmspe = r(mean) if state == `i'
+}
+local threshold " "1000000" "20" "10" "5" "2" "	/* the 1000000 is meant to ensure that no states are dropped in the graph */
+foreach i of local threshold {
+	sort state year
+	gen threshold_pre_rmspe_`i' = `i'*pre_rmspe if state == 42
+	sum threshold_pre_rmspe_`i'
+	replace threshold_pre_rmspe_`i' = r(mean)
+	# delimit
+	twoway
+		(line alpha year if state == 1 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 2 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 5 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 10 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 11 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 12 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 13 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 15 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 17 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 19 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 21 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 23 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 24 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 25 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 26 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 28 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 29 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 30 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 31 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 32 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 33 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 34 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 36 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 37 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 39 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 40 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 41 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 44 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 45 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 47 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 50 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 51 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 53 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 54 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 55 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 42, lwidth(thick) lcolor(black) 
+		xline(1995, lwidth(thick) lcolor(maroon)) yline(0, lwidth(thick) lcolor(maroon)))
+		,
+		leg(lab(36 "Pennsylvania") lab(1 "Control States") size(medsmall) pos(11) order(36 1) ring(0) cols(1))
+		xtitle("Year") xlab(1980[2]2014, grid glcolor(gs15) angle(45))
+		ytitle("Gap in Total Nursing Home Expenditure Per Capita") ylab(, grid glcolor(gs15))
+		graphregion(color(white)) bgcolor(white) plotregion(color(white));
+	# delimit cr
+	graph export "CON_Expenditure_PA\Figures\nursing_home_tot_exp_Gaps_with_Placebos_`i'_PA.pdf", replace
+}
 *Exact p-value based on post/pre RMSPE & histogram of RMSPEs
 use CON_Expenditure_PA\Placebos\Nursing_Home_Total_Exp\synth_total_nursing_home_exp_all.dta, clear
 keep alpha* year
@@ -1033,52 +1048,67 @@ save CON_Expenditure_PA\Placebos\Nursing_Home_Medicaid_Exp\synth_medicaid_nursin
 use CON_Expenditure_PA\Placebos\Nursing_Home_Medicaid_Exp\synth_medicaid_nursing_home_exp_all.dta, clear
 keep alpha* year
 reshape long alpha, i(year) j(state)
-# delimit
-twoway
-	(line alpha year if state == 1, lcolor(gs12))
-	(line alpha year if state == 2, lcolor(gs12))
-	(line alpha year if state == 5, lcolor(gs12))
-	(line alpha year if state == 10, lcolor(gs12))
-	(line alpha year if state == 11, lcolor(gs12))
-	(line alpha year if state == 12, lcolor(gs12))
-	(line alpha year if state == 13, lcolor(gs12))
-	(line alpha year if state == 15, lcolor(gs12))
-	(line alpha year if state == 17, lcolor(gs12))
-	(line alpha year if state == 19, lcolor(gs12))
-	(line alpha year if state == 21, lcolor(gs12))
-	(line alpha year if state == 23, lcolor(gs12))
-	(line alpha year if state == 24, lcolor(gs12))
-	(line alpha year if state == 25, lcolor(gs12))
-	(line alpha year if state == 26, lcolor(gs12))
-	(line alpha year if state == 28, lcolor(gs12))
-	(line alpha year if state == 29, lcolor(gs12))
-	(line alpha year if state == 30, lcolor(gs12))
-	(line alpha year if state == 31, lcolor(gs12))
-	(line alpha year if state == 32, lcolor(gs12))
-	(line alpha year if state == 33, lcolor(gs12))
-	(line alpha year if state == 34, lcolor(gs12))
-	(line alpha year if state == 36, lcolor(gs12))
-	(line alpha year if state == 37, lcolor(gs12))
-	(line alpha year if state == 39, lcolor(gs12))
-	(line alpha year if state == 40, lcolor(gs12))
-	(line alpha year if state == 41, lcolor(gs12))
-	(line alpha year if state == 44, lcolor(gs12))
-	(line alpha year if state == 45, lcolor(gs12))
-	(line alpha year if state == 47, lcolor(gs12))
-	(line alpha year if state == 50, lcolor(gs12))
-	(line alpha year if state == 51, lcolor(gs12))
-	(line alpha year if state == 53, lcolor(gs12))
-	(line alpha year if state == 54, lcolor(gs12))
-	(line alpha year if state == 55, lcolor(gs12))
-	(line alpha year if state == 42, lwidth(thick) lcolor(black) 
-	xline(1995, lwidth(thick) lcolor(maroon)) yline(0, lwidth(thick) lcolor(maroon)))
-	,
-	leg(lab(36 "Pennsylvania") lab(1 "Control States") size(medsmall) pos(11) order(36 1) ring(0) cols(1))
-	xtitle("Year") xlab(1980[2]2014, grid glcolor(gs15) angle(45))
-	ytitle("Gap in Nursing Home Medicaid Expenditure Per Capita") ylab(, grid glcolor(gs15))
-	graphregion(color(white)) bgcolor(white) plotregion(color(white));
-# delimit cr
-graph export "CON_Expenditure_PA\Figures\nursing_home_medicaid_exp_Gaps_with_Placebos_PA.pdf", replace
+gen alpha_sqrd = alpha*alpha
+bysort state: egen pre_mspe = mean(alpha_sqrd) if year <= 1995
+gen pre_rmspe = sqrt(pre_mspe)
+local statelist "1 2 5 10 11 12 13 15 17 19 21 23 24 25 26 28 29 30 31 32 33 34 36 37 39 40 41 42 44 45 47 50 51 53 54 55"
+foreach i of local statelist {
+    sum pre_rmspe if state == `i'
+	replace pre_rmspe = r(mean) if state == `i'
+}
+local threshold " "1000000" "20" "10" "5" "2" "	/* the 1000000 is meant to ensure that no states are dropped in the graph */
+foreach i of local threshold {
+	sort state year
+	gen threshold_pre_rmspe_`i' = `i'*pre_rmspe if state == 42
+	sum threshold_pre_rmspe_`i'
+	replace threshold_pre_rmspe_`i' = r(mean)
+	# delimit
+	twoway
+		(line alpha year if state == 1 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 2 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 5 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 10 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 11 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 12 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 13 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 15 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 17 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 19 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 21 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 23 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 24 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 25 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 26 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 28 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 29 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 30 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 31 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 32 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 33 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 34 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 36 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 37 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 39 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 40 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 41 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 44 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 45 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 47 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 50 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 51 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 53 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 54 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 55 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 42, lwidth(thick) lcolor(black) 
+		xline(1995, lwidth(thick) lcolor(maroon)) yline(0, lwidth(thick) lcolor(maroon)))
+		,
+		leg(lab(36 "Pennsylvania") lab(1 "Control States") size(medsmall) pos(11) order(36 1) ring(0) cols(1))
+		xtitle("Year") xlab(1980[2]2014, grid glcolor(gs15) angle(45))
+		ytitle("Gap in Nursing Home Medicaid Expenditure Per Capita") ylab(, grid glcolor(gs15))
+		graphregion(color(white)) bgcolor(white) plotregion(color(white));
+	# delimit cr
+	graph export "CON_Expenditure_PA\Figures\nursing_home_medicaid_exp_Gaps_with_Placebos_`i'_PA.pdf", replace
+}
 *Exact p-value based on post/pre RMSPE & histogram of RMSPEs
 use CON_Expenditure_PA\Placebos\Nursing_Home_Medicaid_Exp\synth_medicaid_nursing_home_exp_all.dta, clear
 keep alpha* year
@@ -1151,52 +1181,67 @@ save CON_Expenditure_PA\Placebos\Q_Nursing_Homes\synth_q_nursing_homes_all.dta, 
 use CON_Expenditure_PA\Placebos\Q_Nursing_Homes\synth_q_nursing_homes_all.dta, clear
 keep alpha* year
 reshape long alpha, i(year) j(state)
-# delimit
-twoway
-	(line alpha year if state == 1, lcolor(gs12))
-	(line alpha year if state == 2, lcolor(gs12))
-	(line alpha year if state == 5, lcolor(gs12))
-	(line alpha year if state == 10, lcolor(gs12))
-	(line alpha year if state == 11, lcolor(gs12))
-	(line alpha year if state == 12, lcolor(gs12))
-	(line alpha year if state == 13, lcolor(gs12))
-	(line alpha year if state == 15, lcolor(gs12))
-	(line alpha year if state == 17, lcolor(gs12))
-	(line alpha year if state == 19, lcolor(gs12))
-	(line alpha year if state == 21, lcolor(gs12))
-	(line alpha year if state == 23, lcolor(gs12))
-	(line alpha year if state == 24, lcolor(gs12))
-	(line alpha year if state == 25, lcolor(gs12))
-	(line alpha year if state == 26, lcolor(gs12))
-	(line alpha year if state == 28, lcolor(gs12))
-	(line alpha year if state == 29, lcolor(gs12))
-	(line alpha year if state == 30, lcolor(gs12))
-	(line alpha year if state == 31, lcolor(gs12))
-	(line alpha year if state == 32, lcolor(gs12))
-	(line alpha year if state == 33, lcolor(gs12))
-	(line alpha year if state == 34, lcolor(gs12))
-	(line alpha year if state == 36, lcolor(gs12))
-	(line alpha year if state == 37, lcolor(gs12))
-	(line alpha year if state == 39, lcolor(gs12))
-	(line alpha year if state == 40, lcolor(gs12))
-	(line alpha year if state == 41, lcolor(gs12))
-	(line alpha year if state == 44, lcolor(gs12))
-	(line alpha year if state == 45, lcolor(gs12))
-	(line alpha year if state == 47, lcolor(gs12))
-	(line alpha year if state == 50, lcolor(gs12))
-	(line alpha year if state == 51, lcolor(gs12))
-	(line alpha year if state == 53, lcolor(gs12))
-	(line alpha year if state == 54, lcolor(gs12))
-	(line alpha year if state == 55, lcolor(gs12))
-	(line alpha year if state == 42, lwidth(thick) lcolor(black) 
-	xline(1995, lwidth(thick) lcolor(maroon)) yline(0, lwidth(thick) lcolor(maroon)))
-	,
-	leg(lab(36 "Pennsylvania") lab(1 "Control States") size(medsmall) pos(11) order(36 1) ring(0) cols(1))
-	xtitle("Year") xlab(1990[2]2014, grid glcolor(gs15) angle(45))
-	ytitle("Gap in Quantity of Nursing Homes Per 100,000") ylab(, grid glcolor(gs15))
-	graphregion(color(white)) bgcolor(white) plotregion(color(white));
-# delimit cr
-graph export "CON_Expenditure_PA\Figures\q_nursing_homes_Gaps_with_Placebos_PA.pdf", replace
+gen alpha_sqrd = alpha*alpha
+bysort state: egen pre_mspe = mean(alpha_sqrd) if year <= 1995
+gen pre_rmspe = sqrt(pre_mspe)
+local statelist "1 2 5 10 11 12 13 15 17 19 21 23 24 25 26 28 29 30 31 32 33 34 36 37 39 40 41 42 44 45 47 50 51 53 54 55"
+foreach i of local statelist {
+    sum pre_rmspe if state == `i'
+	replace pre_rmspe = r(mean) if state == `i'
+}
+local threshold " "1000000" "20" "10" "5" "2" "	/* the 1000000 is meant to ensure that no states are dropped in the graph */
+foreach i of local threshold {
+	sort state year
+	gen threshold_pre_rmspe_`i' = `i'*pre_rmspe if state == 42
+	sum threshold_pre_rmspe_`i'
+	replace threshold_pre_rmspe_`i' = r(mean)
+	# delimit
+	twoway
+		(line alpha year if state == 1 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 2 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 5 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 10 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 11 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 12 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 13 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 15 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 17 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 19 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 21 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 23 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 24 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 25 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 26 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 28 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 29 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 30 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 31 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 32 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 33 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 34 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 36 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 37 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 39 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 40 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 41 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 44 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 45 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 47 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 50 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 51 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 53 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 54 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 55 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 42, lwidth(thick) lcolor(black) 
+		xline(1995, lwidth(thick) lcolor(maroon)) yline(0, lwidth(thick) lcolor(maroon)))
+		,
+		leg(lab(36 "Pennsylvania") lab(1 "Control States") size(medsmall) pos(11) order(36 1) ring(0) cols(1))
+		xtitle("Year") xlab(1990[2]2014, grid glcolor(gs15) angle(45))
+		ytitle("Gap in Quantity of Nursing Homes Per 100,000") ylab(, grid glcolor(gs15))
+		graphregion(color(white)) bgcolor(white) plotregion(color(white));
+	# delimit cr
+	graph export "CON_Expenditure_PA\Figures\q_nursing_homes_Gaps_with_Placebos_`i'_PA.pdf", replace
+}
 *Exact p-value based on post/pre RMSPE & histogram of RMSPEs
 use CON_Expenditure_PA\Placebos\Q_Nursing_Homes\synth_q_nursing_homes_all.dta, clear
 keep alpha* year
@@ -1269,52 +1314,70 @@ save CON_Expenditure_PA\Placebos\Q_Nursing_Home_Beds\synth_q_nursing_home_beds_a
 use CON_Expenditure_PA\Placebos\Q_Nursing_Home_Beds\synth_q_nursing_home_beds_all.dta, clear
 keep alpha* year
 reshape long alpha, i(year) j(state)
-# delimit
-twoway
-	(line alpha year if state == 1, lcolor(gs12))
-	(line alpha year if state == 2, lcolor(gs12))
-	(line alpha year if state == 5, lcolor(gs12))
-	(line alpha year if state == 10, lcolor(gs12))
-	(line alpha year if state == 11, lcolor(gs12))
-	(line alpha year if state == 12, lcolor(gs12))
-	(line alpha year if state == 13, lcolor(gs12))
-	(line alpha year if state == 15, lcolor(gs12))
-	(line alpha year if state == 17, lcolor(gs12))
-	(line alpha year if state == 19, lcolor(gs12))
-	(line alpha year if state == 21, lcolor(gs12))
-	(line alpha year if state == 23, lcolor(gs12))
-	(line alpha year if state == 24, lcolor(gs12))
-	(line alpha year if state == 25, lcolor(gs12))
-	(line alpha year if state == 26, lcolor(gs12))
-	(line alpha year if state == 28, lcolor(gs12))
-	(line alpha year if state == 29, lcolor(gs12))
-	(line alpha year if state == 30, lcolor(gs12))
-	(line alpha year if state == 31, lcolor(gs12))
-	(line alpha year if state == 32, lcolor(gs12))
-	(line alpha year if state == 33, lcolor(gs12))
-	(line alpha year if state == 34, lcolor(gs12))
-	(line alpha year if state == 36, lcolor(gs12))
-	(line alpha year if state == 37, lcolor(gs12))
-	(line alpha year if state == 39, lcolor(gs12))
-	(line alpha year if state == 40, lcolor(gs12))
-	(line alpha year if state == 41, lcolor(gs12))
-	(line alpha year if state == 44, lcolor(gs12))
-	(line alpha year if state == 45, lcolor(gs12))
-	(line alpha year if state == 47, lcolor(gs12))
-	(line alpha year if state == 50, lcolor(gs12))
-	(line alpha year if state == 51, lcolor(gs12))
-	(line alpha year if state == 53, lcolor(gs12))
-	(line alpha year if state == 54, lcolor(gs12))
-	(line alpha year if state == 55, lcolor(gs12))
-	(line alpha year if state == 42, lwidth(thick) lcolor(black) 
-	xline(1995, lwidth(thick) lcolor(maroon)) yline(0, lwidth(thick) lcolor(maroon)))
-	,
-	leg(lab(36 "Pennsylvania") lab(1 "Control States") size(medsmall) pos(11) order(36 1) ring(0) cols(1))
-	xtitle("Year") xlab(1990[2]2014, grid glcolor(gs15) angle(45))
-	ytitle("Gap in Quantity of Nursing Home Beds Per 100,000") ylab(, grid glcolor(gs15))
-	graphregion(color(white)) bgcolor(white) plotregion(color(white));
-# delimit cr
-graph export "CON_Expenditure_PA\Figures\q_nursing_home_beds_Gaps_with_Placebos_PA.pdf", replace
+use CON_Expenditure_PA\Placebos\Q_Nursing_Homes\synth_q_nursing_homes_all.dta, clear
+keep alpha* year
+reshape long alpha, i(year) j(state)
+gen alpha_sqrd = alpha*alpha
+bysort state: egen pre_mspe = mean(alpha_sqrd) if year <= 1995
+gen pre_rmspe = sqrt(pre_mspe)
+local statelist "1 2 5 10 11 12 13 15 17 19 21 23 24 25 26 28 29 30 31 32 33 34 36 37 39 40 41 42 44 45 47 50 51 53 54 55"
+foreach i of local statelist {
+    sum pre_rmspe if state == `i'
+	replace pre_rmspe = r(mean) if state == `i'
+}
+local threshold " "1000000" "20" "10" "5" "2" "	/* the 1000000 is meant to ensure that no states are dropped in the graph */
+foreach i of local threshold {
+	sort state year
+	gen threshold_pre_rmspe_`i' = `i'*pre_rmspe if state == 42
+	sum threshold_pre_rmspe_`i'
+	replace threshold_pre_rmspe_`i' = r(mean)
+	# delimit
+	twoway
+		(line alpha year if state == 1 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 2 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 5 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 10 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 11 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 12 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 13 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 15 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 17 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 19 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 21 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 23 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 24 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 25 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 26 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 28 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 29 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 30 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 31 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 32 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 33 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 34 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 36 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 37 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 39 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 40 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 41 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 44 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 45 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 47 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 50 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 51 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 53 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 54 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 55 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 42, lwidth(thick) lcolor(black) 
+		xline(1995, lwidth(thick) lcolor(maroon)) yline(0, lwidth(thick) lcolor(maroon)))
+		,
+		leg(lab(36 "Pennsylvania") lab(1 "Control States") size(medsmall) pos(11) order(36 1) ring(0) cols(1))
+		xtitle("Year") xlab(1990[2]2014, grid glcolor(gs15) angle(45))
+		ytitle("Gap in Quantity of Nursing Home Beds Per 100,000") ylab(, grid glcolor(gs15))
+		graphregion(color(white)) bgcolor(white) plotregion(color(white));
+	# delimit cr
+	graph export "CON_Expenditure_PA\Figures\q_nursing_home_beds_Gaps_with_Placebos_`i'_PA.pdf", replace
+}
 *Exact p-value based on post/pre RMSPE & histogram of RMSPEs
 use CON_Expenditure_PA\Placebos\Q_Nursing_Home_Beds\synth_q_nursing_home_beds_all.dta, clear
 keep alpha* year
@@ -1557,8 +1620,7 @@ forvalues i = 4/4 {
 
 
 *   ---Placebo Graph and Exact P-value - Total Nursing Home Expenditure---
-*local statelist "1 2 5 10 11 12 13 15 17 19 21 23 24 25 26 28 29 30 31 32 33 34 36 37 38 39 40 41 44 45 47 50 51 53 54 55"
-local statelist "32 33 34 36 37 38 39"
+local statelist "1 2 5 10 11 12 13 15 17 19 21 23 24 25 26 28 29 30 31 32 33 34 36 37 38 39 40 41 44 45 47 50 51 53 54 55"
 foreach i of local statelist {
 	*load fresh data
 	use CON_Expenditure.dta, clear
@@ -1600,52 +1662,67 @@ save CON_Expenditure_ND\Placebos\Nursing_Home_Total_Exp\synth_total_nursing_home
 use CON_Expenditure_ND\Placebos\Nursing_Home_Total_Exp\synth_total_nursing_home_exp_all.dta, clear
 keep alpha* year
 reshape long alpha, i(year) j(state)
-# delimit
-twoway
-	(line alpha year if state == 1, lcolor(gs12))
-	(line alpha year if state == 2, lcolor(gs12))
-	(line alpha year if state == 5, lcolor(gs12))
-	(line alpha year if state == 10, lcolor(gs12))
-	(line alpha year if state == 11, lcolor(gs12))
-	(line alpha year if state == 12, lcolor(gs12))
-	(line alpha year if state == 13, lcolor(gs12))
-	(line alpha year if state == 15, lcolor(gs12))
-	(line alpha year if state == 17, lcolor(gs12))
-	(line alpha year if state == 19, lcolor(gs12))
-	(line alpha year if state == 21, lcolor(gs12))
-	(line alpha year if state == 23, lcolor(gs12))
-	(line alpha year if state == 24, lcolor(gs12))
-	(line alpha year if state == 25, lcolor(gs12))
-	(line alpha year if state == 26, lcolor(gs12))
-	(line alpha year if state == 28, lcolor(gs12))
-	(line alpha year if state == 29, lcolor(gs12))
-	(line alpha year if state == 30, lcolor(gs12))
-	(line alpha year if state == 31, lcolor(gs12))
-	(line alpha year if state == 32, lcolor(gs12))
-	(line alpha year if state == 33, lcolor(gs12))
-	(line alpha year if state == 34, lcolor(gs12))
-	(line alpha year if state == 36, lcolor(gs12))
-	(line alpha year if state == 37, lcolor(gs12))
-	(line alpha year if state == 39, lcolor(gs12))
-	(line alpha year if state == 40, lcolor(gs12))
-	(line alpha year if state == 41, lcolor(gs12))
-	(line alpha year if state == 44, lcolor(gs12))
-	(line alpha year if state == 45, lcolor(gs12))
-	(line alpha year if state == 47, lcolor(gs12))
-	(line alpha year if state == 50, lcolor(gs12))
-	(line alpha year if state == 51, lcolor(gs12))
-	(line alpha year if state == 53, lcolor(gs12))
-	(line alpha year if state == 54, lcolor(gs12))
-	(line alpha year if state == 55, lcolor(gs12))
-	(line alpha year if state == 38, lwidth(thick) lcolor(black) 
-	xline(1994, lwidth(thick) lcolor(maroon)) yline(0, lwidth(thick) lcolor(maroon)))
-	,
-	leg(lab(36 "North Dakota") lab(1 "Control States") size(medsmall) pos(11) order(36 1) ring(0) cols(1))
-	xtitle("Year") xlab(1980[2]2014, grid glcolor(gs15) angle(45))
-	ytitle("Gap in Total Nursing Home Expenditure Per Capita") ylab(, grid glcolor(gs15))
-	graphregion(color(white)) bgcolor(white) plotregion(color(white));
-# delimit cr
-graph export "CON_Expenditure_ND\Figures\nursing_home_tot_exp_Gaps_with_Placebos_ND.pdf", replace
+gen alpha_sqrd = alpha*alpha
+bysort state: egen pre_mspe = mean(alpha_sqrd) if year <= 1994
+gen pre_rmspe = sqrt(pre_mspe)
+local statelist "1 2 5 10 11 12 13 15 17 19 21 23 24 25 26 28 29 30 31 32 33 34 36 37 38 39 40 41 44 45 47 50 51 53 54 55"
+foreach i of local statelist {
+    sum pre_rmspe if state == `i'
+	replace pre_rmspe = r(mean) if state == `i'
+}
+local threshold " "1000000" "20" "10" "5" "2" "	/* the 1000000 is meant to ensure that no states are dropped in the graph */
+foreach i of local threshold {
+	sort state year
+	gen threshold_pre_rmspe_`i' = `i'*pre_rmspe if state == 38
+	sum threshold_pre_rmspe_`i'
+	replace threshold_pre_rmspe_`i' = r(mean)
+	# delimit
+	twoway
+		(line alpha year if state == 1 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 2 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 5 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 10 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 11 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 12 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 13 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 15 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 17 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 19 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 21 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 23 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 24 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 25 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 26 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 28 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 29 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 30 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 31 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 32 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 33 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 34 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 36 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 37 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 39 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 40 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 41 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 44 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 45 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 47 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 50 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 51 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 53 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 54 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 55 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 38, lwidth(thick) lcolor(black) 
+		xline(1994, lwidth(thick) lcolor(maroon)) yline(0, lwidth(thick) lcolor(maroon)))
+		,
+		leg(lab(36 "North Dakota") lab(1 "Control States") size(medsmall) pos(11) order(36 1) ring(0) cols(1))
+		xtitle("Year") xlab(1980[2]2014, grid glcolor(gs15) angle(45))
+		ytitle("Gap in Total Nursing Home Expenditure Per Capita") ylab(, grid glcolor(gs15))
+		graphregion(color(white)) bgcolor(white) plotregion(color(white));
+	# delimit cr
+	graph export "CON_Expenditure_ND\Figures\nursing_home_tot_exp_Gaps_with_Placebos_`i'_ND.pdf", replace
+}
 *Exact p-value based on post/pre RMSPE & histogram of RMSPEs
 use CON_Expenditure_ND\Placebos\Nursing_Home_Total_Exp\synth_total_nursing_home_exp_all.dta, clear
 keep alpha* year
@@ -1720,52 +1797,67 @@ save CON_Expenditure_ND\Placebos\Nursing_Home_Medicaid_Exp\synth_medicaid_nursin
 use CON_Expenditure_ND\Placebos\Nursing_Home_Medicaid_Exp\synth_medicaid_nursing_home_exp_all.dta, clear
 keep alpha* year
 reshape long alpha, i(year) j(state)
-# delimit
-twoway
-	(line alpha year if state == 1, lcolor(gs12))
-	(line alpha year if state == 2, lcolor(gs12))
-	(line alpha year if state == 5, lcolor(gs12))
-	(line alpha year if state == 10, lcolor(gs12))
-	(line alpha year if state == 11, lcolor(gs12))
-	(line alpha year if state == 12, lcolor(gs12))
-	(line alpha year if state == 13, lcolor(gs12))
-	(line alpha year if state == 15, lcolor(gs12))
-	(line alpha year if state == 17, lcolor(gs12))
-	(line alpha year if state == 19, lcolor(gs12))
-	(line alpha year if state == 21, lcolor(gs12))
-	(line alpha year if state == 23, lcolor(gs12))
-	(line alpha year if state == 24, lcolor(gs12))
-	(line alpha year if state == 25, lcolor(gs12))
-	(line alpha year if state == 26, lcolor(gs12))
-	(line alpha year if state == 28, lcolor(gs12))
-	(line alpha year if state == 29, lcolor(gs12))
-	(line alpha year if state == 30, lcolor(gs12))
-	(line alpha year if state == 31, lcolor(gs12))
-	(line alpha year if state == 32, lcolor(gs12))
-	(line alpha year if state == 33, lcolor(gs12))
-	(line alpha year if state == 34, lcolor(gs12))
-	(line alpha year if state == 36, lcolor(gs12))
-	(line alpha year if state == 37, lcolor(gs12))
-	(line alpha year if state == 39, lcolor(gs12))
-	(line alpha year if state == 40, lcolor(gs12))
-	(line alpha year if state == 41, lcolor(gs12))
-	(line alpha year if state == 44, lcolor(gs12))
-	(line alpha year if state == 45, lcolor(gs12))
-	(line alpha year if state == 47, lcolor(gs12))
-	(line alpha year if state == 50, lcolor(gs12))
-	(line alpha year if state == 51, lcolor(gs12))
-	(line alpha year if state == 53, lcolor(gs12))
-	(line alpha year if state == 54, lcolor(gs12))
-	(line alpha year if state == 55, lcolor(gs12))
-	(line alpha year if state == 38, lwidth(thick) lcolor(black) 
-	xline(1994, lwidth(thick) lcolor(maroon)) yline(0, lwidth(thick) lcolor(maroon)))
-	,
-	leg(lab(36 "North Dakota") lab(1 "Control States") size(medsmall) pos(11) order(36 1) ring(0) cols(1))
-	xtitle("Year") xlab(1980[2]2014, grid glcolor(gs15) angle(45))
-	ytitle("Gap in Nursing Home Medicaid Expenditure Per Capita") ylab(, grid glcolor(gs15))
-	graphregion(color(white)) bgcolor(white) plotregion(color(white));
-# delimit cr
-graph export "CON_Expenditure_ND\Figures\nursing_home_medicaid_exp_Gaps_with_Placebos_ND.pdf", replace
+gen alpha_sqrd = alpha*alpha
+bysort state: egen pre_mspe = mean(alpha_sqrd) if year <= 1994
+gen pre_rmspe = sqrt(pre_mspe)
+local statelist "1 2 5 10 11 12 13 15 17 19 21 23 24 25 26 28 29 30 31 32 33 34 36 37 38 39 40 41 44 45 47 50 51 53 54 55"
+foreach i of local statelist {
+    sum pre_rmspe if state == `i'
+	replace pre_rmspe = r(mean) if state == `i'
+}
+local threshold " "1000000" "20" "10" "5" "2" "	/* the 1000000 is meant to ensure that no states are dropped in the graph */
+foreach i of local threshold {
+	sort state year
+	gen threshold_pre_rmspe_`i' = `i'*pre_rmspe if state == 38
+	sum threshold_pre_rmspe_`i'
+	replace threshold_pre_rmspe_`i' = r(mean)
+	# delimit
+	twoway
+		(line alpha year if state == 1 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 2 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 5 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 10 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 11 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 12 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 13 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 15 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 17 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 19 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 21 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 23 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 24 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 25 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 26 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 28 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 29 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 30 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 31 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 32 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 33 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 34 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 36 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 37 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 39 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 40 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 41 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 44 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 45 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 47 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 50 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 51 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 53 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 54 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 55 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 38, lwidth(thick) lcolor(black) 
+		xline(1994, lwidth(thick) lcolor(maroon)) yline(0, lwidth(thick) lcolor(maroon)))
+		,
+		leg(lab(36 "North Dakota") lab(1 "Control States") size(medsmall) pos(11) order(36 1) ring(0) cols(1))
+		xtitle("Year") xlab(1980[2]2014, grid glcolor(gs15) angle(45))
+		ytitle("Gap in Nursing Home Medicaid Expenditure Per Capita") ylab(, grid glcolor(gs15))
+		graphregion(color(white)) bgcolor(white) plotregion(color(white));
+	# delimit cr
+	graph export "CON_Expenditure_ND\Figures\nursing_home_medicaid_exp_Gaps_with_Placebos_`i'_ND.pdf", replace
+}
 *Exact p-value based on post/pre RMSPE & histogram of RMSPEs
 use CON_Expenditure_ND\Placebos\Nursing_Home_Medicaid_Exp\synth_medicaid_nursing_home_exp_all.dta, clear
 keep alpha* year
@@ -1838,52 +1930,67 @@ save CON_Expenditure_ND\Placebos\Q_Nursing_Homes\synth_q_nursing_homes_all.dta, 
 use CON_Expenditure_ND\Placebos\Q_Nursing_Homes\synth_q_nursing_homes_all.dta, clear
 keep alpha* year
 reshape long alpha, i(year) j(state)
-# delimit
-twoway
-	(line alpha year if state == 1, lcolor(gs12))
-	(line alpha year if state == 2, lcolor(gs12))
-	(line alpha year if state == 5, lcolor(gs12))
-	(line alpha year if state == 10, lcolor(gs12))
-	(line alpha year if state == 11, lcolor(gs12))
-	(line alpha year if state == 12, lcolor(gs12))
-	(line alpha year if state == 13, lcolor(gs12))
-	(line alpha year if state == 15, lcolor(gs12))
-	(line alpha year if state == 17, lcolor(gs12))
-	(line alpha year if state == 19, lcolor(gs12))
-	(line alpha year if state == 21, lcolor(gs12))
-	(line alpha year if state == 23, lcolor(gs12))
-	(line alpha year if state == 24, lcolor(gs12))
-	(line alpha year if state == 25, lcolor(gs12))
-	(line alpha year if state == 26, lcolor(gs12))
-	(line alpha year if state == 28, lcolor(gs12))
-	(line alpha year if state == 29, lcolor(gs12))
-	(line alpha year if state == 30, lcolor(gs12))
-	(line alpha year if state == 31, lcolor(gs12))
-	(line alpha year if state == 32, lcolor(gs12))
-	(line alpha year if state == 33, lcolor(gs12))
-	(line alpha year if state == 34, lcolor(gs12))
-	(line alpha year if state == 36, lcolor(gs12))
-	(line alpha year if state == 37, lcolor(gs12))
-	(line alpha year if state == 39, lcolor(gs12))
-	(line alpha year if state == 40, lcolor(gs12))
-	(line alpha year if state == 41, lcolor(gs12))
-	(line alpha year if state == 44, lcolor(gs12))
-	(line alpha year if state == 45, lcolor(gs12))
-	(line alpha year if state == 47, lcolor(gs12))
-	(line alpha year if state == 50, lcolor(gs12))
-	(line alpha year if state == 51, lcolor(gs12))
-	(line alpha year if state == 53, lcolor(gs12))
-	(line alpha year if state == 54, lcolor(gs12))
-	(line alpha year if state == 55, lcolor(gs12))
-	(line alpha year if state == 38, lwidth(thick) lcolor(black) 
-	xline(1994, lwidth(thick) lcolor(maroon)) yline(0, lwidth(thick) lcolor(maroon)))
-	,
-	leg(lab(36 "North Dakota") lab(1 "Control States") size(medsmall) pos(11) order(36 1) ring(0) cols(1))
-	xtitle("Year") xlab(1990[2]2014, grid glcolor(gs15) angle(45))
-	ytitle("Gap in Quantity of Nursing Homes Per 100,000") ylab(, grid glcolor(gs15))
-	graphregion(color(white)) bgcolor(white) plotregion(color(white));
-# delimit cr
-graph export "CON_Expenditure_ND\Figures\q_nursing_homes_Gaps_with_Placebos_ND.pdf", replace
+gen alpha_sqrd = alpha*alpha
+bysort state: egen pre_mspe = mean(alpha_sqrd) if year <= 1994
+gen pre_rmspe = sqrt(pre_mspe)
+local statelist "1 2 5 10 11 12 13 15 17 19 21 23 24 25 26 28 29 30 31 32 33 34 36 37 38 39 40 41 44 45 47 50 51 53 54 55"
+foreach i of local statelist {
+    sum pre_rmspe if state == `i'
+	replace pre_rmspe = r(mean) if state == `i'
+}
+local threshold " "1000000" "20" "10" "5" "2" "	/* the 1000000 is meant to ensure that no states are dropped in the graph */
+foreach i of local threshold {
+	sort state year
+	gen threshold_pre_rmspe_`i' = `i'*pre_rmspe if state == 38
+	sum threshold_pre_rmspe_`i'
+	replace threshold_pre_rmspe_`i' = r(mean)
+	# delimit
+	twoway
+		(line alpha year if state == 1 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 2 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 5 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 10 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 11 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 12 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 13 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 15 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 17 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 19 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 21 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 23 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 24 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 25 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 26 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 28 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 29 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 30 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 31 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 32 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 33 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 34 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 36 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 37 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 39 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 40 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 41 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 44 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 45 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 47 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 50 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 51 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 53 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 54 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 55 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 38, lwidth(thick) lcolor(black) 
+		xline(1994, lwidth(thick) lcolor(maroon)) yline(0, lwidth(thick) lcolor(maroon)))
+		,
+		leg(lab(36 "North Dakota") lab(1 "Control States") size(medsmall) pos(11) order(36 1) ring(0) cols(1))
+		xtitle("Year") xlab(1990[2]2014, grid glcolor(gs15) angle(45))
+		ytitle("Gap in Quantity of Nursing Homes Per 100,000") ylab(, grid glcolor(gs15))
+		graphregion(color(white)) bgcolor(white) plotregion(color(white));
+	# delimit cr
+	graph export "CON_Expenditure_ND\Figures\q_nursing_homes_Gaps_with_Placebos_`i'_ND.pdf", replace
+}
 *Exact p-value based on post/pre RMSPE & histogram of RMSPEs
 use CON_Expenditure_ND\Placebos\Q_Nursing_Homes\synth_q_nursing_homes_all.dta, clear
 keep alpha* year
@@ -1956,52 +2063,67 @@ save CON_Expenditure_ND\Placebos\Q_Nursing_Home_Beds\synth_q_nursing_home_beds_a
 use CON_Expenditure_ND\Placebos\Q_Nursing_Home_Beds\synth_q_nursing_home_beds_all.dta, clear
 keep alpha* year
 reshape long alpha, i(year) j(state)
-# delimit
-twoway
-	(line alpha year if state == 1, lcolor(gs12))
-	(line alpha year if state == 2, lcolor(gs12))
-	(line alpha year if state == 5, lcolor(gs12))
-	(line alpha year if state == 10, lcolor(gs12))
-	(line alpha year if state == 11, lcolor(gs12))
-	(line alpha year if state == 12, lcolor(gs12))
-	(line alpha year if state == 13, lcolor(gs12))
-	(line alpha year if state == 15, lcolor(gs12))
-	(line alpha year if state == 17, lcolor(gs12))
-	(line alpha year if state == 19, lcolor(gs12))
-	(line alpha year if state == 21, lcolor(gs12))
-	(line alpha year if state == 23, lcolor(gs12))
-	(line alpha year if state == 24, lcolor(gs12))
-	(line alpha year if state == 25, lcolor(gs12))
-	(line alpha year if state == 26, lcolor(gs12))
-	(line alpha year if state == 28, lcolor(gs12))
-	(line alpha year if state == 29, lcolor(gs12))
-	(line alpha year if state == 30, lcolor(gs12))
-	(line alpha year if state == 31, lcolor(gs12))
-	(line alpha year if state == 32, lcolor(gs12))
-	(line alpha year if state == 33, lcolor(gs12))
-	(line alpha year if state == 34, lcolor(gs12))
-	(line alpha year if state == 36, lcolor(gs12))
-	(line alpha year if state == 37, lcolor(gs12))
-	(line alpha year if state == 39, lcolor(gs12))
-	(line alpha year if state == 40, lcolor(gs12))
-	(line alpha year if state == 41, lcolor(gs12))
-	(line alpha year if state == 44, lcolor(gs12))
-	(line alpha year if state == 45, lcolor(gs12))
-	(line alpha year if state == 47, lcolor(gs12))
-	(line alpha year if state == 50, lcolor(gs12))
-	(line alpha year if state == 51, lcolor(gs12))
-	(line alpha year if state == 53, lcolor(gs12))
-	(line alpha year if state == 54, lcolor(gs12))
-	(line alpha year if state == 55, lcolor(gs12))
-	(line alpha year if state == 38, lwidth(thick) lcolor(black) 
-	xline(1994, lwidth(thick) lcolor(maroon)) yline(0, lwidth(thick) lcolor(maroon)))
-	,
-	leg(lab(36 "North Dakota") lab(1 "Control States") size(medsmall) pos(11) order(36 1) ring(0) cols(1))
-	xtitle("Year") xlab(1990[2]2014, grid glcolor(gs15) angle(45))
-	ytitle("Gap in Quantity of Nursing Home Beds Per 100,000") ylab(, grid glcolor(gs15))
-	graphregion(color(white)) bgcolor(white) plotregion(color(white));
-# delimit cr
-graph export "CON_Expenditure_ND\Figures\q_nursing_home_beds_Gaps_with_Placebos_ND.pdf", replace
+gen alpha_sqrd = alpha*alpha
+bysort state: egen pre_mspe = mean(alpha_sqrd) if year <= 1994
+gen pre_rmspe = sqrt(pre_mspe)
+local statelist "1 2 5 10 11 12 13 15 17 19 21 23 24 25 26 28 29 30 31 32 33 34 36 37 38 39 40 41 44 45 47 50 51 53 54 55"
+foreach i of local statelist {
+    sum pre_rmspe if state == `i'
+	replace pre_rmspe = r(mean) if state == `i'
+}
+local threshold " "1000000" "20" "10" "5" "2" "	/* the 1000000 is meant to ensure that no states are dropped in the graph */
+foreach i of local threshold {
+	sort state year
+	gen threshold_pre_rmspe_`i' = `i'*pre_rmspe if state == 38
+	sum threshold_pre_rmspe_`i'
+	replace threshold_pre_rmspe_`i' = r(mean)
+	# delimit
+	twoway
+		(line alpha year if state == 1 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 2 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 5 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 10 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 11 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 12 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 13 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 15 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 17 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 19 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 21 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 23 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 24 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 25 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 26 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 28 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 29 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 30 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 31 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 32 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 33 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 34 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 36 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 37 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 39 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 40 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 41 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 44 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 45 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 47 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 50 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 51 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 53 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 54 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 55 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 38, lwidth(thick) lcolor(black) 
+		xline(1994, lwidth(thick) lcolor(maroon)) yline(0, lwidth(thick) lcolor(maroon)))
+		,
+		leg(lab(36 "North Dakota") lab(1 "Control States") size(medsmall) pos(11) order(36 1) ring(0) cols(1))
+		xtitle("Year") xlab(1990[2]2014, grid glcolor(gs15) angle(45))
+		ytitle("Gap in Quantity of Nursing Home Beds Per 100,000") ylab(, grid glcolor(gs15))
+		graphregion(color(white)) bgcolor(white) plotregion(color(white));
+	# delimit cr
+	graph export "CON_Expenditure_ND\Figures\q_nursing_home_beds_Gaps_with_Placebos_`i'_ND.pdf", replace
+}
 *Exact p-value based on post/pre RMSPE & histogram of RMSPEs
 use CON_Expenditure_ND\Placebos\Q_Nursing_Home_Beds\synth_q_nursing_home_beds_all.dta, clear
 keep alpha* year
@@ -2286,52 +2408,67 @@ save CON_Expenditure_IN\Placebos\Nursing_Home_Total_Exp\synth_total_nursing_home
 use CON_Expenditure_IN\Placebos\Nursing_Home_Total_Exp\synth_total_nursing_home_exp_all.dta, clear
 keep alpha* year
 reshape long alpha, i(year) j(state)
-# delimit
-twoway
-	(line alpha year if state == 1, lcolor(gs12))
-	(line alpha year if state == 2, lcolor(gs12))
-	(line alpha year if state == 5, lcolor(gs12))
-	(line alpha year if state == 10, lcolor(gs12))
-	(line alpha year if state == 11, lcolor(gs12))
-	(line alpha year if state == 12, lcolor(gs12))
-	(line alpha year if state == 13, lcolor(gs12))
-	(line alpha year if state == 15, lcolor(gs12))
-	(line alpha year if state == 17, lcolor(gs12))
-	(line alpha year if state == 19, lcolor(gs12))
-	(line alpha year if state == 21, lcolor(gs12))
-	(line alpha year if state == 23, lcolor(gs12))
-	(line alpha year if state == 24, lcolor(gs12))
-	(line alpha year if state == 25, lcolor(gs12))
-	(line alpha year if state == 26, lcolor(gs12))
-	(line alpha year if state == 28, lcolor(gs12))
-	(line alpha year if state == 29, lcolor(gs12))
-	(line alpha year if state == 30, lcolor(gs12))
-	(line alpha year if state == 31, lcolor(gs12))
-	(line alpha year if state == 32, lcolor(gs12))
-	(line alpha year if state == 33, lcolor(gs12))
-	(line alpha year if state == 34, lcolor(gs12))
-	(line alpha year if state == 36, lcolor(gs12))
-	(line alpha year if state == 37, lcolor(gs12))
-	(line alpha year if state == 39, lcolor(gs12))
-	(line alpha year if state == 40, lcolor(gs12))
-	(line alpha year if state == 41, lcolor(gs12))
-	(line alpha year if state == 44, lcolor(gs12))
-	(line alpha year if state == 45, lcolor(gs12))
-	(line alpha year if state == 47, lcolor(gs12))
-	(line alpha year if state == 50, lcolor(gs12))
-	(line alpha year if state == 51, lcolor(gs12))
-	(line alpha year if state == 53, lcolor(gs12))
-	(line alpha year if state == 54, lcolor(gs12))
-	(line alpha year if state == 55, lcolor(gs12))
-	(line alpha year if state == 18, lwidth(thick) lcolor(black) 
-	xline(1998, lwidth(thick) lcolor(maroon)) yline(0, lwidth(thick) lcolor(maroon)))
-	,
-	leg(lab(36 "Indiana") lab(1 "Control States") size(medsmall) pos(11) order(36 1) ring(0) cols(1))
-	xtitle("Year") xlab(1980[2]2014, grid glcolor(gs15) angle(45))
-	ytitle("Gap in Total Nursing Home Expenditure Per Capita") ylab(, grid glcolor(gs15))
-	graphregion(color(white)) bgcolor(white) plotregion(color(white));
-# delimit cr
-graph export "CON_Expenditure_IN\Figures\nursing_home_tot_exp_Gaps_with_Placebos_IN.pdf", replace
+gen alpha_sqrd = alpha*alpha
+bysort state: egen pre_mspe = mean(alpha_sqrd) if year <= 1998
+gen pre_rmspe = sqrt(pre_mspe)
+local statelist "1 2 5 10 11 12 13 15 17 18 19 21 23 24 25 26 28 29 30 31 32 33 34 36 37 39 40 41 44 45 47 50 51 53 54 55"
+foreach i of local statelist {
+    sum pre_rmspe if state == `i'
+	replace pre_rmspe = r(mean) if state == `i'
+}
+local threshold " "1000000" "20" "10" "5" "2" "	/* the 1000000 is meant to ensure that no states are dropped in the graph */
+foreach i of local threshold {
+	sort state year
+	gen threshold_pre_rmspe_`i' = `i'*pre_rmspe if state == 18
+	sum threshold_pre_rmspe_`i'
+	replace threshold_pre_rmspe_`i' = r(mean)
+	# delimit
+	twoway
+		(line alpha year if state == 1 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 2 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 5 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 10 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 11 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 12 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 13 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 15 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 17 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 19 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 21 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 23 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 24 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 25 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 26 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 28 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 29 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 30 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 31 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 32 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 33 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 34 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 36 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 37 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 39 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 40 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 41 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 44 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 45 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 47 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 50 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 51 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 53 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 54 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 55 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 18, lwidth(thick) lcolor(black) 
+		xline(1998, lwidth(thick) lcolor(maroon)) yline(0, lwidth(thick) lcolor(maroon)))
+		,
+		leg(lab(36 "Indiana") lab(1 "Control States") size(medsmall) pos(11) order(36 1) ring(0) cols(1))
+		xtitle("Year") xlab(1980[2]2014, grid glcolor(gs15) angle(45))
+		ytitle("Gap in Total Nursing Home Expenditure Per Capita") ylab(, grid glcolor(gs15))
+		graphregion(color(white)) bgcolor(white) plotregion(color(white));
+	# delimit cr
+	graph export "CON_Expenditure_IN\Figures\nursing_home_tot_exp_Gaps_with_Placebos_`i'_IN.pdf", replace
+}
 *Exact p-value based on post/pre RMSPE & histogram of RMSPEs
 use CON_Expenditure_IN\Placebos\Nursing_Home_Total_Exp\synth_total_nursing_home_exp_all.dta, clear
 keep alpha* year
@@ -2406,52 +2543,67 @@ save CON_Expenditure_IN\Placebos\Nursing_Home_Medicaid_Exp\synth_medicaid_nursin
 use CON_Expenditure_IN\Placebos\Nursing_Home_Medicaid_Exp\synth_medicaid_nursing_home_exp_all.dta, clear
 keep alpha* year
 reshape long alpha, i(year) j(state)
-# delimit
-twoway
-	(line alpha year if state == 1, lcolor(gs12))
-	(line alpha year if state == 2, lcolor(gs12))
-	(line alpha year if state == 5, lcolor(gs12))
-	(line alpha year if state == 10, lcolor(gs12))
-	(line alpha year if state == 11, lcolor(gs12))
-	(line alpha year if state == 12, lcolor(gs12))
-	(line alpha year if state == 13, lcolor(gs12))
-	(line alpha year if state == 15, lcolor(gs12))
-	(line alpha year if state == 17, lcolor(gs12))
-	(line alpha year if state == 19, lcolor(gs12))
-	(line alpha year if state == 21, lcolor(gs12))
-	(line alpha year if state == 23, lcolor(gs12))
-	(line alpha year if state == 24, lcolor(gs12))
-	(line alpha year if state == 25, lcolor(gs12))
-	(line alpha year if state == 26, lcolor(gs12))
-	(line alpha year if state == 28, lcolor(gs12))
-	(line alpha year if state == 29, lcolor(gs12))
-	(line alpha year if state == 30, lcolor(gs12))
-	(line alpha year if state == 31, lcolor(gs12))
-	(line alpha year if state == 32, lcolor(gs12))
-	(line alpha year if state == 33, lcolor(gs12))
-	(line alpha year if state == 34, lcolor(gs12))
-	(line alpha year if state == 36, lcolor(gs12))
-	(line alpha year if state == 37, lcolor(gs12))
-	(line alpha year if state == 39, lcolor(gs12))
-	(line alpha year if state == 40, lcolor(gs12))
-	(line alpha year if state == 41, lcolor(gs12))
-	(line alpha year if state == 44, lcolor(gs12))
-	(line alpha year if state == 45, lcolor(gs12))
-	(line alpha year if state == 47, lcolor(gs12))
-	(line alpha year if state == 50, lcolor(gs12))
-	(line alpha year if state == 51, lcolor(gs12))
-	(line alpha year if state == 53, lcolor(gs12))
-	(line alpha year if state == 54, lcolor(gs12))
-	(line alpha year if state == 55, lcolor(gs12))
-	(line alpha year if state == 18, lwidth(thick) lcolor(black) 
-	xline(1998, lwidth(thick) lcolor(maroon)) yline(0, lwidth(thick) lcolor(maroon)))
-	,
-	leg(lab(36 "Indiana") lab(1 "Control States") size(medsmall) pos(11) order(36 1) ring(0) cols(1))
-	xtitle("Year") xlab(1980[2]2014, grid glcolor(gs15) angle(45))
-	ytitle("Gap in Nursing Home Medicaid Expenditure Per Capita") ylab(, grid glcolor(gs15))
-	graphregion(color(white)) bgcolor(white) plotregion(color(white));
-# delimit cr
-graph export "CON_Expenditure_IN\Figures\nursing_home_medicaid_exp_Gaps_with_Placebos_IN.pdf", replace
+gen alpha_sqrd = alpha*alpha
+bysort state: egen pre_mspe = mean(alpha_sqrd) if year <= 1998
+gen pre_rmspe = sqrt(pre_mspe)
+local statelist "1 2 5 10 11 12 13 15 17 18 19 21 23 24 25 26 28 29 30 31 32 33 34 36 37 39 40 41 44 45 47 50 51 53 54 55"
+foreach i of local statelist {
+    sum pre_rmspe if state == `i'
+	replace pre_rmspe = r(mean) if state == `i'
+}
+local threshold " "1000000" "20" "10" "5" "2" "	/* the 1000000 is meant to ensure that no states are dropped in the graph */
+foreach i of local threshold {
+	sort state year
+	gen threshold_pre_rmspe_`i' = `i'*pre_rmspe if state == 18
+	sum threshold_pre_rmspe_`i'
+	replace threshold_pre_rmspe_`i' = r(mean)
+	# delimit
+	twoway
+		(line alpha year if state == 1 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 2 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 5 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 10 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 11 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 12 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 13 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 15 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 17 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 19 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 21 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 23 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 24 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 25 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 26 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 28 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 29 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 30 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 31 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 32 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 33 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 34 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 36 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 37 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 39 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 40 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 41 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 44 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 45 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 47 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 50 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 51 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 53 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 54 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 55 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 18, lwidth(thick) lcolor(black) 
+		xline(1998, lwidth(thick) lcolor(maroon)) yline(0, lwidth(thick) lcolor(maroon)))
+		,
+		leg(lab(36 "Indiana") lab(1 "Control States") size(medsmall) pos(11) order(36 1) ring(0) cols(1))
+		xtitle("Year") xlab(1980[2]2014, grid glcolor(gs15) angle(45))
+		ytitle("Gap in Nursing Home Medicaid Expenditure Per Capita") ylab(, grid glcolor(gs15))
+		graphregion(color(white)) bgcolor(white) plotregion(color(white));
+	# delimit cr
+	graph export "CON_Expenditure_IN\Figures\nursing_home_medicaid_exp_Gaps_with_Placebos_`i'_IN.pdf", replace
+}
 *Exact p-value based on post/pre RMSPE & histogram of RMSPEs
 use CON_Expenditure_IN\Placebos\Nursing_Home_Medicaid_Exp\synth_medicaid_nursing_home_exp_all.dta, clear
 keep alpha* year
@@ -2524,52 +2676,67 @@ save CON_Expenditure_IN\Placebos\Q_Nursing_Homes\synth_q_nursing_homes_all.dta, 
 use CON_Expenditure_IN\Placebos\Q_Nursing_Homes\synth_q_nursing_homes_all.dta, clear
 keep alpha* year
 reshape long alpha, i(year) j(state)
-# delimit
-twoway
-	(line alpha year if state == 1, lcolor(gs12))
-	(line alpha year if state == 2, lcolor(gs12))
-	(line alpha year if state == 5, lcolor(gs12))
-	(line alpha year if state == 10, lcolor(gs12))
-	(line alpha year if state == 11, lcolor(gs12))
-	(line alpha year if state == 12, lcolor(gs12))
-	(line alpha year if state == 13, lcolor(gs12))
-	(line alpha year if state == 15, lcolor(gs12))
-	(line alpha year if state == 17, lcolor(gs12))
-	(line alpha year if state == 19, lcolor(gs12))
-	(line alpha year if state == 21, lcolor(gs12))
-	(line alpha year if state == 23, lcolor(gs12))
-	(line alpha year if state == 24, lcolor(gs12))
-	(line alpha year if state == 25, lcolor(gs12))
-	(line alpha year if state == 26, lcolor(gs12))
-	(line alpha year if state == 28, lcolor(gs12))
-	(line alpha year if state == 29, lcolor(gs12))
-	(line alpha year if state == 30, lcolor(gs12))
-	(line alpha year if state == 31, lcolor(gs12))
-	(line alpha year if state == 32, lcolor(gs12))
-	(line alpha year if state == 33, lcolor(gs12))
-	(line alpha year if state == 34, lcolor(gs12))
-	(line alpha year if state == 36, lcolor(gs12))
-	(line alpha year if state == 37, lcolor(gs12))
-	(line alpha year if state == 39, lcolor(gs12))
-	(line alpha year if state == 40, lcolor(gs12))
-	(line alpha year if state == 41, lcolor(gs12))
-	(line alpha year if state == 44, lcolor(gs12))
-	(line alpha year if state == 45, lcolor(gs12))
-	(line alpha year if state == 47, lcolor(gs12))
-	(line alpha year if state == 50, lcolor(gs12))
-	(line alpha year if state == 51, lcolor(gs12))
-	(line alpha year if state == 53, lcolor(gs12))
-	(line alpha year if state == 54, lcolor(gs12))
-	(line alpha year if state == 55, lcolor(gs12))
-	(line alpha year if state == 18, lwidth(thick) lcolor(black) 
-	xline(1998, lwidth(thick) lcolor(maroon)) yline(0, lwidth(thick) lcolor(maroon)))
-	,
-	leg(lab(36 "Indiana") lab(1 "Control States") size(medsmall) pos(11) order(36 1) ring(0) cols(1))
-	xtitle("Year") xlab(1990[2]2014, grid glcolor(gs15) angle(45))
-	ytitle("Gap in Quantity of Nursing Homes Per 100,000") ylab(, grid glcolor(gs15))
-	graphregion(color(white)) bgcolor(white) plotregion(color(white));
-# delimit cr
-graph export "CON_Expenditure_IN\Figures\q_nursing_homes_Gaps_with_Placebos_IN.pdf", replace
+gen alpha_sqrd = alpha*alpha
+bysort state: egen pre_mspe = mean(alpha_sqrd) if year <= 1998
+gen pre_rmspe = sqrt(pre_mspe)
+local statelist "1 2 5 10 11 12 13 15 17 18 19 21 23 24 25 26 28 29 30 31 32 33 34 36 37 39 40 41 44 45 47 50 51 53 54 55"
+foreach i of local statelist {
+    sum pre_rmspe if state == `i'
+	replace pre_rmspe = r(mean) if state == `i'
+}
+local threshold " "1000000" "20" "10" "5" "2" "	/* the 1000000 is meant to ensure that no states are dropped in the graph */
+foreach i of local threshold {
+	sort state year
+	gen threshold_pre_rmspe_`i' = `i'*pre_rmspe if state == 18
+	sum threshold_pre_rmspe_`i'
+	replace threshold_pre_rmspe_`i' = r(mean)
+	# delimit
+	twoway
+		(line alpha year if state == 1 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 2 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 5 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 10 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 11 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 12 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 13 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 15 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 17 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 19 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 21 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 23 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 24 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 25 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 26 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 28 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 29 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 30 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 31 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 32 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 33 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 34 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 36 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 37 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 39 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 40 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 41 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 44 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 45 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 47 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 50 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 51 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 53 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 54 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 55 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 18, lwidth(thick) lcolor(black) 
+		xline(1998, lwidth(thick) lcolor(maroon)) yline(0, lwidth(thick) lcolor(maroon)))
+		,
+		leg(lab(36 "Indiana") lab(1 "Control States") size(medsmall) pos(11) order(36 1) ring(0) cols(1))
+		xtitle("Year") xlab(1990[2]2014, grid glcolor(gs15) angle(45))
+		ytitle("Gap in Quantity of Nursing Homes Per 100,000") ylab(, grid glcolor(gs15))
+		graphregion(color(white)) bgcolor(white) plotregion(color(white));
+	# delimit cr
+	graph export "CON_Expenditure_IN\Figures\q_nursing_homes_Gaps_with_Placebos_`i'_IN.pdf", replace
+}
 *Exact p-value based on post/pre RMSPE & histogram of RMSPEs
 use CON_Expenditure_IN\Placebos\Q_Nursing_Homes\synth_q_nursing_homes_all.dta, clear
 keep alpha* year
@@ -2642,52 +2809,67 @@ save CON_Expenditure_IN\Placebos\Q_Nursing_Home_Beds\synth_q_nursing_home_beds_a
 use CON_Expenditure_IN\Placebos\Q_Nursing_Home_Beds\synth_q_nursing_home_beds_all.dta, clear
 keep alpha* year
 reshape long alpha, i(year) j(state)
-# delimit
-twoway
-	(line alpha year if state == 1, lcolor(gs12))
-	(line alpha year if state == 2, lcolor(gs12))
-	(line alpha year if state == 5, lcolor(gs12))
-	(line alpha year if state == 10, lcolor(gs12))
-	(line alpha year if state == 11, lcolor(gs12))
-	(line alpha year if state == 12, lcolor(gs12))
-	(line alpha year if state == 13, lcolor(gs12))
-	(line alpha year if state == 15, lcolor(gs12))
-	(line alpha year if state == 17, lcolor(gs12))
-	(line alpha year if state == 19, lcolor(gs12))
-	(line alpha year if state == 21, lcolor(gs12))
-	(line alpha year if state == 23, lcolor(gs12))
-	(line alpha year if state == 24, lcolor(gs12))
-	(line alpha year if state == 25, lcolor(gs12))
-	(line alpha year if state == 26, lcolor(gs12))
-	(line alpha year if state == 28, lcolor(gs12))
-	(line alpha year if state == 29, lcolor(gs12))
-	(line alpha year if state == 30, lcolor(gs12))
-	(line alpha year if state == 31, lcolor(gs12))
-	(line alpha year if state == 32, lcolor(gs12))
-	(line alpha year if state == 33, lcolor(gs12))
-	(line alpha year if state == 34, lcolor(gs12))
-	(line alpha year if state == 36, lcolor(gs12))
-	(line alpha year if state == 37, lcolor(gs12))
-	(line alpha year if state == 39, lcolor(gs12))
-	(line alpha year if state == 40, lcolor(gs12))
-	(line alpha year if state == 41, lcolor(gs12))
-	(line alpha year if state == 44, lcolor(gs12))
-	(line alpha year if state == 45, lcolor(gs12))
-	(line alpha year if state == 47, lcolor(gs12))
-	(line alpha year if state == 50, lcolor(gs12))
-	(line alpha year if state == 51, lcolor(gs12))
-	(line alpha year if state == 53, lcolor(gs12))
-	(line alpha year if state == 54, lcolor(gs12))
-	(line alpha year if state == 55, lcolor(gs12))
-	(line alpha year if state == 18, lwidth(thick) lcolor(black) 
-	xline(1998, lwidth(thick) lcolor(maroon)) yline(0, lwidth(thick) lcolor(maroon)))
-	,
-	leg(lab(36 "Indiana") lab(1 "Control States") size(medsmall) pos(11) order(36 1) ring(0) cols(1))
-	xtitle("Year") xlab(1990[2]2014, grid glcolor(gs15) angle(45))
-	ytitle("Gap in Quantity of Nursing Home Beds Per 100,000") ylab(, grid glcolor(gs15))
-	graphregion(color(white)) bgcolor(white) plotregion(color(white));
-# delimit cr
-graph export "CON_Expenditure_IN\Figures\q_nursing_home_beds_Gaps_with_Placebos_IN.pdf", replace
+gen alpha_sqrd = alpha*alpha
+bysort state: egen pre_mspe = mean(alpha_sqrd) if year <= 1998
+gen pre_rmspe = sqrt(pre_mspe)
+local statelist "1 2 5 10 11 12 13 15 17 18 19 21 23 24 25 26 28 29 30 31 32 33 34 36 37 39 40 41 44 45 47 50 51 53 54 55"
+foreach i of local statelist {
+    sum pre_rmspe if state == `i'
+	replace pre_rmspe = r(mean) if state == `i'
+}
+local threshold " "1000000" "20" "10" "5" "2" "	/* the 1000000 is meant to ensure that no states are dropped in the graph */
+foreach i of local threshold {
+	sort state year
+	gen threshold_pre_rmspe_`i' = `i'*pre_rmspe if state == 18
+	sum threshold_pre_rmspe_`i'
+	replace threshold_pre_rmspe_`i' = r(mean)
+	# delimit
+	twoway
+		(line alpha year if state == 1 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 2 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 5 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 10 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 11 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 12 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 13 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 15 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 17 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 19 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 21 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 23 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 24 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 25 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 26 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 28 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 29 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 30 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 31 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 32 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 33 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 34 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 36 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 37 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 39 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 40 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 41 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 44 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 45 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 47 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 50 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 51 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 53 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 54 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 55 & pre_rmspe <= threshold_pre_rmspe_`i', lcolor(gs12))
+		(line alpha year if state == 18, lwidth(thick) lcolor(black) 
+		xline(1998, lwidth(thick) lcolor(maroon)) yline(0, lwidth(thick) lcolor(maroon)))
+		,
+		leg(lab(36 "Indiana") lab(1 "Control States") size(medsmall) pos(11) order(36 1) ring(0) cols(1))
+		xtitle("Year") xlab(1990[2]2014, grid glcolor(gs15) angle(45))
+		ytitle("Gap in Quantity of Nursing Home Beds Per 100,000") ylab(, grid glcolor(gs15))
+		graphregion(color(white)) bgcolor(white) plotregion(color(white));
+	# delimit cr
+	graph export "CON_Expenditure_IN\Figures\q_nursing_home_beds_Gaps_with_Placebos_`i'_IN.pdf", replace
+}
 *Exact p-value based on post/pre RMSPE & histogram of RMSPEs
 use CON_Expenditure_IN\Placebos\Q_Nursing_Home_Beds\synth_q_nursing_home_beds_all.dta, clear
 keep alpha* year
