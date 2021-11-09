@@ -632,6 +632,48 @@ save CON_Expenditure.dta, replace
 
 
 * ------------------------------------------------------------------------------
+* Map of Nursing Home CON States
+* ------------------------------------------------------------------------------
+
+*Obtain and install the shp2dta and spmap commands.
+*cap ssc install shp2dta 
+*cap ssc install spmap
+
+clear
+global directory: env Combined_CON_Directory
+cd "$directory"
+shp2dta using CON_Map\s_11au16.shp, ///
+                database(CON_Map\states) coordinates(CON_Map\statecoord) replace
+use CON_Map\states.dta, clear
+destring FIPS, generate(id)
+rename STATE state	
+rename LON lon
+renam LAT lat	
+drop NAME FIPS	
+drop if id > 56
+drop if lon == 0
+sort id
+save CON_Map\states.dta, replace
+
+use CON_Expenditure.dta, clear
+drop _merge
+duplicates drop id, force
+merge 1:1 id using "CON_Map\states.dta"
+
+replace alwaysconpa = . if state == "PA" | state == "ND" | state == "IN"
+
+spmap alwaysconpa using CON_Map\statecoord if state != "AK" & state != "HI", id(_ID) ocolor(white ..) ndocolor(white ..) fcolor(Blues) ndfcolor(cranberry)
+gr_edit .legend.DragBy 7.12744767371562 15.95190669831593
+gr_edit .legend.plotregion1.label[1].text = {}
+gr_edit .legend.plotregion1.label[1].text.Arrpush Nursing Home CON
+gr_edit .legend.plotregion1.label[2].text = {}
+gr_edit .legend.plotregion1.label[2].text.Arrpush No Nursing Home CON
+gr_edit .legend.plotregion1.label[3].text = {}
+gr_edit .legend.plotregion1.label[3].text.Arrpush Dropped Nursing Home CON
+graph export CON_Map\CON_Map.pdf, replace
+
+
+* ------------------------------------------------------------------------------
 * Synthetic Control Estimates
 * ------------------------------------------------------------------------------
 
