@@ -661,8 +661,10 @@ duplicates drop id, force
 merge 1:1 id using "CON_Map\states.dta"
 
 replace alwaysconpa = . if state == "PA" | state == "ND" | state == "IN"
+replace alwaysconpa = 1 if state == "CT" | state == "LA"
+/* Add footnote in figure saying that CT and LA adopted NH Con during sample period so we dropped them */
 
-spmap alwaysconpa using CON_Map\statecoord if state != "AK" & state != "HI", id(_ID) ocolor(white ..) ndocolor(white ..) fcolor(Blues) ndfcolor(cranberry)
+spmap alwaysconpa using CON_Map\statecoord if state != "AK" & state != "HI", clmethod(unique) id(_ID) ocolor(white ..) ndocolor(white ..) fcolor(Greys) ndfcolor(black) legorder(hilo)
 gr_edit .legend.DragBy 7.12744767371562 15.95190669831593
 gr_edit .legend.plotregion1.label[1].text = {}
 gr_edit .legend.plotregion1.label[1].text.Arrpush Nursing Home CON
