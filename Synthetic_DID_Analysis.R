@@ -1,11 +1,15 @@
-########################## Pennsylvania Synthetic DID Analysis #############################
+########################## Synthetic DID Analysis #############################
 
 ##### Load Necessary Packages #####
 #install.packages("remotes")
 #remotes::install_github("synth-inference/synthdid")
+#install.packages("foreach")
+#install.packages("xtable")
 library(synthdid)
 library(ggplot2)
 library(haven) # used to import .dta files #
+library(foreach) # for parallel execution #
+library(xtable)
 
 
 ##### Set working directory #####
@@ -16,6 +20,8 @@ setwd(Sys.getenv("Combined_CON_Directory"))
 CON_Expenditure <- read_dta("CON_Expenditure.dta")
 View(CON_Expenditure)
 
+
+########## Pennsylvania ###########
 
 ##### Create 3D arrays of time-varying covariates for synthetic matching #####
 CON_Expenditure$treated_pa_aux <- ifelse(CON_Expenditure$name == "Pennsylvania", 1, 0)
@@ -46,18 +52,25 @@ estimators = list(did=did_estimate,
 total_exp_pa_estimates <- lapply(estimators, function(estimator) {
   estimator(setup_total_exp_pa$Y, setup_total_exp_pa$N0, setup_total_exp_pa$T0, X = covariates_pa_array)
   })
+total_exp_pa_estimates_rounded <- rbind(unlist(total_exp_pa_estimates))
+total_exp_pa_estimates_rounded <- lapply(total_exp_pa_estimates,round,2)
 total_exp_pa_se <- lapply(total_exp_pa_estimates, function(estimate) {
   set.seed(12345)
   sqrt(vcov(estimate, method='placebo'))
   })
-total_exp_pa_ci <- foreach(i = total_exp_pa_estimates, j = total_exp_pa_se) {
-  sprintf('(%1.2f, %1.2f)', i - 1.96*j, i + 1.96*j)
-}
-total_exp_pa_estimates.table <- rbind(unlist(total_exp_pa_estimates), unlist(total_exp_pa_se), unlist(total_exp_pa_ci))
+total_exp_pa_se_rounded <- lapply(total_exp_pa_se,round,2)
+total_exp_pa_ci <- foreach(i = total_exp_pa_estimates, j = total_exp_pa_se) %do% sprintf('(%1.2f, %1.2f)', i - 1.96*j, i + 1.96*j)
+total_exp_pa_estimates.table <- rbind(unlist(total_exp_pa_estimates_rounded), unlist(total_exp_pa_se_rounded), unlist(total_exp_pa_ci))
 rownames(total_exp_pa_estimates.table) <- (c('estimate', 'standard error', '95% Confidence Interval'))
 colnames(total_exp_pa_estimates.table) <- (c('Diff-in-Diff', 'Synthetic Control', 'Synthetic Diff-in-Diff'))
-round(total_exp_pa_estimates.table, digits=2)
+total_exp_pa_estimates.table
+total_exp_pa_estimates.latextable <- xtable(total_exp_pa_estimates.table, align = "lccc", caption = 'Total Expenditure - PA')
+print(total_exp_pa_estimates.latextable, type='latex', file='SynthDID_Figs_and_Tables/total_expenditure_estimates_PA.tex')
 # Parallel Trends Plots #
+pdf(file='SynthDID_Figs_and_Tables/total_expenditure_plots_PA.pdf')
 synthdid_plot(total_exp_pa_estimates)
+dev.off()
 # Control Unit Contribution Plots #
+pdf(file='SynthDID_Figs_and_Tables/total_expenditure_control_plots_PA.pdf')
 synthdid_units_plot(total_exp_pa_estimates, se.method='placebo')
+dev.off()
