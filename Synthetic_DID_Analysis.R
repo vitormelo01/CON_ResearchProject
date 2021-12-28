@@ -52,6 +52,7 @@ estimators = list(did=did_estimate,
 total_exp_pa_estimates <- lapply(estimators, function(estimator) {
   estimator(setup_total_exp_pa$Y, setup_total_exp_pa$N0, setup_total_exp_pa$T0, X = covariates_pa_array)
   })
+names(total_exp_pa_estimates) = c('Diff-in-Diff', 'Synthetic Control', 'Synthetic Diff-in-Diff')
 total_exp_pa_estimates_rounded <- rbind(unlist(total_exp_pa_estimates))
 total_exp_pa_estimates_rounded <- lapply(total_exp_pa_estimates,round,2)
 total_exp_pa_se <- lapply(total_exp_pa_estimates, function(estimate) {
@@ -72,5 +73,5 @@ synthdid_plot(total_exp_pa_estimates)
 dev.off()
 # Control Unit Contribution Plots #
 pdf(file='SynthDID_Figs_and_Tables/total_expenditure_control_plots_PA.pdf')
-synthdid_units_plot(total_exp_pa_estimates, se.method='placebo')
+synthdid_units_plot(total_exp_pa_estimates)
 dev.off()
