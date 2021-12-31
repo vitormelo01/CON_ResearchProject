@@ -204,3 +204,373 @@ dev.off()
 pdf(file='SynthDID_Figs_and_Tables/medicaid_expenditure_control_plots_PA.pdf')
 synthdid_units_plot(medicaid_exp_pa_estimates, se.method='none') + theme(axis.text.x = element_text(size = 5, hjust=1, vjust=0.3))
 dev.off()
+
+
+
+
+########## Indiana ###########
+
+##### Create 3D array of time-varying covariates for synthetic matching - CON_Expenditure #####
+CON_Expenditure$treated_in_aux <- ifelse(CON_Expenditure$name == "Indiana", 1, 0)
+covariates_in_exp_df <- subset(CON_Expenditure, alwaysconpa == 1 | name == "Indiana")
+covariates_in_exp_df <- covariates_in_exp_df[order(covariates_in_exp_df$year, covariates_in_exp_df$treated_in_aux, covariates_in_exp_df$name),]
+covariates_in_exp_df <- as.data.frame(subset(covariates_in_exp_df, code == 10, select=c(name, year, income_pcp_adj, pop_density, unemp_rate, top1_adj, gini, prop_age_25to45_bsy, prop_age_45to65_bsy, prop_age_over65_bsy, prop_bach_degree_bsy, prop_male_bsy, prop_married_bsy, prop_white_bsy)))
+covariates_in_exp_df$income_pcp_adj <- covariates_in_exp_df$income_pcp_adj/100000    # there seems to be a problem with the scalability of covariates - see Github issues page #
+covariates_in_exp_df$unemp_rate <- covariates_in_exp_df$unemp_rate/100    # there seems to be a problem with the scalability of covariates - see Github issues page #
+covariates_in_exp_df$top1_adj <- covariates_in_exp_df$top1_adj/100    # there seems to be a problem with the scalability of covariates - see Github issues page #
+column.names_exp_in <- c(1980:2014)
+row.names_exp_in <- c(covariates_in_exp_df[1:36,1])
+matrix.names_exp_in <- c("income_pcp_adj", "pop_density", "unemp_rate", "top1_adj", "gini", "prop_age_25to45_bsy", "prop_age_45to65_bsy", "prop_age_over65_bsy", "prop_bach_degree_bsy", "prop_male_bsy", "prop_married_bsy", "prop_white_bsy")
+covariates_exp_in_array <- array(as.matrix(covariates_in_exp_df[,3:14]), dim = c(36,35,12), dimnames = list(row.names_exp_in, column.names_exp_in, matrix.names_exp_in))
+
+##### Create 3D array of time-varying covariates for synthetic matching - CON_NursingHome #####
+CON_NursingHome$treated_in_aux <- ifelse(CON_NursingHome$name == "Indiana", 1, 0)
+covariates_in_acc_df <- subset(CON_NursingHome, alwaysconpa == 1 | name == "Indiana")
+covariates_in_acc_df <- covariates_in_acc_df[order(covariates_in_acc_df$year, covariates_in_acc_df$treated_in_aux, covariates_in_acc_df$name),]
+covariates_in_acc_df <- as.data.frame(subset(covariates_in_acc_df, code == 10, select=c(name, year, income_pcp_adj, pop_density, unemp_rate, top1_adj, gini, prop_age_25to45_bsy, prop_age_45to65_bsy, prop_age_over65_bsy, prop_bach_degree_bsy, prop_male_bsy, prop_married_bsy, prop_white_bsy)))
+covariates_in_acc_df$income_pcp_adj <- covariates_in_acc_df$income_pcp_adj/100000    # there seems to be a problem with the scalability of covariates - see Github issues page #
+covariates_in_acc_df$unemp_rate <- covariates_in_acc_df$unemp_rate/100    # there seems to be a problem with the scalability of covariates - see Github issues page #
+covariates_in_acc_df$top1_adj <- covariates_in_acc_df$top1_adj/100    # there seems to be a problem with the scalability of covariates - see Github issues page #
+column.names_acc_in <- c(1991:2014)
+row.names_acc_in <- c(covariates_in_acc_df[1:36,1])
+matrix.names_acc_in <- c("income_pcp_adj", "pop_density", "unemp_rate", "top1_adj", "gini", "prop_age_25to45_bsy", "prop_age_45to65_bsy", "prop_age_over65_bsy", "prop_bach_degree_bsy", "prop_male_bsy", "prop_married_bsy", "prop_white_bsy")
+covariates_acc_in_array <- array(as.matrix(covariates_in_acc_df[,3:14]), dim = c(36,24,12), dimnames = list(row.names_acc_in, column.names_acc_in, matrix.names_acc_in))
+
+
+##### DID, SC, and SDID Estimates, SEs, and 95% CIs; Parallel Trends Plots; Control Unit Contribution Plots #####
+### Quantity of Nursing Homes ###
+# Restrict to treated state and control states by expenditure type (code = 10 for nursing home care), and get in panel form for synthdid #
+CON_NursingHome$treated <- as.integer(ifelse(CON_NursingHome$name == "Indiana" & CON_NursingHome$year >= 1999, 1, 0))
+q_nursing_homes_in_df <- as.data.frame(subset(CON_NursingHome, code == 10))
+q_nursing_homes_in_df <- q_nursing_homes_in_df[order(q_nursing_homes_in_df$year, q_nursing_homes_in_df$treated_in_aux, q_nursing_homes_in_df$name),]
+q_nursing_homes_in_df <- subset(q_nursing_homes_in_df, alwaysconpa == 1 | name == "Indiana", select=c(name, year, Q_SkilledNursingHomes_pcp, treated))
+setup_q_nursing_homes_in <- panel.matrices(q_nursing_homes_in_df, unit = 1, time = 2, outcome = 3, treatment = 4)
+# DID, SC, and SDID Estimates, SEs, and 95% CIs #
+estimators = list(did=did_estimate,
+                  sc=sc_estimate,
+                  sdid=synthdid_estimate)
+q_nursing_homes_in_estimates <- lapply(estimators, function(estimator) {
+  estimator(setup_q_nursing_homes_in$Y, setup_q_nursing_homes_in$N0, setup_q_nursing_homes_in$T0, X = covariates_acc_in_array)
+})
+names(q_nursing_homes_in_estimates) = c('Diff-in-Diff', 'Synthetic Control', 'Synthetic Diff-in-Diff')
+q_nursing_homes_in_estimates_rounded <- rbind(unlist(q_nursing_homes_in_estimates))
+q_nursing_homes_in_estimates_rounded <- lapply(q_nursing_homes_in_estimates,round,2)
+q_nursing_homes_in_se <- lapply(q_nursing_homes_in_estimates, function(estimate) {
+  set.seed(12345)
+  sqrt(vcov(estimate, method='placebo'))
+})
+q_nursing_homes_in_se_rounded <- lapply(q_nursing_homes_in_se,round,2)
+q_nursing_homes_in_ci <- foreach(i = q_nursing_homes_in_estimates, j = q_nursing_homes_in_se) %do% sprintf('(%1.2f, %1.2f)', i - 1.96*j, i + 1.96*j)
+q_nursing_homes_in_estimates.table <- rbind(unlist(q_nursing_homes_in_estimates_rounded), unlist(q_nursing_homes_in_se_rounded), unlist(q_nursing_homes_in_ci))
+rownames(q_nursing_homes_in_estimates.table) <- (c('estimate', 'standard error', '95% Confidence Interval'))
+colnames(q_nursing_homes_in_estimates.table) <- (c('Diff-in-Diff', 'Synthetic Control', 'Synthetic Diff-in-Diff'))
+q_nursing_homes_in_estimates.table
+q_nursing_homes_in_estimates.latextable <- xtable(q_nursing_homes_in_estimates.table, align = "lccc", caption = 'Quantity of Nursing Homes Per 100,000 - IN')
+print(q_nursing_homes_in_estimates.latextable, type='latex', file='SynthDID_Figs_and_Tables/q_nursing_homes_estimates_IN.tex')
+# Parallel Trends Plots #
+pdf(file='SynthDID_Figs_and_Tables/q_nursing_homes_plots_IN.pdf')
+synthdid_plot(q_nursing_homes_in_estimates)
+dev.off()
+# Control Unit Contribution Plots #
+pdf(file='SynthDID_Figs_and_Tables/q_nursing_homes_control_plots_IN.pdf')
+synthdid_units_plot(q_nursing_homes_in_estimates, se.method='none') + theme(axis.text.x = element_text(size = 5, hjust=1, vjust=0.3))
+dev.off()
+
+### Quantity of Nursing Home Beds ###
+# Restrict to treated state and control states by expenditure type (code = 10 for nursing home care), and get in panel form for synthdid #
+CON_NursingHome$treated <- as.integer(ifelse(CON_NursingHome$name == "Indiana" & CON_NursingHome$year >= 1999, 1, 0))
+q_nursing_home_beds_in_df <- as.data.frame(subset(CON_NursingHome, code == 10))
+q_nursing_home_beds_in_df <- q_nursing_home_beds_in_df[order(q_nursing_home_beds_in_df$year, q_nursing_home_beds_in_df$treated_in_aux, q_nursing_home_beds_in_df$name),]
+q_nursing_home_beds_in_df <- subset(q_nursing_home_beds_in_df, alwaysconpa == 1 | name == "Indiana", select=c(name, year, Q_SkilledNursingHomeBeds_pcp, treated))
+setup_q_nursing_home_beds_in <- panel.matrices(q_nursing_home_beds_in_df, unit = 1, time = 2, outcome = 3, treatment = 4)
+# DID, SC, and SDID Estimates, SEs, and 95% CIs #
+estimators = list(did=did_estimate,
+                  sc=sc_estimate,
+                  sdid=synthdid_estimate)
+q_nursing_home_beds_in_estimates <- lapply(estimators, function(estimator) {
+  estimator(setup_q_nursing_home_beds_in$Y, setup_q_nursing_home_beds_in$N0, setup_q_nursing_home_beds_in$T0, X = covariates_acc_in_array)
+})
+names(q_nursing_home_beds_in_estimates) = c('Diff-in-Diff', 'Synthetic Control', 'Synthetic Diff-in-Diff')
+q_nursing_home_beds_in_estimates_rounded <- rbind(unlist(q_nursing_home_beds_in_estimates))
+q_nursing_home_beds_in_estimates_rounded <- lapply(q_nursing_home_beds_in_estimates,round,2)
+q_nursing_home_beds_in_se <- lapply(q_nursing_home_beds_in_estimates, function(estimate) {
+  set.seed(12345)
+  sqrt(vcov(estimate, method='placebo'))
+})
+q_nursing_home_beds_in_se_rounded <- lapply(q_nursing_home_beds_in_se,round,2)
+q_nursing_home_beds_in_ci <- foreach(i = q_nursing_home_beds_in_estimates, j = q_nursing_home_beds_in_se) %do% sprintf('(%1.2f, %1.2f)', i - 1.96*j, i + 1.96*j)
+q_nursing_home_beds_in_estimates.table <- rbind(unlist(q_nursing_home_beds_in_estimates_rounded), unlist(q_nursing_home_beds_in_se_rounded), unlist(q_nursing_home_beds_in_ci))
+rownames(q_nursing_home_beds_in_estimates.table) <- (c('estimate', 'standard error', '95% Confidence Interval'))
+colnames(q_nursing_home_beds_in_estimates.table) <- (c('Diff-in-Diff', 'Synthetic Control', 'Synthetic Diff-in-Diff'))
+q_nursing_home_beds_in_estimates.table
+q_nursing_home_beds_in_estimates.latextable <- xtable(q_nursing_home_beds_in_estimates.table, align = "lccc", caption = 'Quantity of Nursing Home Beds Per 100,000 - IN')
+print(q_nursing_home_beds_in_estimates.latextable, type='latex', file='SynthDID_Figs_and_Tables/q_nursing_home_beds_estimates_IN.tex')
+# Parallel Trends Plots #
+pdf(file='SynthDID_Figs_and_Tables/q_nursing_home_beds_plots_IN.pdf')
+synthdid_plot(q_nursing_home_beds_in_estimates)
+dev.off()
+# Control Unit Contribution Plots #
+pdf(file='SynthDID_Figs_and_Tables/q_nursing_home_beds_control_plots_IN.pdf')
+synthdid_units_plot(q_nursing_home_beds_in_estimates, se.method='none') + theme(axis.text.x = element_text(size = 5, hjust=1, vjust=0.3))
+dev.off()
+
+### Total Expenditure ###
+# Restrict to treated state and control states by expenditure type (code = 10 for nursing home care), and get in panel form for synthdid #
+CON_Expenditure$treated <- as.integer(ifelse(CON_Expenditure$name == "Indiana" & CON_Expenditure$year >= 1999, 1, 0))
+total_exp_in_df <- as.data.frame(subset(CON_Expenditure, code == 10))
+total_exp_in_df <- total_exp_in_df[order(total_exp_in_df$year, total_exp_in_df$treated_in_aux, total_exp_in_df$name),]
+total_exp_in_df <- subset(total_exp_in_df, alwaysconpa == 1 | name == "Indiana", select=c(name, year, total_exp, treated))
+setup_total_exp_in <- panel.matrices(total_exp_in_df, unit = 1, time = 2, outcome = 3, treatment = 4)
+# DID, SC, and SDID Estimates, SEs, and 95% CIs #
+estimators = list(did=did_estimate,
+                  sc=sc_estimate,
+                  sdid=synthdid_estimate)
+total_exp_in_estimates <- lapply(estimators, function(estimator) {
+  estimator(setup_total_exp_in$Y, setup_total_exp_in$N0, setup_total_exp_in$T0, X = covariates_exp_in_array)
+})
+names(total_exp_in_estimates) = c('Diff-in-Diff', 'Synthetic Control', 'Synthetic Diff-in-Diff')
+total_exp_in_estimates_rounded <- rbind(unlist(total_exp_in_estimates))
+total_exp_in_estimates_rounded <- lapply(total_exp_in_estimates,round,2)
+total_exp_in_se <- lapply(total_exp_in_estimates, function(estimate) {
+  set.seed(12345)
+  sqrt(vcov(estimate, method='placebo'))
+})
+total_exp_in_se_rounded <- lapply(total_exp_in_se,round,2)
+total_exp_in_ci <- foreach(i = total_exp_in_estimates, j = total_exp_in_se) %do% sprintf('(%1.2f, %1.2f)', i - 1.96*j, i + 1.96*j)
+total_exp_in_estimates.table <- rbind(unlist(total_exp_in_estimates_rounded), unlist(total_exp_in_se_rounded), unlist(total_exp_in_ci))
+rownames(total_exp_in_estimates.table) <- (c('estimate', 'standard error', '95% Confidence Interval'))
+colnames(total_exp_in_estimates.table) <- (c('Diff-in-Diff', 'Synthetic Control', 'Synthetic Diff-in-Diff'))
+total_exp_in_estimates.table
+total_exp_in_estimates.latextable <- xtable(total_exp_in_estimates.table, align = "lccc", caption = 'Total Expenditure - IN')
+print(total_exp_in_estimates.latextable, type='latex', file='SynthDID_Figs_and_Tables/total_expenditure_estimates_IN.tex')
+# Parallel Trends Plots #
+pdf(file='SynthDID_Figs_and_Tables/total_expenditure_plots_IN.pdf')
+synthdid_plot(total_exp_in_estimates)
+dev.off()
+# Control Unit Contribution Plots #
+pdf(file='SynthDID_Figs_and_Tables/total_expenditure_control_plots_IN.pdf')
+synthdid_units_plot(total_exp_in_estimates, se.method='none') + theme(axis.text.x = element_text(size = 5, hjust=1, vjust=0.3))
+dev.off()
+
+### Medicaid Expenditure ###
+# Restrict to treated state and control states by expenditure type (code = 10 for nursing home care), and get in panel form for synthdid #
+CON_Expenditure$treated <- as.integer(ifelse(CON_Expenditure$name == "Indiana" & CON_Expenditure$year >= 1999, 1, 0))
+medicaid_exp_in_df <- as.data.frame(subset(CON_Expenditure, code == 10))
+medicaid_exp_in_df <- medicaid_exp_in_df[order(medicaid_exp_in_df$year, medicaid_exp_in_df$treated_in_aux, medicaid_exp_in_df$name),]
+medicaid_exp_in_df <- subset(medicaid_exp_in_df, alwaysconpa == 1 | name == "Indiana", select=c(name, year, medicaid_exp, treated))
+setup_medicaid_exp_in <- panel.matrices(medicaid_exp_in_df, unit = 1, time = 2, outcome = 3, treatment = 4)
+# DID, SC, and SDID Estimates, SEs, and 95% CIs #
+estimators = list(did=did_estimate,
+                  sc=sc_estimate,
+                  sdid=synthdid_estimate)
+medicaid_exp_in_estimates <- lapply(estimators, function(estimator) {
+  estimator(setup_medicaid_exp_in$Y, setup_medicaid_exp_in$N0, setup_medicaid_exp_in$T0, X = covariates_exp_in_array)
+})
+names(medicaid_exp_in_estimates) = c('Diff-in-Diff', 'Synthetic Control', 'Synthetic Diff-in-Diff')
+medicaid_exp_in_estimates_rounded <- rbind(unlist(medicaid_exp_in_estimates))
+medicaid_exp_in_estimates_rounded <- lapply(medicaid_exp_in_estimates,round,2)
+medicaid_exp_in_se <- lapply(medicaid_exp_in_estimates, function(estimate) {
+  set.seed(12345)
+  sqrt(vcov(estimate, method='placebo'))
+})
+medicaid_exp_in_se_rounded <- lapply(medicaid_exp_in_se,round,2)
+medicaid_exp_in_ci <- foreach(i = medicaid_exp_in_estimates, j = medicaid_exp_in_se) %do% sprintf('(%1.2f, %1.2f)', i - 1.96*j, i + 1.96*j)
+medicaid_exp_in_estimates.table <- rbind(unlist(medicaid_exp_in_estimates_rounded), unlist(medicaid_exp_in_se_rounded), unlist(medicaid_exp_in_ci))
+rownames(medicaid_exp_in_estimates.table) <- (c('estimate', 'standard error', '95% Confidence Interval'))
+colnames(medicaid_exp_in_estimates.table) <- (c('Diff-in-Diff', 'Synthetic Control', 'Synthetic Diff-in-Diff'))
+medicaid_exp_in_estimates.table
+medicaid_exp_in_estimates.latextable <- xtable(medicaid_exp_in_estimates.table, align = "lccc", caption = 'Medicaid Expenditure - IN')
+print(medicaid_exp_in_estimates.latextable, type='latex', file='SynthDID_Figs_and_Tables/medicaid_expenditure_estimates_IN.tex')
+# Parallel Trends Plots #
+pdf(file='SynthDID_Figs_and_Tables/medicaid_expenditure_plots_IN.pdf')
+synthdid_plot(medicaid_exp_in_estimates)
+dev.off()
+# Control Unit Contribution Plots #
+pdf(file='SynthDID_Figs_and_Tables/medicaid_expenditure_control_plots_IN.pdf')
+synthdid_units_plot(medicaid_exp_in_estimates, se.method='none') + theme(axis.text.x = element_text(size = 5, hjust=1, vjust=0.3))
+dev.off()
+
+
+
+
+########## North Dakota ###########
+
+##### Create 3D array of time-varying covariates for synthetic matching - CON_Expenditure #####
+CON_Expenditure$treated_nd_aux <- ifelse(CON_Expenditure$name == "North Dakota", 1, 0)
+covariates_nd_exp_df <- subset(CON_Expenditure, alwaysconpa == 1 | name == "North Dakota")
+covariates_nd_exp_df <- covariates_nd_exp_df[order(covariates_nd_exp_df$year, covariates_nd_exp_df$treated_nd_aux, covariates_nd_exp_df$name),]
+covariates_nd_exp_df <- as.data.frame(subset(covariates_nd_exp_df, code == 10, select=c(name, year, income_pcp_adj, pop_density, unemp_rate, top1_adj, gini, prop_age_25to45_bsy, prop_age_45to65_bsy, prop_age_over65_bsy, prop_bach_degree_bsy, prop_male_bsy, prop_married_bsy, prop_white_bsy)))
+covariates_nd_exp_df$income_pcp_adj <- covariates_nd_exp_df$income_pcp_adj/100000    # there seems to be a problem with the scalability of covariates - see Github issues page #
+covariates_nd_exp_df$unemp_rate <- covariates_nd_exp_df$unemp_rate/100    # there seems to be a problem with the scalability of covariates - see Github issues page #
+covariates_nd_exp_df$top1_adj <- covariates_nd_exp_df$top1_adj/100    # there seems to be a problem with the scalability of covariates - see Github issues page #
+column.names_exp_nd <- c(1980:2014)
+row.names_exp_nd <- c(covariates_nd_exp_df[1:36,1])
+matrix.names_exp_nd <- c("income_pcp_adj", "pop_density", "unemp_rate", "top1_adj", "gini", "prop_age_25to45_bsy", "prop_age_45to65_bsy", "prop_age_over65_bsy", "prop_bach_degree_bsy", "prop_male_bsy", "prop_married_bsy", "prop_white_bsy")
+covariates_exp_nd_array <- array(as.matrix(covariates_nd_exp_df[,3:14]), dim = c(36,35,12), dimnames = list(row.names_exp_nd, column.names_exp_nd, matrix.names_exp_nd))
+
+##### Create 3D array of time-varying covariates for synthetic matching - CON_NursingHome #####
+CON_NursingHome$treated_nd_aux <- ifelse(CON_NursingHome$name == "North Dakota", 1, 0)
+covariates_nd_acc_df <- subset(CON_NursingHome, alwaysconpa == 1 | name == "North Dakota")
+covariates_nd_acc_df <- covariates_nd_acc_df[order(covariates_nd_acc_df$year, covariates_nd_acc_df$treated_nd_aux, covariates_nd_acc_df$name),]
+covariates_nd_acc_df <- as.data.frame(subset(covariates_nd_acc_df, code == 10, select=c(name, year, income_pcp_adj, pop_density, unemp_rate, top1_adj, gini, prop_age_25to45_bsy, prop_age_45to65_bsy, prop_age_over65_bsy, prop_bach_degree_bsy, prop_male_bsy, prop_married_bsy, prop_white_bsy)))
+covariates_nd_acc_df$income_pcp_adj <- covariates_nd_acc_df$income_pcp_adj/100000    # there seems to be a problem with the scalability of covariates - see Github issues page #
+covariates_nd_acc_df$unemp_rate <- covariates_nd_acc_df$unemp_rate/100    # there seems to be a problem with the scalability of covariates - see Github issues page #
+covariates_nd_acc_df$top1_adj <- covariates_nd_acc_df$top1_adj/100    # there seems to be a problem with the scalability of covariates - see Github issues page #
+column.names_acc_nd <- c(1991:2014)
+row.names_acc_nd <- c(covariates_nd_acc_df[1:36,1])
+matrix.names_acc_nd <- c("income_pcp_adj", "pop_density", "unemp_rate", "top1_adj", "gini", "prop_age_25to45_bsy", "prop_age_45to65_bsy", "prop_age_over65_bsy", "prop_bach_degree_bsy", "prop_male_bsy", "prop_married_bsy", "prop_white_bsy")
+covariates_acc_nd_array <- array(as.matrix(covariates_nd_acc_df[,3:14]), dim = c(36,24,12), dimnames = list(row.names_acc_nd, column.names_acc_nd, matrix.names_acc_nd))
+
+
+##### DID, SC, and SDID Estimates, SEs, and 95% CIs; Parallel Trends Plots; Control Unit Contribution Plots #####
+### Quantity of Nursing Homes ###
+# Restrict to treated state and control states by expenditure type (code = 10 for nursing home care), and get in panel form for synthdid #
+CON_NursingHome$treated <- as.integer(ifelse(CON_NursingHome$name == "North Dakota" & CON_NursingHome$year >= 1995, 1, 0))
+q_nursing_homes_nd_df <- as.data.frame(subset(CON_NursingHome, code == 10))
+q_nursing_homes_nd_df <- q_nursing_homes_nd_df[order(q_nursing_homes_nd_df$year, q_nursing_homes_nd_df$treated_nd_aux, q_nursing_homes_nd_df$name),]
+q_nursing_homes_nd_df <- subset(q_nursing_homes_nd_df, alwaysconpa == 1 | name == "North Dakota", select=c(name, year, Q_SkilledNursingHomes_pcp, treated))
+setup_q_nursing_homes_nd <- panel.matrices(q_nursing_homes_nd_df, unit = 1, time = 2, outcome = 3, treatment = 4)
+# DID, SC, and SDID Estimates, SEs, and 95% CIs #
+estimators = list(did=did_estimate,
+                  sc=sc_estimate,
+                  sdid=synthdid_estimate)
+q_nursing_homes_nd_estimates <- lapply(estimators, function(estimator) {
+  estimator(setup_q_nursing_homes_nd$Y, setup_q_nursing_homes_nd$N0, setup_q_nursing_homes_nd$T0, X = covariates_acc_nd_array)
+})
+names(q_nursing_homes_nd_estimates) = c('Diff-in-Diff', 'Synthetic Control', 'Synthetic Diff-in-Diff')
+q_nursing_homes_nd_estimates_rounded <- rbind(unlist(q_nursing_homes_nd_estimates))
+q_nursing_homes_nd_estimates_rounded <- lapply(q_nursing_homes_nd_estimates,round,2)
+q_nursing_homes_nd_se <- lapply(q_nursing_homes_nd_estimates, function(estimate) {
+  set.seed(12345)
+  sqrt(vcov(estimate, method='placebo'))
+})
+q_nursing_homes_nd_se_rounded <- lapply(q_nursing_homes_nd_se,round,2)
+q_nursing_homes_nd_ci <- foreach(i = q_nursing_homes_nd_estimates, j = q_nursing_homes_nd_se) %do% sprintf('(%1.2f, %1.2f)', i - 1.96*j, i + 1.96*j)
+q_nursing_homes_nd_estimates.table <- rbind(unlist(q_nursing_homes_nd_estimates_rounded), unlist(q_nursing_homes_nd_se_rounded), unlist(q_nursing_homes_nd_ci))
+rownames(q_nursing_homes_nd_estimates.table) <- (c('estimate', 'standard error', '95% Confidence Interval'))
+colnames(q_nursing_homes_nd_estimates.table) <- (c('Diff-in-Diff', 'Synthetic Control', 'Synthetic Diff-in-Diff'))
+q_nursing_homes_nd_estimates.table
+q_nursing_homes_nd_estimates.latextable <- xtable(q_nursing_homes_nd_estimates.table, align = "lccc", caption = 'Quantity of Nursing Homes Per 100,000 - ND')
+print(q_nursing_homes_nd_estimates.latextable, type='latex', file='SynthDID_Figs_and_Tables/q_nursing_homes_estimates_ND.tex')
+# Parallel Trends Plots #
+pdf(file='SynthDID_Figs_and_Tables/q_nursing_homes_plots_ND.pdf')
+synthdid_plot(q_nursing_homes_nd_estimates)
+dev.off()
+# Control Unit Contribution Plots #
+pdf(file='SynthDID_Figs_and_Tables/q_nursing_homes_control_plots_ND.pdf')
+synthdid_units_plot(q_nursing_homes_nd_estimates, se.method='none') + theme(axis.text.x = element_text(size = 5, hjust=1, vjust=0.3))
+dev.off()
+
+### Quantity of Nursing Home Beds ###
+# Restrict to treated state and control states by expenditure type (code = 10 for nursing home care), and get in panel form for synthdid #
+CON_NursingHome$treated <- as.integer(ifelse(CON_NursingHome$name == "North Dakota" & CON_NursingHome$year >= 1995, 1, 0))
+q_nursing_home_beds_nd_df <- as.data.frame(subset(CON_NursingHome, code == 10))
+q_nursing_home_beds_nd_df <- q_nursing_home_beds_nd_df[order(q_nursing_home_beds_nd_df$year, q_nursing_home_beds_nd_df$treated_nd_aux, q_nursing_home_beds_nd_df$name),]
+q_nursing_home_beds_nd_df <- subset(q_nursing_home_beds_nd_df, alwaysconpa == 1 | name == "North Dakota", select=c(name, year, Q_SkilledNursingHomeBeds_pcp, treated))
+setup_q_nursing_home_beds_nd <- panel.matrices(q_nursing_home_beds_nd_df, unit = 1, time = 2, outcome = 3, treatment = 4)
+# DID, SC, and SDID Estimates, SEs, and 95% CIs #
+estimators = list(did=did_estimate,
+                  sc=sc_estimate,
+                  sdid=synthdid_estimate)
+q_nursing_home_beds_nd_estimates <- lapply(estimators, function(estimator) {
+  estimator(setup_q_nursing_home_beds_nd$Y, setup_q_nursing_home_beds_nd$N0, setup_q_nursing_home_beds_nd$T0, X = covariates_acc_nd_array)
+})
+names(q_nursing_home_beds_nd_estimates) = c('Diff-in-Diff', 'Synthetic Control', 'Synthetic Diff-in-Diff')
+q_nursing_home_beds_nd_estimates_rounded <- rbind(unlist(q_nursing_home_beds_nd_estimates))
+q_nursing_home_beds_nd_estimates_rounded <- lapply(q_nursing_home_beds_nd_estimates,round,2)
+q_nursing_home_beds_nd_se <- lapply(q_nursing_home_beds_nd_estimates, function(estimate) {
+  set.seed(12345)
+  sqrt(vcov(estimate, method='placebo'))
+})
+q_nursing_home_beds_nd_se_rounded <- lapply(q_nursing_home_beds_nd_se,round,2)
+q_nursing_home_beds_nd_ci <- foreach(i = q_nursing_home_beds_nd_estimates, j = q_nursing_home_beds_nd_se) %do% sprintf('(%1.2f, %1.2f)', i - 1.96*j, i + 1.96*j)
+q_nursing_home_beds_nd_estimates.table <- rbind(unlist(q_nursing_home_beds_nd_estimates_rounded), unlist(q_nursing_home_beds_nd_se_rounded), unlist(q_nursing_home_beds_nd_ci))
+rownames(q_nursing_home_beds_nd_estimates.table) <- (c('estimate', 'standard error', '95% Confidence Interval'))
+colnames(q_nursing_home_beds_nd_estimates.table) <- (c('Diff-in-Diff', 'Synthetic Control', 'Synthetic Diff-in-Diff'))
+q_nursing_home_beds_nd_estimates.table
+q_nursing_home_beds_nd_estimates.latextable <- xtable(q_nursing_home_beds_nd_estimates.table, align = "lccc", caption = 'Quantity of Nursing Home Beds Per 100,000 - ND')
+print(q_nursing_home_beds_nd_estimates.latextable, type='latex', file='SynthDID_Figs_and_Tables/q_nursing_home_beds_estimates_ND.tex')
+# Parallel Trends Plots #
+pdf(file='SynthDID_Figs_and_Tables/q_nursing_home_beds_plots_ND.pdf')
+synthdid_plot(q_nursing_home_beds_nd_estimates)
+dev.off()
+# Control Unit Contribution Plots #
+pdf(file='SynthDID_Figs_and_Tables/q_nursing_home_beds_control_plots_ND.pdf')
+synthdid_units_plot(q_nursing_home_beds_nd_estimates, se.method='none') + theme(axis.text.x = element_text(size = 5, hjust=1, vjust=0.3))
+dev.off()
+
+### Total Expenditure ###
+# Restrict to treated state and control states by expenditure type (code = 10 for nursing home care), and get in panel form for synthdid #
+CON_Expenditure$treated <- as.integer(ifelse(CON_Expenditure$name == "North Dakota" & CON_Expenditure$year >= 1995, 1, 0))
+total_exp_nd_df <- as.data.frame(subset(CON_Expenditure, code == 10))
+total_exp_nd_df <- total_exp_nd_df[order(total_exp_nd_df$year, total_exp_nd_df$treated_nd_aux, total_exp_nd_df$name),]
+total_exp_nd_df <- subset(total_exp_nd_df, alwaysconpa == 1 | name == "North Dakota", select=c(name, year, total_exp, treated))
+setup_total_exp_nd <- panel.matrices(total_exp_nd_df, unit = 1, time = 2, outcome = 3, treatment = 4)
+# DID, SC, and SDID Estimates, SEs, and 95% CIs #
+estimators = list(did=did_estimate,
+                  sc=sc_estimate,
+                  sdid=synthdid_estimate)
+total_exp_nd_estimates <- lapply(estimators, function(estimator) {
+  estimator(setup_total_exp_nd$Y, setup_total_exp_nd$N0, setup_total_exp_nd$T0, X = covariates_exp_nd_array)
+})
+names(total_exp_nd_estimates) = c('Diff-in-Diff', 'Synthetic Control', 'Synthetic Diff-in-Diff')
+total_exp_nd_estimates_rounded <- rbind(unlist(total_exp_nd_estimates))
+total_exp_nd_estimates_rounded <- lapply(total_exp_nd_estimates,round,2)
+total_exp_nd_se <- lapply(total_exp_nd_estimates, function(estimate) {
+  set.seed(12345)
+  sqrt(vcov(estimate, method='placebo'))
+})
+total_exp_nd_se_rounded <- lapply(total_exp_nd_se,round,2)
+total_exp_nd_ci <- foreach(i = total_exp_nd_estimates, j = total_exp_nd_se) %do% sprintf('(%1.2f, %1.2f)', i - 1.96*j, i + 1.96*j)
+total_exp_nd_estimates.table <- rbind(unlist(total_exp_nd_estimates_rounded), unlist(total_exp_nd_se_rounded), unlist(total_exp_nd_ci))
+rownames(total_exp_nd_estimates.table) <- (c('estimate', 'standard error', '95% Confidence Interval'))
+colnames(total_exp_nd_estimates.table) <- (c('Diff-in-Diff', 'Synthetic Control', 'Synthetic Diff-in-Diff'))
+total_exp_nd_estimates.table
+total_exp_nd_estimates.latextable <- xtable(total_exp_nd_estimates.table, align = "lccc", caption = 'Total Expenditure - ND')
+print(total_exp_nd_estimates.latextable, type='latex', file='SynthDID_Figs_and_Tables/total_expenditure_estimates_ND.tex')
+# Parallel Trends Plots #
+pdf(file='SynthDID_Figs_and_Tables/total_expenditure_plots_ND.pdf')
+synthdid_plot(total_exp_nd_estimates)
+dev.off()
+# Control Unit Contribution Plots #
+pdf(file='SynthDID_Figs_and_Tables/total_expenditure_control_plots_ND.pdf')
+synthdid_units_plot(total_exp_nd_estimates, se.method='none') + theme(axis.text.x = element_text(size = 5, hjust=1, vjust=0.3))
+dev.off()
+
+### Medicaid Expenditure ###
+# Restrict to treated state and control states by expenditure type (code = 10 for nursing home care), and get in panel form for synthdid #
+CON_Expenditure$treated <- as.integer(ifelse(CON_Expenditure$name == "North Dakota" & CON_Expenditure$year >= 1995, 1, 0))
+medicaid_exp_nd_df <- as.data.frame(subset(CON_Expenditure, code == 10))
+medicaid_exp_nd_df <- medicaid_exp_nd_df[order(medicaid_exp_nd_df$year, medicaid_exp_nd_df$treated_nd_aux, medicaid_exp_nd_df$name),]
+medicaid_exp_nd_df <- subset(medicaid_exp_nd_df, alwaysconpa == 1 | name == "North Dakota", select=c(name, year, medicaid_exp, treated))
+setup_medicaid_exp_nd <- panel.matrices(medicaid_exp_nd_df, unit = 1, time = 2, outcome = 3, treatment = 4)
+# DID, SC, and SDID Estimates, SEs, and 95% CIs #
+estimators = list(did=did_estimate,
+                  sc=sc_estimate,
+                  sdid=synthdid_estimate)
+medicaid_exp_nd_estimates <- lapply(estimators, function(estimator) {
+  estimator(setup_medicaid_exp_nd$Y, setup_medicaid_exp_nd$N0, setup_medicaid_exp_nd$T0, X = covariates_exp_nd_array)
+})
+names(medicaid_exp_nd_estimates) = c('Diff-in-Diff', 'Synthetic Control', 'Synthetic Diff-in-Diff')
+medicaid_exp_nd_estimates_rounded <- rbind(unlist(medicaid_exp_nd_estimates))
+medicaid_exp_nd_estimates_rounded <- lapply(medicaid_exp_nd_estimates,round,2)
+medicaid_exp_nd_se <- lapply(medicaid_exp_nd_estimates, function(estimate) {
+  set.seed(12345)
+  sqrt(vcov(estimate, method='placebo'))
+})
+medicaid_exp_nd_se_rounded <- lapply(medicaid_exp_nd_se,round,2)
+medicaid_exp_nd_ci <- foreach(i = medicaid_exp_nd_estimates, j = medicaid_exp_nd_se) %do% sprintf('(%1.2f, %1.2f)', i - 1.96*j, i + 1.96*j)
+medicaid_exp_nd_estimates.table <- rbind(unlist(medicaid_exp_nd_estimates_rounded), unlist(medicaid_exp_nd_se_rounded), unlist(medicaid_exp_nd_ci))
+rownames(medicaid_exp_nd_estimates.table) <- (c('estimate', 'standard error', '95% Confidence Interval'))
+colnames(medicaid_exp_nd_estimates.table) <- (c('Diff-in-Diff', 'Synthetic Control', 'Synthetic Diff-in-Diff'))
+medicaid_exp_nd_estimates.table
+medicaid_exp_nd_estimates.latextable <- xtable(medicaid_exp_nd_estimates.table, align = "lccc", caption = 'Medicaid Expenditure - ND')
+print(medicaid_exp_nd_estimates.latextable, type='latex', file='SynthDID_Figs_and_Tables/medicaid_expenditure_estimates_ND.tex')
+# Parallel Trends Plots #
+pdf(file='SynthDID_Figs_and_Tables/medicaid_expenditure_plots_ND.pdf')
+synthdid_plot(medicaid_exp_nd_estimates)
+dev.off()
+# Control Unit Contribution Plots #
+pdf(file='SynthDID_Figs_and_Tables/medicaid_expenditure_control_plots_ND.pdf')
+synthdid_units_plot(medicaid_exp_nd_estimates, se.method='none') + theme(axis.text.x = element_text(size = 5, hjust=1, vjust=0.3))
+dev.off()
