@@ -3,13 +3,17 @@
 ##### Load Necessary Packages #####
 #install.packages("remotes")
 #remotes::install_github("synth-inference/synthdid")
+#install.packages("ggplot2")
+#install.packages("haven")
 #install.packages("foreach")
 #install.packages("xtable")
+#install.packages("patchwork")
 library(synthdid)
 library(ggplot2)
 library(haven) # used to import .dta files #
 library(foreach) # for parallel execution #
 library(xtable) # to export latex tables #
+library(patchwork) # to combine multiple plots on a single page #
 
 
 ##### Set working directory #####
@@ -82,14 +86,47 @@ colnames(q_nursing_homes_pa_estimates.table) <- (c('Diff-in-Diff', 'Synthetic Co
 q_nursing_homes_pa_estimates.table
 q_nursing_homes_pa_estimates.latextable <- xtable(q_nursing_homes_pa_estimates.table, align = "lccc", caption = 'Quantity of Nursing Homes Per 100,000 - PA')
 print(q_nursing_homes_pa_estimates.latextable, type='latex', file='SynthDID_Figs_and_Tables/q_nursing_homes_estimates_PA.tex')
-# Parallel Trends Plots #
+# Parallel Trends and Control Contribution Plots #
 pdf(file='SynthDID_Figs_and_Tables/q_nursing_homes_plots_PA.pdf')
-synthdid_plot(q_nursing_homes_pa_estimates)
+q_nursing_homes_plots_PA <- synthdid_plot(q_nursing_homes_pa_estimates, 
+              facet.vertical=FALSE,
+              control.name='Control', treated.name='Pennsylvania',
+              lambda.comparable=TRUE, se.method = 'none',
+              trajectory.linetype = 'solid', line.width=1, 
+              trajectory.alpha = .5, guide.linetype = 'dashed', 
+              effect.curvature=.25, effect.alpha=.5, 
+              diagram.alpha=1, onset.alpha=.5,
+              point.size = 1) +
+  labs(y= "Quantity of Nursing Homes\n(Per 100,000)") +
+  theme(aspect.ratio=1,
+        panel.spacing.x=unit(1, "lines"),
+        panel.grid.major.x = element_line(size=.1, color='lightgrey'),
+        panel.grid.minor.x = element_blank(), 
+        panel.grid.major.y = element_line(size=.1, color='lightgrey'),
+        panel.grid.minor.y = element_blank(),
+        axis.text.x = element_text(angle = 45, hjust=1, size = 8),
+        axis.title.y = element_text(size=8),
+        strip.background = element_rect(fill="grey60", size=1),
+        strip.text = element_text(size=8, face="bold"),
+        #legend.box.background = element_rect(colour = "black", size=.5),
+        legend.position='top', 
+        legend.text = element_text(size=8),
+        legend.direction='horizontal')
+q_nursing_homes_control_plots_PA <- synthdid_units_plot(q_nursing_homes_pa_estimates, se.method='none') + 
+  labs(y= "Difference in Quantity of Nursing Homes\n(Per 100,000)") +
+  theme(aspect.ratio=1,
+        panel.spacing.x=unit(1, "lines"),
+        axis.title.y = element_text(size=8),
+        axis.text.x = element_text(size = 5, hjust=1, vjust=0.3),
+        legend.background=element_blank(),
+        legend.direction='horizontal', legend.position='bottom',
+        strip.background=element_blank(), strip.text.x = element_blank(),
+        #legend.box.background = element_rect(colour = "black", size=.5),
+        legend.text = element_text(size=8),
+        legend.title = element_text(size=8, face="bold"))
+q_nursing_homes_plots_PA + q_nursing_homes_control_plots_PA + plot_layout(ncol=1)
 dev.off()
-# Control Unit Contribution Plots #
-pdf(file='SynthDID_Figs_and_Tables/q_nursing_homes_control_plots_PA.pdf')
-synthdid_units_plot(q_nursing_homes_pa_estimates, se.method='none') + theme(axis.text.x = element_text(size = 5, hjust=1, vjust=0.3))
-dev.off()
+
 
 ### Quantity of Nursing Home Beds ###
 # Restrict to treated state and control states by expenditure type (code = 10 for nursing home care), and get in panel form for synthdid #
