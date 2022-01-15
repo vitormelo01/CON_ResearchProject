@@ -92,7 +92,7 @@ q_nursing_homes_plots_PA <- synthdid_plot(q_nursing_homes_pa_estimates,
               facet.vertical=FALSE,
               control.name='Control', treated.name='Pennsylvania',
               lambda.comparable=TRUE, se.method = 'none',
-              trajectory.linetype = 'solid', line.width=1, 
+              trajectory.linetype = 'solid', line.width=.5, 
               trajectory.alpha = .5, guide.linetype = 'dashed', 
               effect.curvature=.25, effect.alpha=.5, 
               diagram.alpha=1, onset.alpha=.5,
@@ -100,15 +100,14 @@ q_nursing_homes_plots_PA <- synthdid_plot(q_nursing_homes_pa_estimates,
   labs(y= "Quantity of Nursing Homes\n(Per 100,000)") +
   theme(aspect.ratio=1,
         panel.spacing.x=unit(1, "lines"),
-        panel.grid.major.x = element_line(size=.1, color='lightgrey'),
+        panel.grid.major.x = element_blank(),
         panel.grid.minor.x = element_blank(), 
-        panel.grid.major.y = element_line(size=.1, color='lightgrey'),
+        panel.grid.major.y = element_line(size=.25, color='grey90'),
         panel.grid.minor.y = element_blank(),
         axis.text.x = element_text(angle = 45, hjust=1, size = 8),
         axis.title.y = element_text(size=8),
-        strip.background = element_rect(fill="grey60", size=1),
+        strip.background = element_rect(fill="grey70", size=1),
         strip.text = element_text(size=8, face="bold"),
-        #legend.box.background = element_rect(colour = "black", size=.5),
         legend.position='top', 
         legend.text = element_text(size=8),
         legend.direction='horizontal')
@@ -116,12 +115,15 @@ q_nursing_homes_control_plots_PA <- synthdid_units_plot(q_nursing_homes_pa_estim
   labs(y= "Difference in Quantity of Nursing Homes\n(Per 100,000)") +
   theme(aspect.ratio=1,
         panel.spacing.x=unit(1, "lines"),
+        panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank(), 
+        panel.grid.major.y = element_line(size=.25, color='grey90'),
+        panel.grid.minor.y = element_blank(),
         axis.title.y = element_text(size=8),
         axis.text.x = element_text(size = 5, hjust=1, vjust=0.3),
         legend.background=element_blank(),
         legend.direction='horizontal', legend.position='bottom',
         strip.background=element_blank(), strip.text.x = element_blank(),
-        #legend.box.background = element_rect(colour = "black", size=.5),
         legend.text = element_text(size=8),
         legend.title = element_text(size=8, face="bold"))
 q_nursing_homes_plots_PA + q_nursing_homes_control_plots_PA + plot_layout(ncol=1)
@@ -157,13 +159,47 @@ colnames(q_nursing_home_beds_pa_estimates.table) <- (c('Diff-in-Diff', 'Syntheti
 q_nursing_home_beds_pa_estimates.table
 q_nursing_home_beds_pa_estimates.latextable <- xtable(q_nursing_home_beds_pa_estimates.table, align = "lccc", caption = 'Quantity of Nursing Home Beds Per 100,000 - PA')
 print(q_nursing_home_beds_pa_estimates.latextable, type='latex', file='SynthDID_Figs_and_Tables/q_nursing_home_beds_estimates_PA.tex')
-# Parallel Trends Plots #
+# Parallel Trends and Control Contribution Plots #
 pdf(file='SynthDID_Figs_and_Tables/q_nursing_home_beds_plots_PA.pdf')
-synthdid_plot(q_nursing_home_beds_pa_estimates)
-dev.off()
-# Control Unit Contribution Plots #
-pdf(file='SynthDID_Figs_and_Tables/q_nursing_home_beds_control_plots_PA.pdf')
-synthdid_units_plot(q_nursing_home_beds_pa_estimates, se.method='none') + theme(axis.text.x = element_text(size = 5, hjust=1, vjust=0.3))
+q_nursing_home_beds_plots_PA <- synthdid_plot(q_nursing_home_beds_pa_estimates, 
+                                          facet.vertical=FALSE,
+                                          control.name='Control', treated.name='Pennsylvania',
+                                          lambda.comparable=TRUE, se.method = 'none',
+                                          trajectory.linetype = 'solid', line.width=.5, 
+                                          trajectory.alpha = .5, guide.linetype = 'dashed', 
+                                          effect.curvature=.25, effect.alpha=.5, 
+                                          diagram.alpha=1, onset.alpha=.5,
+                                          point.size = 1) +
+  labs(y= "Quantity of Nursing Home Beds\n(Per 100,000)") +
+  theme(aspect.ratio=1,
+        panel.spacing.x=unit(1, "lines"),
+        panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank(), 
+        panel.grid.major.y = element_line(size=.25, color='grey90'),
+        panel.grid.minor.y = element_blank(),
+        axis.text.x = element_text(angle = 45, hjust=1, size = 8),
+        axis.title.y = element_text(size=8),
+        strip.background = element_rect(fill="grey70", size=1),
+        strip.text = element_text(size=8, face="bold"),
+        legend.position='top', 
+        legend.text = element_text(size=8),
+        legend.direction='horizontal')
+q_nursing_home_beds_control_plots_PA <- synthdid_units_plot(q_nursing_home_beds_pa_estimates, se.method='none') + 
+  labs(y= "Difference in Quantity of Nursing Home Beds\n(Per 100,000)") +
+  theme(aspect.ratio=1,
+        panel.spacing.x=unit(1, "lines"),
+        panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank(), 
+        panel.grid.major.y = element_line(size=.25, color='grey90'),
+        panel.grid.minor.y = element_blank(),
+        axis.title.y = element_text(size=8),
+        axis.text.x = element_text(size = 5, hjust=1, vjust=0.3),
+        legend.background=element_blank(),
+        legend.direction='horizontal', legend.position='bottom',
+        strip.background=element_blank(), strip.text.x = element_blank(),
+        legend.text = element_text(size=8),
+        legend.title = element_text(size=8, face="bold"))
+q_nursing_home_beds_plots_PA + q_nursing_home_beds_control_plots_PA + plot_layout(ncol=1)
 dev.off()
 
 ### Total Expenditure ###
@@ -195,14 +231,49 @@ colnames(total_exp_pa_estimates.table) <- (c('Diff-in-Diff', 'Synthetic Control'
 total_exp_pa_estimates.table
 total_exp_pa_estimates.latextable <- xtable(total_exp_pa_estimates.table, align = "lccc", caption = 'Total Expenditure - PA')
 print(total_exp_pa_estimates.latextable, type='latex', file='SynthDID_Figs_and_Tables/total_expenditure_estimates_PA.tex')
-# Parallel Trends Plots #
+# Parallel Trends and Control Contribution Plots #
 pdf(file='SynthDID_Figs_and_Tables/total_expenditure_plots_PA.pdf')
-synthdid_plot(total_exp_pa_estimates)
+total_expenditure_plots_PA <- synthdid_plot(total_exp_pa_estimates, 
+                                              facet.vertical=FALSE,
+                                              control.name='Control', treated.name='Pennsylvania',
+                                              lambda.comparable=TRUE, se.method = 'none',
+                                              trajectory.linetype = 'solid', line.width=.5, 
+                                              trajectory.alpha = .5, guide.linetype = 'dashed', 
+                                              effect.curvature=.25, effect.alpha=.5, 
+                                              diagram.alpha=1, onset.alpha=.5,
+                                              point.size = 1) +
+  labs(y= "Total Nursing Home Expenditure\n(Per Capita)") +
+  theme(aspect.ratio=1,
+        panel.spacing.x=unit(1, "lines"),
+        panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank(), 
+        panel.grid.major.y = element_line(size=.25, color='grey90'),
+        panel.grid.minor.y = element_blank(),
+        axis.text.x = element_text(angle = 45, hjust=1, size = 8),
+        axis.title.y = element_text(size=8),
+        strip.background = element_rect(fill="grey70", size=1),
+        strip.text = element_text(size=8, face="bold"),
+        legend.position='top', 
+        legend.text = element_text(size=8),
+        legend.direction='horizontal')
+total_expenditure_control_plots_PA <- synthdid_units_plot(total_exp_pa_estimates, se.method='none') + 
+  labs(y= "Difference in Total Nursing Home Expenditure\n(Per Capita)") +
+  theme(aspect.ratio=1,
+        panel.spacing.x=unit(1, "lines"),
+        panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank(), 
+        panel.grid.major.y = element_line(size=.25, color='grey90'),
+        panel.grid.minor.y = element_blank(),
+        axis.title.y = element_text(size=8),
+        axis.text.x = element_text(size = 5, hjust=1, vjust=0.3),
+        legend.background=element_blank(),
+        legend.direction='horizontal', legend.position='bottom',
+        strip.background=element_blank(), strip.text.x = element_blank(),
+        legend.text = element_text(size=8),
+        legend.title = element_text(size=8, face="bold"))
+total_expenditure_plots_PA + total_expenditure_control_plots_PA + plot_layout(ncol=1)
 dev.off()
-# Control Unit Contribution Plots #
-pdf(file='SynthDID_Figs_and_Tables/total_expenditure_control_plots_PA.pdf')
-synthdid_units_plot(total_exp_pa_estimates, se.method='none') + theme(axis.text.x = element_text(size = 5, hjust=1, vjust=0.3))
-dev.off()
+
 
 ### Medicaid Expenditure ###
 # Restrict to treated state and control states by expenditure type (code = 10 for nursing home care), and get in panel form for synthdid #
@@ -233,15 +304,48 @@ colnames(medicaid_exp_pa_estimates.table) <- (c('Diff-in-Diff', 'Synthetic Contr
 medicaid_exp_pa_estimates.table
 medicaid_exp_pa_estimates.latextable <- xtable(medicaid_exp_pa_estimates.table, align = "lccc", caption = 'Medicaid Expenditure - PA')
 print(medicaid_exp_pa_estimates.latextable, type='latex', file='SynthDID_Figs_and_Tables/medicaid_expenditure_estimates_PA.tex')
-# Parallel Trends Plots #
+# Parallel Trends and Control Contribution Plots #
 pdf(file='SynthDID_Figs_and_Tables/medicaid_expenditure_plots_PA.pdf')
-synthdid_plot(medicaid_exp_pa_estimates)
+medicaid_expenditure_plots_PA <- synthdid_plot(medicaid_exp_pa_estimates, 
+                                            facet.vertical=FALSE,
+                                            control.name='Control', treated.name='Pennsylvania',
+                                            lambda.comparable=TRUE, se.method = 'none',
+                                            trajectory.linetype = 'solid', line.width=.5, 
+                                            trajectory.alpha = .5, guide.linetype = 'dashed', 
+                                            effect.curvature=.25, effect.alpha=.5, 
+                                            diagram.alpha=1, onset.alpha=.5,
+                                            point.size = 1) +
+  labs(y= "Medicaid Nursing Home Expenditure\n(Per Capita)") +
+  theme(aspect.ratio=1,
+        panel.spacing.x=unit(1, "lines"),
+        panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank(), 
+        panel.grid.major.y = element_line(size=.25, color='grey90'),
+        panel.grid.minor.y = element_blank(),
+        axis.text.x = element_text(angle = 45, hjust=1, size = 8),
+        axis.title.y = element_text(size=8),
+        strip.background = element_rect(fill="grey70", size=1),
+        strip.text = element_text(size=8, face="bold"),
+        legend.position='top', 
+        legend.text = element_text(size=8),
+        legend.direction='horizontal')
+medicaid_expenditure_control_plots_PA <- synthdid_units_plot(medicaid_exp_pa_estimates, se.method='none') + 
+  labs(y= "Difference in Medicaid Nursing Home Expenditure\n(Per Capita)") +
+  theme(aspect.ratio=1,
+        panel.spacing.x=unit(1, "lines"),
+        panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank(), 
+        panel.grid.major.y = element_line(size=.25, color='grey90'),
+        panel.grid.minor.y = element_blank(),
+        axis.title.y = element_text(size=8),
+        axis.text.x = element_text(size = 5, hjust=1, vjust=0.3),
+        legend.background=element_blank(),
+        legend.direction='horizontal', legend.position='bottom',
+        strip.background=element_blank(), strip.text.x = element_blank(),
+        legend.text = element_text(size=8),
+        legend.title = element_text(size=8, face="bold"))
+medicaid_expenditure_plots_PA + medicaid_expenditure_control_plots_PA + plot_layout(ncol=1)
 dev.off()
-# Control Unit Contribution Plots #
-pdf(file='SynthDID_Figs_and_Tables/medicaid_expenditure_control_plots_PA.pdf')
-synthdid_units_plot(medicaid_exp_pa_estimates, se.method='none') + theme(axis.text.x = element_text(size = 5, hjust=1, vjust=0.3))
-dev.off()
-
 
 
 
@@ -304,13 +408,47 @@ colnames(q_nursing_homes_in_estimates.table) <- (c('Diff-in-Diff', 'Synthetic Co
 q_nursing_homes_in_estimates.table
 q_nursing_homes_in_estimates.latextable <- xtable(q_nursing_homes_in_estimates.table, align = "lccc", caption = 'Quantity of Nursing Homes Per 100,000 - IN')
 print(q_nursing_homes_in_estimates.latextable, type='latex', file='SynthDID_Figs_and_Tables/q_nursing_homes_estimates_IN.tex')
-# Parallel Trends Plots #
+# Parallel Trends and Control Contribution Plots #
 pdf(file='SynthDID_Figs_and_Tables/q_nursing_homes_plots_IN.pdf')
-synthdid_plot(q_nursing_homes_in_estimates)
-dev.off()
-# Control Unit Contribution Plots #
-pdf(file='SynthDID_Figs_and_Tables/q_nursing_homes_control_plots_IN.pdf')
-synthdid_units_plot(q_nursing_homes_in_estimates, se.method='none') + theme(axis.text.x = element_text(size = 5, hjust=1, vjust=0.3))
+q_nursing_homes_plots_IN <- synthdid_plot(q_nursing_homes_in_estimates, 
+                                          facet.vertical=FALSE,
+                                          control.name='Control', treated.name='Indiana',
+                                          lambda.comparable=TRUE, se.method = 'none',
+                                          trajectory.linetype = 'solid', line.width=.5, 
+                                          trajectory.alpha = .5, guide.linetype = 'dashed', 
+                                          effect.curvature=.25, effect.alpha=.5, 
+                                          diagram.alpha=1, onset.alpha=.5,
+                                          point.size = 1) +
+  labs(y= "Quantity of Nursing Homes\n(Per 100,000)") +
+  theme(aspect.ratio=1,
+        panel.spacing.x=unit(1, "lines"),
+        panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank(), 
+        panel.grid.major.y = element_line(size=.25, color='grey90'),
+        panel.grid.minor.y = element_blank(),
+        axis.text.x = element_text(angle = 45, hjust=1, size = 8),
+        axis.title.y = element_text(size=8),
+        strip.background = element_rect(fill="grey70", size=1),
+        strip.text = element_text(size=8, face="bold"),
+        legend.position='top', 
+        legend.text = element_text(size=8),
+        legend.direction='horizontal')
+q_nursing_homes_control_plots_IN <- synthdid_units_plot(q_nursing_homes_in_estimates, se.method='none') + 
+  labs(y= "Difference in Quantity of Nursing Homes\n(Per 100,000)") +
+  theme(aspect.ratio=1,
+        panel.spacing.x=unit(1, "lines"),
+        panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank(), 
+        panel.grid.major.y = element_line(size=.25, color='grey90'),
+        panel.grid.minor.y = element_blank(),
+        axis.title.y = element_text(size=8),
+        axis.text.x = element_text(size = 5, hjust=1, vjust=0.3),
+        legend.background=element_blank(),
+        legend.direction='horizontal', legend.position='bottom',
+        strip.background=element_blank(), strip.text.x = element_blank(),
+        legend.text = element_text(size=8),
+        legend.title = element_text(size=8, face="bold"))
+q_nursing_homes_plots_IN + q_nursing_homes_control_plots_IN + plot_layout(ncol=1)
 dev.off()
 
 ### Quantity of Nursing Home Beds ###
@@ -342,13 +480,47 @@ colnames(q_nursing_home_beds_in_estimates.table) <- (c('Diff-in-Diff', 'Syntheti
 q_nursing_home_beds_in_estimates.table
 q_nursing_home_beds_in_estimates.latextable <- xtable(q_nursing_home_beds_in_estimates.table, align = "lccc", caption = 'Quantity of Nursing Home Beds Per 100,000 - IN')
 print(q_nursing_home_beds_in_estimates.latextable, type='latex', file='SynthDID_Figs_and_Tables/q_nursing_home_beds_estimates_IN.tex')
-# Parallel Trends Plots #
+# Parallel Trends and Control Contribution Plots #
 pdf(file='SynthDID_Figs_and_Tables/q_nursing_home_beds_plots_IN.pdf')
-synthdid_plot(q_nursing_home_beds_in_estimates)
-dev.off()
-# Control Unit Contribution Plots #
-pdf(file='SynthDID_Figs_and_Tables/q_nursing_home_beds_control_plots_IN.pdf')
-synthdid_units_plot(q_nursing_home_beds_in_estimates, se.method='none') + theme(axis.text.x = element_text(size = 5, hjust=1, vjust=0.3))
+q_nursing_home_beds_plots_IN <- synthdid_plot(q_nursing_home_beds_in_estimates, 
+                                              facet.vertical=FALSE,
+                                              control.name='Control', treated.name='Indiana',
+                                              lambda.comparable=TRUE, se.method = 'none',
+                                              trajectory.linetype = 'solid', line.width=.5, 
+                                              trajectory.alpha = .5, guide.linetype = 'dashed', 
+                                              effect.curvature=.25, effect.alpha=.5, 
+                                              diagram.alpha=1, onset.alpha=.5,
+                                              point.size = 1) +
+  labs(y= "Quantity of Nursing Home Beds\n(Per 100,000)") +
+  theme(aspect.ratio=1,
+        panel.spacing.x=unit(1, "lines"),
+        panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank(), 
+        panel.grid.major.y = element_line(size=.25, color='grey90'),
+        panel.grid.minor.y = element_blank(),
+        axis.text.x = element_text(angle = 45, hjust=1, size = 8),
+        axis.title.y = element_text(size=8),
+        strip.background = element_rect(fill="grey70", size=1),
+        strip.text = element_text(size=8, face="bold"),
+        legend.position='top', 
+        legend.text = element_text(size=8),
+        legend.direction='horizontal')
+q_nursing_home_beds_control_plots_IN <- synthdid_units_plot(q_nursing_home_beds_in_estimates, se.method='none') + 
+  labs(y= "Difference in Quantity of Nursing Home Beds\n(Per 100,000)") +
+  theme(aspect.ratio=1,
+        panel.spacing.x=unit(1, "lines"),
+        panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank(), 
+        panel.grid.major.y = element_line(size=.25, color='grey90'),
+        panel.grid.minor.y = element_blank(),
+        axis.title.y = element_text(size=8),
+        axis.text.x = element_text(size = 5, hjust=1, vjust=0.3),
+        legend.background=element_blank(),
+        legend.direction='horizontal', legend.position='bottom',
+        strip.background=element_blank(), strip.text.x = element_blank(),
+        legend.text = element_text(size=8),
+        legend.title = element_text(size=8, face="bold"))
+q_nursing_home_beds_plots_IN + q_nursing_home_beds_control_plots_IN + plot_layout(ncol=1)
 dev.off()
 
 ### Total Expenditure ###
@@ -380,14 +552,49 @@ colnames(total_exp_in_estimates.table) <- (c('Diff-in-Diff', 'Synthetic Control'
 total_exp_in_estimates.table
 total_exp_in_estimates.latextable <- xtable(total_exp_in_estimates.table, align = "lccc", caption = 'Total Expenditure - IN')
 print(total_exp_in_estimates.latextable, type='latex', file='SynthDID_Figs_and_Tables/total_expenditure_estimates_IN.tex')
-# Parallel Trends Plots #
+# Parallel Trends and Control Contribution Plots #
 pdf(file='SynthDID_Figs_and_Tables/total_expenditure_plots_IN.pdf')
-synthdid_plot(total_exp_in_estimates)
+total_expenditure_plots_IN <- synthdid_plot(total_exp_in_estimates, 
+                                            facet.vertical=FALSE,
+                                            control.name='Control', treated.name='Indiana',
+                                            lambda.comparable=TRUE, se.method = 'none',
+                                            trajectory.linetype = 'solid', line.width=.5, 
+                                            trajectory.alpha = .5, guide.linetype = 'dashed', 
+                                            effect.curvature=.25, effect.alpha=.5, 
+                                            diagram.alpha=1, onset.alpha=.5,
+                                            point.size = 1) +
+  labs(y= "Total Nursing Home Expenditure\n(Per Capita)") +
+  theme(aspect.ratio=1,
+        panel.spacing.x=unit(1, "lines"),
+        panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank(), 
+        panel.grid.major.y = element_line(size=.25, color='grey90'),
+        panel.grid.minor.y = element_blank(),
+        axis.text.x = element_text(angle = 45, hjust=1, size = 8),
+        axis.title.y = element_text(size=8),
+        strip.background = element_rect(fill="grey70", size=1),
+        strip.text = element_text(size=8, face="bold"),
+        legend.position='top', 
+        legend.text = element_text(size=8),
+        legend.direction='horizontal')
+total_expenditure_control_plots_IN <- synthdid_units_plot(total_exp_in_estimates, se.method='none') + 
+  labs(y= "Difference in Total Nursing Home Expenditure\n(Per Capita)") +
+  theme(aspect.ratio=1,
+        panel.spacing.x=unit(1, "lines"),
+        panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank(), 
+        panel.grid.major.y = element_line(size=.25, color='grey90'),
+        panel.grid.minor.y = element_blank(),
+        axis.title.y = element_text(size=8),
+        axis.text.x = element_text(size = 5, hjust=1, vjust=0.3),
+        legend.background=element_blank(),
+        legend.direction='horizontal', legend.position='bottom',
+        strip.background=element_blank(), strip.text.x = element_blank(),
+        legend.text = element_text(size=8),
+        legend.title = element_text(size=8, face="bold"))
+total_expenditure_plots_IN + total_expenditure_control_plots_IN + plot_layout(ncol=1)
 dev.off()
-# Control Unit Contribution Plots #
-pdf(file='SynthDID_Figs_and_Tables/total_expenditure_control_plots_IN.pdf')
-synthdid_units_plot(total_exp_in_estimates, se.method='none') + theme(axis.text.x = element_text(size = 5, hjust=1, vjust=0.3))
-dev.off()
+
 
 ### Medicaid Expenditure ###
 # Restrict to treated state and control states by expenditure type (code = 10 for nursing home care), and get in panel form for synthdid #
@@ -418,13 +625,47 @@ colnames(medicaid_exp_in_estimates.table) <- (c('Diff-in-Diff', 'Synthetic Contr
 medicaid_exp_in_estimates.table
 medicaid_exp_in_estimates.latextable <- xtable(medicaid_exp_in_estimates.table, align = "lccc", caption = 'Medicaid Expenditure - IN')
 print(medicaid_exp_in_estimates.latextable, type='latex', file='SynthDID_Figs_and_Tables/medicaid_expenditure_estimates_IN.tex')
-# Parallel Trends Plots #
+# Parallel Trends and Control Contribution Plots #
 pdf(file='SynthDID_Figs_and_Tables/medicaid_expenditure_plots_IN.pdf')
-synthdid_plot(medicaid_exp_in_estimates)
-dev.off()
-# Control Unit Contribution Plots #
-pdf(file='SynthDID_Figs_and_Tables/medicaid_expenditure_control_plots_IN.pdf')
-synthdid_units_plot(medicaid_exp_in_estimates, se.method='none') + theme(axis.text.x = element_text(size = 5, hjust=1, vjust=0.3))
+medicaid_expenditure_plots_IN <- synthdid_plot(medicaid_exp_in_estimates, 
+                                               facet.vertical=FALSE,
+                                               control.name='Control', treated.name='Indiana',
+                                               lambda.comparable=TRUE, se.method = 'none',
+                                               trajectory.linetype = 'solid', line.width=.5, 
+                                               trajectory.alpha = .5, guide.linetype = 'dashed', 
+                                               effect.curvature=.25, effect.alpha=.5, 
+                                               diagram.alpha=1, onset.alpha=.5,
+                                               point.size = 1) +
+  labs(y= "Medicaid Nursing Home Expenditure\n(Per Capita)") +
+  theme(aspect.ratio=1,
+        panel.spacing.x=unit(1, "lines"),
+        panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank(), 
+        panel.grid.major.y = element_line(size=.25, color='grey90'),
+        panel.grid.minor.y = element_blank(),
+        axis.text.x = element_text(angle = 45, hjust=1, size = 8),
+        axis.title.y = element_text(size=8),
+        strip.background = element_rect(fill="grey70", size=1),
+        strip.text = element_text(size=8, face="bold"),
+        legend.position='top', 
+        legend.text = element_text(size=8),
+        legend.direction='horizontal')
+medicaid_expenditure_control_plots_IN <- synthdid_units_plot(medicaid_exp_in_estimates, se.method='none') + 
+  labs(y= "Difference in Medicaid Nursing Home Expenditure\n(Per Capita)") +
+  theme(aspect.ratio=1,
+        panel.spacing.x=unit(1, "lines"),
+        panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank(), 
+        panel.grid.major.y = element_line(size=.25, color='grey90'),
+        panel.grid.minor.y = element_blank(),
+        axis.title.y = element_text(size=8),
+        axis.text.x = element_text(size = 5, hjust=1, vjust=0.3),
+        legend.background=element_blank(),
+        legend.direction='horizontal', legend.position='bottom',
+        strip.background=element_blank(), strip.text.x = element_blank(),
+        legend.text = element_text(size=8),
+        legend.title = element_text(size=8, face="bold"))
+medicaid_expenditure_plots_IN + medicaid_expenditure_control_plots_IN + plot_layout(ncol=1)
 dev.off()
 
 
@@ -489,13 +730,47 @@ colnames(q_nursing_homes_nd_estimates.table) <- (c('Diff-in-Diff', 'Synthetic Co
 q_nursing_homes_nd_estimates.table
 q_nursing_homes_nd_estimates.latextable <- xtable(q_nursing_homes_nd_estimates.table, align = "lccc", caption = 'Quantity of Nursing Homes Per 100,000 - ND')
 print(q_nursing_homes_nd_estimates.latextable, type='latex', file='SynthDID_Figs_and_Tables/q_nursing_homes_estimates_ND.tex')
-# Parallel Trends Plots #
+# Parallel Trends and Control Contribution Plots #
 pdf(file='SynthDID_Figs_and_Tables/q_nursing_homes_plots_ND.pdf')
-synthdid_plot(q_nursing_homes_nd_estimates)
-dev.off()
-# Control Unit Contribution Plots #
-pdf(file='SynthDID_Figs_and_Tables/q_nursing_homes_control_plots_ND.pdf')
-synthdid_units_plot(q_nursing_homes_nd_estimates, se.method='none') + theme(axis.text.x = element_text(size = 5, hjust=1, vjust=0.3))
+q_nursing_homes_plots_ND <- synthdid_plot(q_nursing_homes_nd_estimates, 
+                                          facet.vertical=FALSE,
+                                          control.name='Control', treated.name='North Dakota',
+                                          lambda.comparable=TRUE, se.method = 'none',
+                                          trajectory.linetype = 'solid', line.width=.5, 
+                                          trajectory.alpha = .5, guide.linetype = 'dashed', 
+                                          effect.curvature=.25, effect.alpha=.5, 
+                                          diagram.alpha=1, onset.alpha=.5,
+                                          point.size = 1) +
+  labs(y= "Quantity of Nursing Homes\n(Per 100,000)") +
+  theme(aspect.ratio=1,
+        panel.spacing.x=unit(1, "lines"),
+        panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank(), 
+        panel.grid.major.y = element_line(size=.25, color='grey90'),
+        panel.grid.minor.y = element_blank(),
+        axis.text.x = element_text(angle = 45, hjust=1, size = 8),
+        axis.title.y = element_text(size=8),
+        strip.background = element_rect(fill="grey70", size=1),
+        strip.text = element_text(size=8, face="bold"),
+        legend.position='top', 
+        legend.text = element_text(size=8),
+        legend.direction='horizontal')
+q_nursing_homes_control_plots_ND <- synthdid_units_plot(q_nursing_homes_nd_estimates, se.method='none') + 
+  labs(y= "Difference in Quantity of Nursing Homes\n(Per 100,000)") +
+  theme(aspect.ratio=1,
+        panel.spacing.x=unit(1, "lines"),
+        panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank(), 
+        panel.grid.major.y = element_line(size=.25, color='grey90'),
+        panel.grid.minor.y = element_blank(),
+        axis.title.y = element_text(size=8),
+        axis.text.x = element_text(size = 5, hjust=1, vjust=0.3),
+        legend.background=element_blank(),
+        legend.direction='horizontal', legend.position='bottom',
+        strip.background=element_blank(), strip.text.x = element_blank(),
+        legend.text = element_text(size=8),
+        legend.title = element_text(size=8, face="bold"))
+q_nursing_homes_plots_ND + q_nursing_homes_control_plots_ND + plot_layout(ncol=1)
 dev.off()
 
 ### Quantity of Nursing Home Beds ###
@@ -527,13 +802,47 @@ colnames(q_nursing_home_beds_nd_estimates.table) <- (c('Diff-in-Diff', 'Syntheti
 q_nursing_home_beds_nd_estimates.table
 q_nursing_home_beds_nd_estimates.latextable <- xtable(q_nursing_home_beds_nd_estimates.table, align = "lccc", caption = 'Quantity of Nursing Home Beds Per 100,000 - ND')
 print(q_nursing_home_beds_nd_estimates.latextable, type='latex', file='SynthDID_Figs_and_Tables/q_nursing_home_beds_estimates_ND.tex')
-# Parallel Trends Plots #
+# Parallel Trends and Control Contribution Plots #
 pdf(file='SynthDID_Figs_and_Tables/q_nursing_home_beds_plots_ND.pdf')
-synthdid_plot(q_nursing_home_beds_nd_estimates)
-dev.off()
-# Control Unit Contribution Plots #
-pdf(file='SynthDID_Figs_and_Tables/q_nursing_home_beds_control_plots_ND.pdf')
-synthdid_units_plot(q_nursing_home_beds_nd_estimates, se.method='none') + theme(axis.text.x = element_text(size = 5, hjust=1, vjust=0.3))
+q_nursing_home_beds_plots_ND <- synthdid_plot(q_nursing_home_beds_nd_estimates, 
+                                              facet.vertical=FALSE,
+                                              control.name='Control', treated.name='North Dakota',
+                                              lambda.comparable=TRUE, se.method = 'none',
+                                              trajectory.linetype = 'solid', line.width=.5, 
+                                              trajectory.alpha = .5, guide.linetype = 'dashed', 
+                                              effect.curvature=.25, effect.alpha=.5, 
+                                              diagram.alpha=1, onset.alpha=.5,
+                                              point.size = 1) +
+  labs(y= "Quantity of Nursing Home Beds\n(Per 100,000)") +
+  theme(aspect.ratio=1,
+        panel.spacing.x=unit(1, "lines"),
+        panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank(), 
+        panel.grid.major.y = element_line(size=.25, color='grey90'),
+        panel.grid.minor.y = element_blank(),
+        axis.text.x = element_text(angle = 45, hjust=1, size = 8),
+        axis.title.y = element_text(size=8),
+        strip.background = element_rect(fill="grey70", size=1),
+        strip.text = element_text(size=8, face="bold"),
+        legend.position='top', 
+        legend.text = element_text(size=8),
+        legend.direction='horizontal')
+q_nursing_home_beds_control_plots_ND <- synthdid_units_plot(q_nursing_home_beds_nd_estimates, se.method='none') + 
+  labs(y= "Difference in Quantity of Nursing Home Beds\n(Per 100,000)") +
+  theme(aspect.ratio=1,
+        panel.spacing.x=unit(1, "lines"),
+        panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank(), 
+        panel.grid.major.y = element_line(size=.25, color='grey90'),
+        panel.grid.minor.y = element_blank(),
+        axis.title.y = element_text(size=8),
+        axis.text.x = element_text(size = 5, hjust=1, vjust=0.3),
+        legend.background=element_blank(),
+        legend.direction='horizontal', legend.position='bottom',
+        strip.background=element_blank(), strip.text.x = element_blank(),
+        legend.text = element_text(size=8),
+        legend.title = element_text(size=8, face="bold"))
+q_nursing_home_beds_plots_ND + q_nursing_home_beds_control_plots_ND + plot_layout(ncol=1)
 dev.off()
 
 ### Total Expenditure ###
@@ -565,13 +874,47 @@ colnames(total_exp_nd_estimates.table) <- (c('Diff-in-Diff', 'Synthetic Control'
 total_exp_nd_estimates.table
 total_exp_nd_estimates.latextable <- xtable(total_exp_nd_estimates.table, align = "lccc", caption = 'Total Expenditure - ND')
 print(total_exp_nd_estimates.latextable, type='latex', file='SynthDID_Figs_and_Tables/total_expenditure_estimates_ND.tex')
-# Parallel Trends Plots #
+# Parallel Trends and Control Contribution Plots #
 pdf(file='SynthDID_Figs_and_Tables/total_expenditure_plots_ND.pdf')
-synthdid_plot(total_exp_nd_estimates)
-dev.off()
-# Control Unit Contribution Plots #
-pdf(file='SynthDID_Figs_and_Tables/total_expenditure_control_plots_ND.pdf')
-synthdid_units_plot(total_exp_nd_estimates, se.method='none') + theme(axis.text.x = element_text(size = 5, hjust=1, vjust=0.3))
+total_expenditure_plots_ND <- synthdid_plot(total_exp_nd_estimates, 
+                                            facet.vertical=FALSE,
+                                            control.name='Control', treated.name='North Dakota',
+                                            lambda.comparable=TRUE, se.method = 'none',
+                                            trajectory.linetype = 'solid', line.width=.5, 
+                                            trajectory.alpha = .5, guide.linetype = 'dashed', 
+                                            effect.curvature=.25, effect.alpha=.5, 
+                                            diagram.alpha=1, onset.alpha=.5,
+                                            point.size = 1) +
+  labs(y= "Total Nursing Home Expenditure\n(Per Capita)") +
+  theme(aspect.ratio=1,
+        panel.spacing.x=unit(1, "lines"),
+        panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank(), 
+        panel.grid.major.y = element_line(size=.25, color='grey90'),
+        panel.grid.minor.y = element_blank(),
+        axis.text.x = element_text(angle = 45, hjust=1, size = 8),
+        axis.title.y = element_text(size=8),
+        strip.background = element_rect(fill="grey70", size=1),
+        strip.text = element_text(size=8, face="bold"),
+        legend.position='top', 
+        legend.text = element_text(size=8),
+        legend.direction='horizontal')
+total_expenditure_control_plots_ND <- synthdid_units_plot(total_exp_nd_estimates, se.method='none') + 
+  labs(y= "Difference in Total Nursing Home Expenditure\n(Per Capita)") +
+  theme(aspect.ratio=1,
+        panel.spacing.x=unit(1, "lines"),
+        panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank(), 
+        panel.grid.major.y = element_line(size=.25, color='grey90'),
+        panel.grid.minor.y = element_blank(),
+        axis.title.y = element_text(size=8),
+        axis.text.x = element_text(size = 5, hjust=1, vjust=0.3),
+        legend.background=element_blank(),
+        legend.direction='horizontal', legend.position='bottom',
+        strip.background=element_blank(), strip.text.x = element_blank(),
+        legend.text = element_text(size=8),
+        legend.title = element_text(size=8, face="bold"))
+total_expenditure_plots_ND + total_expenditure_control_plots_ND + plot_layout(ncol=1)
 dev.off()
 
 ### Medicaid Expenditure ###
@@ -603,11 +946,45 @@ colnames(medicaid_exp_nd_estimates.table) <- (c('Diff-in-Diff', 'Synthetic Contr
 medicaid_exp_nd_estimates.table
 medicaid_exp_nd_estimates.latextable <- xtable(medicaid_exp_nd_estimates.table, align = "lccc", caption = 'Medicaid Expenditure - ND')
 print(medicaid_exp_nd_estimates.latextable, type='latex', file='SynthDID_Figs_and_Tables/medicaid_expenditure_estimates_ND.tex')
-# Parallel Trends Plots #
+# Parallel Trends and Control Contribution Plots #
 pdf(file='SynthDID_Figs_and_Tables/medicaid_expenditure_plots_ND.pdf')
-synthdid_plot(medicaid_exp_nd_estimates)
-dev.off()
-# Control Unit Contribution Plots #
-pdf(file='SynthDID_Figs_and_Tables/medicaid_expenditure_control_plots_ND.pdf')
-synthdid_units_plot(medicaid_exp_nd_estimates, se.method='none') + theme(axis.text.x = element_text(size = 5, hjust=1, vjust=0.3))
+medicaid_expenditure_plots_ND <- synthdid_plot(medicaid_exp_nd_estimates, 
+                                               facet.vertical=FALSE,
+                                               control.name='Control', treated.name='North Dakota',
+                                               lambda.comparable=TRUE, se.method = 'none',
+                                               trajectory.linetype = 'solid', line.width=.5, 
+                                               trajectory.alpha = .5, guide.linetype = 'dashed', 
+                                               effect.curvature=.25, effect.alpha=.5, 
+                                               diagram.alpha=1, onset.alpha=.5,
+                                               point.size = 1) +
+  labs(y= "Medicaid Nursing Home Expenditure\n(Per Capita)") +
+  theme(aspect.ratio=1,
+        panel.spacing.x=unit(1, "lines"),
+        panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank(), 
+        panel.grid.major.y = element_line(size=.25, color='grey90'),
+        panel.grid.minor.y = element_blank(),
+        axis.text.x = element_text(angle = 45, hjust=1, size = 8),
+        axis.title.y = element_text(size=8),
+        strip.background = element_rect(fill="grey70", size=1),
+        strip.text = element_text(size=8, face="bold"),
+        legend.position='top', 
+        legend.text = element_text(size=8),
+        legend.direction='horizontal')
+medicaid_expenditure_control_plots_ND <- synthdid_units_plot(medicaid_exp_nd_estimates, se.method='none') + 
+  labs(y= "Difference in Medicaid Nursing Home Expenditure\n(Per Capita)") +
+  theme(aspect.ratio=1,
+        panel.spacing.x=unit(1, "lines"),
+        panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank(), 
+        panel.grid.major.y = element_line(size=.25, color='grey90'),
+        panel.grid.minor.y = element_blank(),
+        axis.title.y = element_text(size=8),
+        axis.text.x = element_text(size = 5, hjust=1, vjust=0.3),
+        legend.background=element_blank(),
+        legend.direction='horizontal', legend.position='bottom',
+        strip.background=element_blank(), strip.text.x = element_blank(),
+        legend.text = element_text(size=8),
+        legend.title = element_text(size=8, face="bold"))
+medicaid_expenditure_plots_ND + medicaid_expenditure_control_plots_ND + plot_layout(ncol=1)
 dev.off()
