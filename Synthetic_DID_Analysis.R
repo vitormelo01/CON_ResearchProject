@@ -988,3 +988,365 @@ medicaid_expenditure_control_plots_ND <- synthdid_units_plot(medicaid_exp_nd_est
         legend.title = element_text(size=8, face="bold"))
 medicaid_expenditure_plots_ND + medicaid_expenditure_control_plots_ND + plot_layout(ncol=1)
 dev.off()
+
+
+
+
+############### Spaghetti and Placebo Distribution Plots ###############
+
+##### Create 3D arrays of time-varying covariates for synthetic matching for all potential control states - CON_Expenditure #####
+controls.df <- subset(CON_Expenditure, alwaysconpa == 1)
+print(unique(controls.df$id))
+for(i in unique(controls.df$id)) {
+  assign(paste0("covariates_exp_df", i), subset(CON_Expenditure, alwaysconpa == 1))
+}
+covariates_exp_df1$treated_aux <- ifelse(covariates_exp_df1$id == 1, 1, 0)
+covariates_exp_df2$treated_aux <- ifelse(covariates_exp_df5$id == 2, 1, 0)
+covariates_exp_df5$treated_aux <- ifelse(covariates_exp_df5$id == 5, 1, 0)
+covariates_exp_df10$treated_aux <- ifelse(covariates_exp_df5$id == 10, 1, 0)
+covariates_exp_df11$treated_aux <- ifelse(covariates_exp_df5$id == 11, 1, 0)
+covariates_exp_df12$treated_aux <- ifelse(covariates_exp_df5$id == 12, 1, 0)
+covariates_exp_df13$treated_aux <- ifelse(covariates_exp_df5$id == 13, 1, 0)
+covariates_exp_df15$treated_aux <- ifelse(covariates_exp_df5$id == 15, 1, 0)
+covariates_exp_df17$treated_aux <- ifelse(covariates_exp_df5$id == 17, 1, 0)
+covariates_exp_df19$treated_aux <- ifelse(covariates_exp_df5$id == 19, 1, 0)
+covariates_exp_df21$treated_aux <- ifelse(covariates_exp_df5$id == 21, 1, 0)
+covariates_exp_df23$treated_aux <- ifelse(covariates_exp_df5$id == 23, 1, 0)
+covariates_exp_df24$treated_aux <- ifelse(covariates_exp_df5$id == 24, 1, 0)
+covariates_exp_df25$treated_aux <- ifelse(covariates_exp_df5$id == 25, 1, 0)
+covariates_exp_df26$treated_aux <- ifelse(covariates_exp_df5$id == 26, 1, 0)
+covariates_exp_df28$treated_aux <- ifelse(covariates_exp_df5$id == 28, 1, 0)
+covariates_exp_df29$treated_aux <- ifelse(covariates_exp_df5$id == 29, 1, 0)
+covariates_exp_df30$treated_aux <- ifelse(covariates_exp_df5$id == 30, 1, 0)
+covariates_exp_df31$treated_aux <- ifelse(covariates_exp_df5$id == 31, 1, 0)
+covariates_exp_df32$treated_aux <- ifelse(covariates_exp_df5$id == 32, 1, 0)
+covariates_exp_df33$treated_aux <- ifelse(covariates_exp_df5$id == 33, 1, 0)
+covariates_exp_df34$treated_aux <- ifelse(covariates_exp_df5$id == 34, 1, 0)
+covariates_exp_df36$treated_aux <- ifelse(covariates_exp_df5$id == 36, 1, 0)
+covariates_exp_df37$treated_aux <- ifelse(covariates_exp_df5$id == 37, 1, 0)
+covariates_exp_df39$treated_aux <- ifelse(covariates_exp_df5$id == 39, 1, 0)
+covariates_exp_df40$treated_aux <- ifelse(covariates_exp_df5$id == 40, 1, 0)
+covariates_exp_df41$treated_aux <- ifelse(covariates_exp_df5$id == 41, 1, 0)
+covariates_exp_df44$treated_aux <- ifelse(covariates_exp_df5$id == 44, 1, 0)
+covariates_exp_df45$treated_aux <- ifelse(covariates_exp_df5$id == 45, 1, 0)
+covariates_exp_df47$treated_aux <- ifelse(covariates_exp_df5$id == 47, 1, 0)
+covariates_exp_df50$treated_aux <- ifelse(covariates_exp_df5$id == 50, 1, 0)
+covariates_exp_df51$treated_aux <- ifelse(covariates_exp_df5$id == 51, 1, 0)
+covariates_exp_df53$treated_aux <- ifelse(covariates_exp_df5$id == 53, 1, 0)
+covariates_exp_df54$treated_aux <- ifelse(covariates_exp_df5$id == 54, 1, 0)
+covariates_exp_df55$treated_aux <- ifelse(covariates_exp_df5$id == 55, 1, 0)
+covariates_exp_df_list <- list(covariates_exp_df1,covariates_exp_df2,covariates_exp_df5,
+                               covariates_exp_df10,covariates_exp_df11,covariates_exp_df12,
+                               covariates_exp_df13,covariates_exp_df15,covariates_exp_df17,
+                               covariates_exp_df19,covariates_exp_df21,covariates_exp_df23,
+                               covariates_exp_df24,covariates_exp_df25,covariates_exp_df26,
+                               covariates_exp_df28,covariates_exp_df29,covariates_exp_df30,
+                               covariates_exp_df31,covariates_exp_df32,covariates_exp_df33,
+                               covariates_exp_df34,covariates_exp_df36,covariates_exp_df37,
+                               covariates_exp_df39,covariates_exp_df40,covariates_exp_df41,
+                               covariates_exp_df44,covariates_exp_df45,covariates_exp_df47,
+                               covariates_exp_df50,covariates_exp_df51,covariates_exp_df53,
+                               covariates_exp_df54,covariates_exp_df55)
+rm(covariates_exp_df1,covariates_exp_df2,covariates_exp_df5,
+   covariates_exp_df10,covariates_exp_df11,covariates_exp_df12,
+   covariates_exp_df13,covariates_exp_df15,covariates_exp_df17,
+   covariates_exp_df19,covariates_exp_df21,covariates_exp_df23,
+   covariates_exp_df24,covariates_exp_df25,covariates_exp_df26,
+   covariates_exp_df28,covariates_exp_df29,covariates_exp_df30,
+   covariates_exp_df31,covariates_exp_df32,covariates_exp_df33,
+   covariates_exp_df34,covariates_exp_df36,covariates_exp_df37,
+   covariates_exp_df39,covariates_exp_df40,covariates_exp_df41,
+   covariates_exp_df44,covariates_exp_df45,covariates_exp_df47,
+   covariates_exp_df50,covariates_exp_df51,covariates_exp_df53,
+   covariates_exp_df54,covariates_exp_df55)
+covariates_exp_df_list <- lapply(covariates_exp_df_list, function(x) {
+  x <- x[order(x$year, x$treated_aux, x$name),]
+  return(x)
+}
+)
+covariates_exp_df_list <- lapply(covariates_exp_df_list, function(x)
+  x <- as.data.frame(subset(x, code == 10, select=c(id,name, year, income_pcp_adj, pop_density, unemp_rate, top1_adj, gini, prop_age_25to45_bsy, prop_age_45to65_bsy, prop_age_over65_bsy, prop_bach_degree_bsy, prop_male_bsy, prop_married_bsy, prop_white_bsy)))
+)
+covariates_exp_df_list <- lapply(covariates_exp_df_list, function(x) {
+  x["income_pcp_adj"] <- x["income_pcp_adj"]/100000    # there seems to be a problem with the scalability of covariates - see Github issues page #
+  x["unemp_rate"] <- x["unemp_rate"]/100    # there seems to be a problem with the scalability of covariates - see Github issues page #
+  x["top1_adj"] <- x["top1_adj"]/100    # there seems to be a problem with the scalability of covariates - see Github issues page #
+  return(x)
+}
+)
+column.names_exp <- c(1980:2014)
+row.names_exp_1 <- c(covariates_exp_df_list[[1]][1:35,2])
+row.names_exp_2 <- c(covariates_exp_df_list[[2]][1:35,2])
+row.names_exp_5 <- c(covariates_exp_df_list[[3]][1:35,2])
+row.names_exp_10 <- c(covariates_exp_df_list[[4]][1:35,2])
+row.names_exp_11 <- c(covariates_exp_df_list[[5]][1:35,2])
+row.names_exp_12 <- c(covariates_exp_df_list[[6]][1:35,2])
+row.names_exp_13 <- c(covariates_exp_df_list[[7]][1:35,2])
+row.names_exp_15 <- c(covariates_exp_df_list[[8]][1:35,2])
+row.names_exp_17 <- c(covariates_exp_df_list[[9]][1:35,2])
+row.names_exp_19 <- c(covariates_exp_df_list[[10]][1:35,2])
+row.names_exp_21 <- c(covariates_exp_df_list[[11]][1:35,2])
+row.names_exp_23 <- c(covariates_exp_df_list[[12]][1:35,2])
+row.names_exp_24 <- c(covariates_exp_df_list[[13]][1:35,2])
+row.names_exp_25 <- c(covariates_exp_df_list[[14]][1:35,2])
+row.names_exp_26 <- c(covariates_exp_df_list[[15]][1:35,2])
+row.names_exp_28 <- c(covariates_exp_df_list[[16]][1:35,2])
+row.names_exp_29 <- c(covariates_exp_df_list[[17]][1:35,2])
+row.names_exp_30 <- c(covariates_exp_df_list[[18]][1:35,2])
+row.names_exp_31 <- c(covariates_exp_df_list[[19]][1:35,2])
+row.names_exp_32 <- c(covariates_exp_df_list[[20]][1:35,2])
+row.names_exp_33 <- c(covariates_exp_df_list[[21]][1:35,2])
+row.names_exp_34 <- c(covariates_exp_df_list[[22]][1:35,2])
+row.names_exp_36 <- c(covariates_exp_df_list[[23]][1:35,2])
+row.names_exp_37 <- c(covariates_exp_df_list[[24]][1:35,2])
+row.names_exp_39 <- c(covariates_exp_df_list[[25]][1:35,2])
+row.names_exp_40 <- c(covariates_exp_df_list[[26]][1:35,2])
+row.names_exp_41 <- c(covariates_exp_df_list[[27]][1:35,2])
+row.names_exp_44 <- c(covariates_exp_df_list[[28]][1:35,2])
+row.names_exp_45 <- c(covariates_exp_df_list[[29]][1:35,2])
+row.names_exp_47 <- c(covariates_exp_df_list[[30]][1:35,2])
+row.names_exp_50 <- c(covariates_exp_df_list[[31]][1:35,2])
+row.names_exp_51 <- c(covariates_exp_df_list[[32]][1:35,2])
+row.names_exp_53 <- c(covariates_exp_df_list[[33]][1:35,2])
+row.names_exp_54 <- c(covariates_exp_df_list[[34]][1:35,2])
+row.names_exp_55 <- c(covariates_exp_df_list[[35]][1:35,2])
+row.names_exp_list <- list(row.names_exp_1,row.names_exp_2,row.names_exp_5,
+                           row.names_exp_10,row.names_exp_11,row.names_exp_12,
+                           row.names_exp_13,row.names_exp_15,row.names_exp_17,
+                           row.names_exp_19,row.names_exp_21,row.names_exp_23,
+                           row.names_exp_24,row.names_exp_25,row.names_exp_26,
+                           row.names_exp_28,row.names_exp_29,row.names_exp_30,
+                           row.names_exp_31,row.names_exp_32,row.names_exp_33,
+                           row.names_exp_34,row.names_exp_36,row.names_exp_37,
+                           row.names_exp_39,row.names_exp_40,row.names_exp_41,
+                           row.names_exp_44,row.names_exp_45,row.names_exp_47,
+                           row.names_exp_50,row.names_exp_51,row.names_exp_53,
+                           row.names_exp_54,row.names_exp_55)
+rm(row.names_exp_1,row.names_exp_2,row.names_exp_5,
+   row.names_exp_10,row.names_exp_11,row.names_exp_12,
+   row.names_exp_13,row.names_exp_15,row.names_exp_17,
+   row.names_exp_19,row.names_exp_21,row.names_exp_23,
+   row.names_exp_24,row.names_exp_25,row.names_exp_26,
+   row.names_exp_28,row.names_exp_29,row.names_exp_30,
+   row.names_exp_31,row.names_exp_32,row.names_exp_33,
+   row.names_exp_34,row.names_exp_36,row.names_exp_37,
+   row.names_exp_39,row.names_exp_40,row.names_exp_41,
+   row.names_exp_44,row.names_exp_45,row.names_exp_47,
+   row.names_exp_50,row.names_exp_51,row.names_exp_53,
+   row.names_exp_54,row.names_exp_55)
+matrix.names_exp <- c("income_pcp_adj", "pop_density", "unemp_rate", "top1_adj", "gini", "prop_age_25to45_bsy", "prop_age_45to65_bsy", "prop_age_over65_bsy", "prop_bach_degree_bsy", "prop_male_bsy", "prop_married_bsy", "prop_white_bsy")
+covariates_exp_array_1 <- array(as.matrix(covariates_exp_df_list[[1]][,4:15]), dim = c(35,35,12), dimnames = list(row.names_exp_list[[1]], column.names_exp, matrix.names_exp))
+covariates_exp_array_2 <- array(as.matrix(covariates_exp_df_list[[2]][,4:15]), dim = c(35,35,12), dimnames = list(row.names_exp_list[[2]], column.names_exp, matrix.names_exp))
+covariates_exp_array_5 <- array(as.matrix(covariates_exp_df_list[[3]][,4:15]), dim = c(35,35,12), dimnames = list(row.names_exp_list[[3]], column.names_exp, matrix.names_exp))
+covariates_exp_array_10 <- array(as.matrix(covariates_exp_df_list[[4]][,4:15]), dim = c(35,35,12), dimnames = list(row.names_exp_list[[4]], column.names_exp, matrix.names_exp))
+covariates_exp_array_11 <- array(as.matrix(covariates_exp_df_list[[5]][,4:15]), dim = c(35,35,12), dimnames = list(row.names_exp_list[[5]], column.names_exp, matrix.names_exp))
+covariates_exp_array_12 <- array(as.matrix(covariates_exp_df_list[[6]][,4:15]), dim = c(35,35,12), dimnames = list(row.names_exp_list[[6]], column.names_exp, matrix.names_exp))
+covariates_exp_array_13 <- array(as.matrix(covariates_exp_df_list[[7]][,4:15]), dim = c(35,35,12), dimnames = list(row.names_exp_list[[7]], column.names_exp, matrix.names_exp))
+covariates_exp_array_15 <- array(as.matrix(covariates_exp_df_list[[8]][,4:15]), dim = c(35,35,12), dimnames = list(row.names_exp_list[[8]], column.names_exp, matrix.names_exp))
+covariates_exp_array_17 <- array(as.matrix(covariates_exp_df_list[[9]][,4:15]), dim = c(35,35,12), dimnames = list(row.names_exp_list[[9]], column.names_exp, matrix.names_exp))
+covariates_exp_array_19 <- array(as.matrix(covariates_exp_df_list[[10]][,4:15]), dim = c(35,35,12), dimnames = list(row.names_exp_list[[10]], column.names_exp, matrix.names_exp))
+covariates_exp_array_21 <- array(as.matrix(covariates_exp_df_list[[11]][,4:15]), dim = c(35,35,12), dimnames = list(row.names_exp_list[[11]], column.names_exp, matrix.names_exp))
+covariates_exp_array_23 <- array(as.matrix(covariates_exp_df_list[[12]][,4:15]), dim = c(35,35,12), dimnames = list(row.names_exp_list[[12]], column.names_exp, matrix.names_exp))
+covariates_exp_array_24 <- array(as.matrix(covariates_exp_df_list[[13]][,4:15]), dim = c(35,35,12), dimnames = list(row.names_exp_list[[13]], column.names_exp, matrix.names_exp))
+covariates_exp_array_25 <- array(as.matrix(covariates_exp_df_list[[14]][,4:15]), dim = c(35,35,12), dimnames = list(row.names_exp_list[[14]], column.names_exp, matrix.names_exp))
+covariates_exp_array_26 <- array(as.matrix(covariates_exp_df_list[[15]][,4:15]), dim = c(35,35,12), dimnames = list(row.names_exp_list[[15]], column.names_exp, matrix.names_exp))
+covariates_exp_array_28 <- array(as.matrix(covariates_exp_df_list[[16]][,4:15]), dim = c(35,35,12), dimnames = list(row.names_exp_list[[16]], column.names_exp, matrix.names_exp))
+covariates_exp_array_29 <- array(as.matrix(covariates_exp_df_list[[17]][,4:15]), dim = c(35,35,12), dimnames = list(row.names_exp_list[[17]], column.names_exp, matrix.names_exp))
+covariates_exp_array_30 <- array(as.matrix(covariates_exp_df_list[[18]][,4:15]), dim = c(35,35,12), dimnames = list(row.names_exp_list[[18]], column.names_exp, matrix.names_exp))
+covariates_exp_array_31 <- array(as.matrix(covariates_exp_df_list[[19]][,4:15]), dim = c(35,35,12), dimnames = list(row.names_exp_list[[19]], column.names_exp, matrix.names_exp))
+covariates_exp_array_32 <- array(as.matrix(covariates_exp_df_list[[20]][,4:15]), dim = c(35,35,12), dimnames = list(row.names_exp_list[[20]], column.names_exp, matrix.names_exp))
+covariates_exp_array_33 <- array(as.matrix(covariates_exp_df_list[[21]][,4:15]), dim = c(35,35,12), dimnames = list(row.names_exp_list[[21]], column.names_exp, matrix.names_exp))
+covariates_exp_array_34 <- array(as.matrix(covariates_exp_df_list[[22]][,4:15]), dim = c(35,35,12), dimnames = list(row.names_exp_list[[22]], column.names_exp, matrix.names_exp))
+covariates_exp_array_36 <- array(as.matrix(covariates_exp_df_list[[23]][,4:15]), dim = c(35,35,12), dimnames = list(row.names_exp_list[[23]], column.names_exp, matrix.names_exp))
+covariates_exp_array_37 <- array(as.matrix(covariates_exp_df_list[[24]][,4:15]), dim = c(35,35,12), dimnames = list(row.names_exp_list[[24]], column.names_exp, matrix.names_exp))
+covariates_exp_array_39 <- array(as.matrix(covariates_exp_df_list[[25]][,4:15]), dim = c(35,35,12), dimnames = list(row.names_exp_list[[25]], column.names_exp, matrix.names_exp))
+covariates_exp_array_40 <- array(as.matrix(covariates_exp_df_list[[26]][,4:15]), dim = c(35,35,12), dimnames = list(row.names_exp_list[[26]], column.names_exp, matrix.names_exp))
+covariates_exp_array_41 <- array(as.matrix(covariates_exp_df_list[[27]][,4:15]), dim = c(35,35,12), dimnames = list(row.names_exp_list[[27]], column.names_exp, matrix.names_exp))
+covariates_exp_array_44 <- array(as.matrix(covariates_exp_df_list[[28]][,4:15]), dim = c(35,35,12), dimnames = list(row.names_exp_list[[28]], column.names_exp, matrix.names_exp))
+covariates_exp_array_45 <- array(as.matrix(covariates_exp_df_list[[29]][,4:15]), dim = c(35,35,12), dimnames = list(row.names_exp_list[[29]], column.names_exp, matrix.names_exp))
+covariates_exp_array_47 <- array(as.matrix(covariates_exp_df_list[[30]][,4:15]), dim = c(35,35,12), dimnames = list(row.names_exp_list[[30]], column.names_exp, matrix.names_exp))
+covariates_exp_array_50 <- array(as.matrix(covariates_exp_df_list[[31]][,4:15]), dim = c(35,35,12), dimnames = list(row.names_exp_list[[31]], column.names_exp, matrix.names_exp))
+covariates_exp_array_51 <- array(as.matrix(covariates_exp_df_list[[32]][,4:15]), dim = c(35,35,12), dimnames = list(row.names_exp_list[[32]], column.names_exp, matrix.names_exp))
+covariates_exp_array_53 <- array(as.matrix(covariates_exp_df_list[[33]][,4:15]), dim = c(35,35,12), dimnames = list(row.names_exp_list[[33]], column.names_exp, matrix.names_exp))
+covariates_exp_array_54 <- array(as.matrix(covariates_exp_df_list[[34]][,4:15]), dim = c(35,35,12), dimnames = list(row.names_exp_list[[34]], column.names_exp, matrix.names_exp))
+covariates_exp_array_55 <- array(as.matrix(covariates_exp_df_list[[35]][,4:15]), dim = c(35,35,12), dimnames = list(row.names_exp_list[[35]], column.names_exp, matrix.names_exp))
+
+##### Create 3D arrays of time-varying covariates for synthetic matching for all potential control states - CON_NursingHome #####
+controls.nh.df <- subset(CON_NursingHome, alwaysconpa == 1)
+print(unique(controls.nh.df$id))
+for(i in unique(controls.nh.df$id)) {
+  assign(paste0("covariates_acc_df", i), subset(CON_NursingHome, alwaysconpa == 1))
+}
+covariates_acc_df1$treated_aux <- ifelse(covariates_acc_df1$id == 1, 1, 0)
+covariates_acc_df2$treated_aux <- ifelse(covariates_acc_df5$id == 2, 1, 0)
+covariates_acc_df5$treated_aux <- ifelse(covariates_acc_df5$id == 5, 1, 0)
+covariates_acc_df10$treated_aux <- ifelse(covariates_acc_df5$id == 10, 1, 0)
+covariates_acc_df11$treated_aux <- ifelse(covariates_acc_df5$id == 11, 1, 0)
+covariates_acc_df12$treated_aux <- ifelse(covariates_acc_df5$id == 12, 1, 0)
+covariates_acc_df13$treated_aux <- ifelse(covariates_acc_df5$id == 13, 1, 0)
+covariates_acc_df15$treated_aux <- ifelse(covariates_acc_df5$id == 15, 1, 0)
+covariates_acc_df17$treated_aux <- ifelse(covariates_acc_df5$id == 17, 1, 0)
+covariates_acc_df19$treated_aux <- ifelse(covariates_acc_df5$id == 19, 1, 0)
+covariates_acc_df21$treated_aux <- ifelse(covariates_acc_df5$id == 21, 1, 0)
+covariates_acc_df23$treated_aux <- ifelse(covariates_acc_df5$id == 23, 1, 0)
+covariates_acc_df24$treated_aux <- ifelse(covariates_acc_df5$id == 24, 1, 0)
+covariates_acc_df25$treated_aux <- ifelse(covariates_acc_df5$id == 25, 1, 0)
+covariates_acc_df26$treated_aux <- ifelse(covariates_acc_df5$id == 26, 1, 0)
+covariates_acc_df28$treated_aux <- ifelse(covariates_acc_df5$id == 28, 1, 0)
+covariates_acc_df29$treated_aux <- ifelse(covariates_acc_df5$id == 29, 1, 0)
+covariates_acc_df30$treated_aux <- ifelse(covariates_acc_df5$id == 30, 1, 0)
+covariates_acc_df31$treated_aux <- ifelse(covariates_acc_df5$id == 31, 1, 0)
+covariates_acc_df32$treated_aux <- ifelse(covariates_acc_df5$id == 32, 1, 0)
+covariates_acc_df33$treated_aux <- ifelse(covariates_acc_df5$id == 33, 1, 0)
+covariates_acc_df34$treated_aux <- ifelse(covariates_acc_df5$id == 34, 1, 0)
+covariates_acc_df36$treated_aux <- ifelse(covariates_acc_df5$id == 36, 1, 0)
+covariates_acc_df37$treated_aux <- ifelse(covariates_acc_df5$id == 37, 1, 0)
+covariates_acc_df39$treated_aux <- ifelse(covariates_acc_df5$id == 39, 1, 0)
+covariates_acc_df40$treated_aux <- ifelse(covariates_acc_df5$id == 40, 1, 0)
+covariates_acc_df41$treated_aux <- ifelse(covariates_acc_df5$id == 41, 1, 0)
+covariates_acc_df44$treated_aux <- ifelse(covariates_acc_df5$id == 44, 1, 0)
+covariates_acc_df45$treated_aux <- ifelse(covariates_acc_df5$id == 45, 1, 0)
+covariates_acc_df47$treated_aux <- ifelse(covariates_acc_df5$id == 47, 1, 0)
+covariates_acc_df50$treated_aux <- ifelse(covariates_acc_df5$id == 50, 1, 0)
+covariates_acc_df51$treated_aux <- ifelse(covariates_acc_df5$id == 51, 1, 0)
+covariates_acc_df53$treated_aux <- ifelse(covariates_acc_df5$id == 53, 1, 0)
+covariates_acc_df54$treated_aux <- ifelse(covariates_acc_df5$id == 54, 1, 0)
+covariates_acc_df55$treated_aux <- ifelse(covariates_acc_df5$id == 55, 1, 0)
+covariates_acc_df_list <- list(covariates_acc_df1,covariates_acc_df2,covariates_acc_df5,
+                               covariates_acc_df10,covariates_acc_df11,covariates_acc_df12,
+                               covariates_acc_df13,covariates_acc_df15,covariates_acc_df17,
+                               covariates_acc_df19,covariates_acc_df21,covariates_acc_df23,
+                               covariates_acc_df24,covariates_acc_df25,covariates_acc_df26,
+                               covariates_acc_df28,covariates_acc_df29,covariates_acc_df30,
+                               covariates_acc_df31,covariates_acc_df32,covariates_acc_df33,
+                               covariates_acc_df34,covariates_acc_df36,covariates_acc_df37,
+                               covariates_acc_df39,covariates_acc_df40,covariates_acc_df41,
+                               covariates_acc_df44,covariates_acc_df45,covariates_acc_df47,
+                               covariates_acc_df50,covariates_acc_df51,covariates_acc_df53,
+                               covariates_acc_df54,covariates_acc_df55)
+rm(covariates_acc_df1,covariates_acc_df2,covariates_acc_df5,
+   covariates_acc_df10,covariates_acc_df11,covariates_acc_df12,
+   covariates_acc_df13,covariates_acc_df15,covariates_acc_df17,
+   covariates_acc_df19,covariates_acc_df21,covariates_acc_df23,
+   covariates_acc_df24,covariates_acc_df25,covariates_acc_df26,
+   covariates_acc_df28,covariates_acc_df29,covariates_acc_df30,
+   covariates_acc_df31,covariates_acc_df32,covariates_acc_df33,
+   covariates_acc_df34,covariates_acc_df36,covariates_acc_df37,
+   covariates_acc_df39,covariates_acc_df40,covariates_acc_df41,
+   covariates_acc_df44,covariates_acc_df45,covariates_acc_df47,
+   covariates_acc_df50,covariates_acc_df51,covariates_acc_df53,
+   covariates_acc_df54,covariates_acc_df55)
+covariates_acc_df_list <- lapply(covariates_acc_df_list, function(x) {
+  x <- x[order(x$year, x$treated_aux, x$name),]
+  return(x)
+}
+)
+covariates_acc_df_list <- lapply(covariates_acc_df_list, function(x)
+  x <- as.data.frame(subset(x, code == 10, select=c(id,name, year, income_pcp_adj, pop_density, unemp_rate, top1_adj, gini, prop_age_25to45_bsy, prop_age_45to65_bsy, prop_age_over65_bsy, prop_bach_degree_bsy, prop_male_bsy, prop_married_bsy, prop_white_bsy)))
+)
+covariates_acc_df_list <- lapply(covariates_acc_df_list, function(x) {
+  x["income_pcp_adj"] <- x["income_pcp_adj"]/100000    # there seems to be a problem with the scalability of covariates - see Github issues page #
+  x["unemp_rate"] <- x["unemp_rate"]/100    # there seems to be a problem with the scalability of covariates - see Github issues page #
+  x["top1_adj"] <- x["top1_adj"]/100    # there seems to be a problem with the scalability of covariates - see Github issues page #
+  return(x)
+}
+)
+column.names_acc <- c(1991:2014)
+row.names_acc_1 <- c(covariates_acc_df_list[[1]][1:35,2])
+row.names_acc_2 <- c(covariates_acc_df_list[[2]][1:35,2])
+row.names_acc_5 <- c(covariates_acc_df_list[[3]][1:35,2])
+row.names_acc_10 <- c(covariates_acc_df_list[[4]][1:35,2])
+row.names_acc_11 <- c(covariates_acc_df_list[[5]][1:35,2])
+row.names_acc_12 <- c(covariates_acc_df_list[[6]][1:35,2])
+row.names_acc_13 <- c(covariates_acc_df_list[[7]][1:35,2])
+row.names_acc_15 <- c(covariates_acc_df_list[[8]][1:35,2])
+row.names_acc_17 <- c(covariates_acc_df_list[[9]][1:35,2])
+row.names_acc_19 <- c(covariates_acc_df_list[[10]][1:35,2])
+row.names_acc_21 <- c(covariates_acc_df_list[[11]][1:35,2])
+row.names_acc_23 <- c(covariates_acc_df_list[[12]][1:35,2])
+row.names_acc_24 <- c(covariates_acc_df_list[[13]][1:35,2])
+row.names_acc_25 <- c(covariates_acc_df_list[[14]][1:35,2])
+row.names_acc_26 <- c(covariates_acc_df_list[[15]][1:35,2])
+row.names_acc_28 <- c(covariates_acc_df_list[[16]][1:35,2])
+row.names_acc_29 <- c(covariates_acc_df_list[[17]][1:35,2])
+row.names_acc_30 <- c(covariates_acc_df_list[[18]][1:35,2])
+row.names_acc_31 <- c(covariates_acc_df_list[[19]][1:35,2])
+row.names_acc_32 <- c(covariates_acc_df_list[[20]][1:35,2])
+row.names_acc_33 <- c(covariates_acc_df_list[[21]][1:35,2])
+row.names_acc_34 <- c(covariates_acc_df_list[[22]][1:35,2])
+row.names_acc_36 <- c(covariates_acc_df_list[[23]][1:35,2])
+row.names_acc_37 <- c(covariates_acc_df_list[[24]][1:35,2])
+row.names_acc_39 <- c(covariates_acc_df_list[[25]][1:35,2])
+row.names_acc_40 <- c(covariates_acc_df_list[[26]][1:35,2])
+row.names_acc_41 <- c(covariates_acc_df_list[[27]][1:35,2])
+row.names_acc_44 <- c(covariates_acc_df_list[[28]][1:35,2])
+row.names_acc_45 <- c(covariates_acc_df_list[[29]][1:35,2])
+row.names_acc_47 <- c(covariates_acc_df_list[[30]][1:35,2])
+row.names_acc_50 <- c(covariates_acc_df_list[[31]][1:35,2])
+row.names_acc_51 <- c(covariates_acc_df_list[[32]][1:35,2])
+row.names_acc_53 <- c(covariates_acc_df_list[[33]][1:35,2])
+row.names_acc_54 <- c(covariates_acc_df_list[[34]][1:35,2])
+row.names_acc_55 <- c(covariates_acc_df_list[[35]][1:35,2])
+row.names_acc_list <- list(row.names_acc_1,row.names_acc_2,row.names_acc_5,
+                           row.names_acc_10,row.names_acc_11,row.names_acc_12,
+                           row.names_acc_13,row.names_acc_15,row.names_acc_17,
+                           row.names_acc_19,row.names_acc_21,row.names_acc_23,
+                           row.names_acc_24,row.names_acc_25,row.names_acc_26,
+                           row.names_acc_28,row.names_acc_29,row.names_acc_30,
+                           row.names_acc_31,row.names_acc_32,row.names_acc_33,
+                           row.names_acc_34,row.names_acc_36,row.names_acc_37,
+                           row.names_acc_39,row.names_acc_40,row.names_acc_41,
+                           row.names_acc_44,row.names_acc_45,row.names_acc_47,
+                           row.names_acc_50,row.names_acc_51,row.names_acc_53,
+                           row.names_acc_54,row.names_acc_55)
+rm(row.names_acc_1,row.names_acc_2,row.names_acc_5,
+   row.names_acc_10,row.names_acc_11,row.names_acc_12,
+   row.names_acc_13,row.names_acc_15,row.names_acc_17,
+   row.names_acc_19,row.names_acc_21,row.names_acc_23,
+   row.names_acc_24,row.names_acc_25,row.names_acc_26,
+   row.names_acc_28,row.names_acc_29,row.names_acc_30,
+   row.names_acc_31,row.names_acc_32,row.names_acc_33,
+   row.names_acc_34,row.names_acc_36,row.names_acc_37,
+   row.names_acc_39,row.names_acc_40,row.names_acc_41,
+   row.names_acc_44,row.names_acc_45,row.names_acc_47,
+   row.names_acc_50,row.names_acc_51,row.names_acc_53,
+   row.names_acc_54,row.names_acc_55)
+matrix.names_acc <- c("income_pcp_adj", "pop_density", "unemp_rate", "top1_adj", "gini", "prop_age_25to45_bsy", "prop_age_45to65_bsy", "prop_age_over65_bsy", "prop_bach_degree_bsy", "prop_male_bsy", "prop_married_bsy", "prop_white_bsy")
+covariates_acc_array_1 <- array(as.matrix(covariates_acc_df_list[[1]][,4:15]), dim = c(35,24,12), dimnames = list(row.names_acc_list[[1]], column.names_acc, matrix.names_acc))
+covariates_acc_array_2 <- array(as.matrix(covariates_acc_df_list[[2]][,4:15]), dim = c(35,24,12), dimnames = list(row.names_acc_list[[2]], column.names_acc, matrix.names_acc))
+covariates_acc_array_5 <- array(as.matrix(covariates_acc_df_list[[3]][,4:15]), dim = c(35,24,12), dimnames = list(row.names_acc_list[[3]], column.names_acc, matrix.names_acc))
+covariates_acc_array_10 <- array(as.matrix(covariates_acc_df_list[[4]][,4:15]), dim = c(35,24,12), dimnames = list(row.names_acc_list[[4]], column.names_acc, matrix.names_acc))
+covariates_acc_array_11 <- array(as.matrix(covariates_acc_df_list[[5]][,4:15]), dim = c(35,24,12), dimnames = list(row.names_acc_list[[5]], column.names_acc, matrix.names_acc))
+covariates_acc_array_12 <- array(as.matrix(covariates_acc_df_list[[6]][,4:15]), dim = c(35,24,12), dimnames = list(row.names_acc_list[[6]], column.names_acc, matrix.names_acc))
+covariates_acc_array_13 <- array(as.matrix(covariates_acc_df_list[[7]][,4:15]), dim = c(35,24,12), dimnames = list(row.names_acc_list[[7]], column.names_acc, matrix.names_acc))
+covariates_acc_array_15 <- array(as.matrix(covariates_acc_df_list[[8]][,4:15]), dim = c(35,24,12), dimnames = list(row.names_acc_list[[8]], column.names_acc, matrix.names_acc))
+covariates_acc_array_17 <- array(as.matrix(covariates_acc_df_list[[9]][,4:15]), dim = c(35,24,12), dimnames = list(row.names_acc_list[[9]], column.names_acc, matrix.names_acc))
+covariates_acc_array_19 <- array(as.matrix(covariates_acc_df_list[[10]][,4:15]), dim = c(35,24,12), dimnames = list(row.names_acc_list[[10]], column.names_acc, matrix.names_acc))
+covariates_acc_array_21 <- array(as.matrix(covariates_acc_df_list[[11]][,4:15]), dim = c(35,24,12), dimnames = list(row.names_acc_list[[11]], column.names_acc, matrix.names_acc))
+covariates_acc_array_23 <- array(as.matrix(covariates_acc_df_list[[12]][,4:15]), dim = c(35,24,12), dimnames = list(row.names_acc_list[[12]], column.names_acc, matrix.names_acc))
+covariates_acc_array_24 <- array(as.matrix(covariates_acc_df_list[[13]][,4:15]), dim = c(35,24,12), dimnames = list(row.names_acc_list[[13]], column.names_acc, matrix.names_acc))
+covariates_acc_array_25 <- array(as.matrix(covariates_acc_df_list[[14]][,4:15]), dim = c(35,24,12), dimnames = list(row.names_acc_list[[14]], column.names_acc, matrix.names_acc))
+covariates_acc_array_26 <- array(as.matrix(covariates_acc_df_list[[15]][,4:15]), dim = c(35,24,12), dimnames = list(row.names_acc_list[[15]], column.names_acc, matrix.names_acc))
+covariates_acc_array_28 <- array(as.matrix(covariates_acc_df_list[[16]][,4:15]), dim = c(35,24,12), dimnames = list(row.names_acc_list[[16]], column.names_acc, matrix.names_acc))
+covariates_acc_array_29 <- array(as.matrix(covariates_acc_df_list[[17]][,4:15]), dim = c(35,24,12), dimnames = list(row.names_acc_list[[17]], column.names_acc, matrix.names_acc))
+covariates_acc_array_30 <- array(as.matrix(covariates_acc_df_list[[18]][,4:15]), dim = c(35,24,12), dimnames = list(row.names_acc_list[[18]], column.names_acc, matrix.names_acc))
+covariates_acc_array_31 <- array(as.matrix(covariates_acc_df_list[[19]][,4:15]), dim = c(35,24,12), dimnames = list(row.names_acc_list[[19]], column.names_acc, matrix.names_acc))
+covariates_acc_array_32 <- array(as.matrix(covariates_acc_df_list[[20]][,4:15]), dim = c(35,24,12), dimnames = list(row.names_acc_list[[20]], column.names_acc, matrix.names_acc))
+covariates_acc_array_33 <- array(as.matrix(covariates_acc_df_list[[21]][,4:15]), dim = c(35,24,12), dimnames = list(row.names_acc_list[[21]], column.names_acc, matrix.names_acc))
+covariates_acc_array_34 <- array(as.matrix(covariates_acc_df_list[[22]][,4:15]), dim = c(35,24,12), dimnames = list(row.names_acc_list[[22]], column.names_acc, matrix.names_acc))
+covariates_acc_array_36 <- array(as.matrix(covariates_acc_df_list[[23]][,4:15]), dim = c(35,24,12), dimnames = list(row.names_acc_list[[23]], column.names_acc, matrix.names_acc))
+covariates_acc_array_37 <- array(as.matrix(covariates_acc_df_list[[24]][,4:15]), dim = c(35,24,12), dimnames = list(row.names_acc_list[[24]], column.names_acc, matrix.names_acc))
+covariates_acc_array_39 <- array(as.matrix(covariates_acc_df_list[[25]][,4:15]), dim = c(35,24,12), dimnames = list(row.names_acc_list[[25]], column.names_acc, matrix.names_acc))
+covariates_acc_array_40 <- array(as.matrix(covariates_acc_df_list[[26]][,4:15]), dim = c(35,24,12), dimnames = list(row.names_acc_list[[26]], column.names_acc, matrix.names_acc))
+covariates_acc_array_41 <- array(as.matrix(covariates_acc_df_list[[27]][,4:15]), dim = c(35,24,12), dimnames = list(row.names_acc_list[[27]], column.names_acc, matrix.names_acc))
+covariates_acc_array_44 <- array(as.matrix(covariates_acc_df_list[[28]][,4:15]), dim = c(35,24,12), dimnames = list(row.names_acc_list[[28]], column.names_acc, matrix.names_acc))
+covariates_acc_array_45 <- array(as.matrix(covariates_acc_df_list[[29]][,4:15]), dim = c(35,24,12), dimnames = list(row.names_acc_list[[29]], column.names_acc, matrix.names_acc))
+covariates_acc_array_47 <- array(as.matrix(covariates_acc_df_list[[30]][,4:15]), dim = c(35,24,12), dimnames = list(row.names_acc_list[[30]], column.names_acc, matrix.names_acc))
+covariates_acc_array_50 <- array(as.matrix(covariates_acc_df_list[[31]][,4:15]), dim = c(35,24,12), dimnames = list(row.names_acc_list[[31]], column.names_acc, matrix.names_acc))
+covariates_acc_array_51 <- array(as.matrix(covariates_acc_df_list[[32]][,4:15]), dim = c(35,24,12), dimnames = list(row.names_acc_list[[32]], column.names_acc, matrix.names_acc))
+covariates_acc_array_53 <- array(as.matrix(covariates_acc_df_list[[33]][,4:15]), dim = c(35,24,12), dimnames = list(row.names_acc_list[[33]], column.names_acc, matrix.names_acc))
+covariates_acc_array_54 <- array(as.matrix(covariates_acc_df_list[[34]][,4:15]), dim = c(35,24,12), dimnames = list(row.names_acc_list[[34]], column.names_acc, matrix.names_acc))
+covariates_acc_array_55 <- array(as.matrix(covariates_acc_df_list[[35]][,4:15]), dim = c(35,24,12), dimnames = list(row.names_acc_list[[35]], column.names_acc, matrix.names_acc))
+
+
+########## Pennsylvania ##########
