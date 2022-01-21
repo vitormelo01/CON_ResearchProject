@@ -998,43 +998,43 @@ dev.off()
 controls.df <- subset(CON_Expenditure, alwaysconpa == 1)
 print(unique(controls.df$id))
 for(i in unique(controls.df$id)) {
-  assign(paste0("covariates_exp_df", i), subset(CON_Expenditure, alwaysconpa == 1))
+  assign(paste0("covariates_exp_df", i), subset(CON_NursingHome, alwaysconpa == 1))
 }
 covariates_exp_df1$treated_aux <- ifelse(covariates_exp_df1$id == 1, 1, 0)
-covariates_exp_df2$treated_aux <- ifelse(covariates_exp_df5$id == 2, 1, 0)
+covariates_exp_df2$treated_aux <- ifelse(covariates_exp_df2$id == 2, 1, 0)
 covariates_exp_df5$treated_aux <- ifelse(covariates_exp_df5$id == 5, 1, 0)
-covariates_exp_df10$treated_aux <- ifelse(covariates_exp_df5$id == 10, 1, 0)
-covariates_exp_df11$treated_aux <- ifelse(covariates_exp_df5$id == 11, 1, 0)
-covariates_exp_df12$treated_aux <- ifelse(covariates_exp_df5$id == 12, 1, 0)
-covariates_exp_df13$treated_aux <- ifelse(covariates_exp_df5$id == 13, 1, 0)
-covariates_exp_df15$treated_aux <- ifelse(covariates_exp_df5$id == 15, 1, 0)
-covariates_exp_df17$treated_aux <- ifelse(covariates_exp_df5$id == 17, 1, 0)
-covariates_exp_df19$treated_aux <- ifelse(covariates_exp_df5$id == 19, 1, 0)
-covariates_exp_df21$treated_aux <- ifelse(covariates_exp_df5$id == 21, 1, 0)
-covariates_exp_df23$treated_aux <- ifelse(covariates_exp_df5$id == 23, 1, 0)
-covariates_exp_df24$treated_aux <- ifelse(covariates_exp_df5$id == 24, 1, 0)
-covariates_exp_df25$treated_aux <- ifelse(covariates_exp_df5$id == 25, 1, 0)
-covariates_exp_df26$treated_aux <- ifelse(covariates_exp_df5$id == 26, 1, 0)
-covariates_exp_df28$treated_aux <- ifelse(covariates_exp_df5$id == 28, 1, 0)
-covariates_exp_df29$treated_aux <- ifelse(covariates_exp_df5$id == 29, 1, 0)
-covariates_exp_df30$treated_aux <- ifelse(covariates_exp_df5$id == 30, 1, 0)
-covariates_exp_df31$treated_aux <- ifelse(covariates_exp_df5$id == 31, 1, 0)
-covariates_exp_df32$treated_aux <- ifelse(covariates_exp_df5$id == 32, 1, 0)
-covariates_exp_df33$treated_aux <- ifelse(covariates_exp_df5$id == 33, 1, 0)
-covariates_exp_df34$treated_aux <- ifelse(covariates_exp_df5$id == 34, 1, 0)
-covariates_exp_df36$treated_aux <- ifelse(covariates_exp_df5$id == 36, 1, 0)
-covariates_exp_df37$treated_aux <- ifelse(covariates_exp_df5$id == 37, 1, 0)
-covariates_exp_df39$treated_aux <- ifelse(covariates_exp_df5$id == 39, 1, 0)
-covariates_exp_df40$treated_aux <- ifelse(covariates_exp_df5$id == 40, 1, 0)
-covariates_exp_df41$treated_aux <- ifelse(covariates_exp_df5$id == 41, 1, 0)
-covariates_exp_df44$treated_aux <- ifelse(covariates_exp_df5$id == 44, 1, 0)
-covariates_exp_df45$treated_aux <- ifelse(covariates_exp_df5$id == 45, 1, 0)
-covariates_exp_df47$treated_aux <- ifelse(covariates_exp_df5$id == 47, 1, 0)
-covariates_exp_df50$treated_aux <- ifelse(covariates_exp_df5$id == 50, 1, 0)
-covariates_exp_df51$treated_aux <- ifelse(covariates_exp_df5$id == 51, 1, 0)
-covariates_exp_df53$treated_aux <- ifelse(covariates_exp_df5$id == 53, 1, 0)
-covariates_exp_df54$treated_aux <- ifelse(covariates_exp_df5$id == 54, 1, 0)
-covariates_exp_df55$treated_aux <- ifelse(covariates_exp_df5$id == 55, 1, 0)
+covariates_exp_df10$treated_aux <- ifelse(covariates_exp_df10$id == 10, 1, 0)
+covariates_exp_df11$treated_aux <- ifelse(covariates_exp_df11$id == 11, 1, 0)
+covariates_exp_df12$treated_aux <- ifelse(covariates_exp_df12$id == 12, 1, 0)
+covariates_exp_df13$treated_aux <- ifelse(covariates_exp_df13$id == 13, 1, 0)
+covariates_exp_df15$treated_aux <- ifelse(covariates_exp_df15$id == 15, 1, 0)
+covariates_exp_df17$treated_aux <- ifelse(covariates_exp_df17$id == 17, 1, 0)
+covariates_exp_df19$treated_aux <- ifelse(covariates_exp_df19$id == 19, 1, 0)
+covariates_exp_df21$treated_aux <- ifelse(covariates_exp_df21$id == 21, 1, 0)
+covariates_exp_df23$treated_aux <- ifelse(covariates_exp_df23$id == 23, 1, 0)
+covariates_exp_df24$treated_aux <- ifelse(covariates_exp_df24$id == 24, 1, 0)
+covariates_exp_df25$treated_aux <- ifelse(covariates_exp_df25$id == 25, 1, 0)
+covariates_exp_df26$treated_aux <- ifelse(covariates_exp_df26$id == 26, 1, 0)
+covariates_exp_df28$treated_aux <- ifelse(covariates_exp_df28$id == 28, 1, 0)
+covariates_exp_df29$treated_aux <- ifelse(covariates_exp_df29$id == 29, 1, 0)
+covariates_exp_df30$treated_aux <- ifelse(covariates_exp_df30$id == 30, 1, 0)
+covariates_exp_df31$treated_aux <- ifelse(covariates_exp_df31$id == 31, 1, 0)
+covariates_exp_df32$treated_aux <- ifelse(covariates_exp_df32$id == 32, 1, 0)
+covariates_exp_df33$treated_aux <- ifelse(covariates_exp_df33$id == 33, 1, 0)
+covariates_exp_df34$treated_aux <- ifelse(covariates_exp_df34$id == 34, 1, 0)
+covariates_exp_df36$treated_aux <- ifelse(covariates_exp_df36$id == 36, 1, 0)
+covariates_exp_df37$treated_aux <- ifelse(covariates_exp_df37$id == 37, 1, 0)
+covariates_exp_df39$treated_aux <- ifelse(covariates_exp_df39$id == 39, 1, 0)
+covariates_exp_df40$treated_aux <- ifelse(covariates_exp_df40$id == 40, 1, 0)
+covariates_exp_df41$treated_aux <- ifelse(covariates_exp_df41$id == 41, 1, 0)
+covariates_exp_df44$treated_aux <- ifelse(covariates_exp_df44$id == 44, 1, 0)
+covariates_exp_df45$treated_aux <- ifelse(covariates_exp_df45$id == 45, 1, 0)
+covariates_exp_df47$treated_aux <- ifelse(covariates_exp_df47$id == 47, 1, 0)
+covariates_exp_df50$treated_aux <- ifelse(covariates_exp_df50$id == 50, 1, 0)
+covariates_exp_df51$treated_aux <- ifelse(covariates_exp_df51$id == 51, 1, 0)
+covariates_exp_df53$treated_aux <- ifelse(covariates_exp_df53$id == 53, 1, 0)
+covariates_exp_df54$treated_aux <- ifelse(covariates_exp_df54$id == 54, 1, 0)
+covariates_exp_df55$treated_aux <- ifelse(covariates_exp_df55$id == 55, 1, 0)
 covariates_exp_df_list <- list(covariates_exp_df1,covariates_exp_df2,covariates_exp_df5,
                                covariates_exp_df10,covariates_exp_df11,covariates_exp_df12,
                                covariates_exp_df13,covariates_exp_df15,covariates_exp_df17,
@@ -1178,40 +1178,40 @@ for(i in unique(controls.nh.df$id)) {
   assign(paste0("covariates_acc_df", i), subset(CON_NursingHome, alwaysconpa == 1))
 }
 covariates_acc_df1$treated_aux <- ifelse(covariates_acc_df1$id == 1, 1, 0)
-covariates_acc_df2$treated_aux <- ifelse(covariates_acc_df5$id == 2, 1, 0)
+covariates_acc_df2$treated_aux <- ifelse(covariates_acc_df2$id == 2, 1, 0)
 covariates_acc_df5$treated_aux <- ifelse(covariates_acc_df5$id == 5, 1, 0)
-covariates_acc_df10$treated_aux <- ifelse(covariates_acc_df5$id == 10, 1, 0)
-covariates_acc_df11$treated_aux <- ifelse(covariates_acc_df5$id == 11, 1, 0)
-covariates_acc_df12$treated_aux <- ifelse(covariates_acc_df5$id == 12, 1, 0)
-covariates_acc_df13$treated_aux <- ifelse(covariates_acc_df5$id == 13, 1, 0)
-covariates_acc_df15$treated_aux <- ifelse(covariates_acc_df5$id == 15, 1, 0)
-covariates_acc_df17$treated_aux <- ifelse(covariates_acc_df5$id == 17, 1, 0)
-covariates_acc_df19$treated_aux <- ifelse(covariates_acc_df5$id == 19, 1, 0)
-covariates_acc_df21$treated_aux <- ifelse(covariates_acc_df5$id == 21, 1, 0)
-covariates_acc_df23$treated_aux <- ifelse(covariates_acc_df5$id == 23, 1, 0)
-covariates_acc_df24$treated_aux <- ifelse(covariates_acc_df5$id == 24, 1, 0)
-covariates_acc_df25$treated_aux <- ifelse(covariates_acc_df5$id == 25, 1, 0)
-covariates_acc_df26$treated_aux <- ifelse(covariates_acc_df5$id == 26, 1, 0)
-covariates_acc_df28$treated_aux <- ifelse(covariates_acc_df5$id == 28, 1, 0)
-covariates_acc_df29$treated_aux <- ifelse(covariates_acc_df5$id == 29, 1, 0)
-covariates_acc_df30$treated_aux <- ifelse(covariates_acc_df5$id == 30, 1, 0)
-covariates_acc_df31$treated_aux <- ifelse(covariates_acc_df5$id == 31, 1, 0)
-covariates_acc_df32$treated_aux <- ifelse(covariates_acc_df5$id == 32, 1, 0)
-covariates_acc_df33$treated_aux <- ifelse(covariates_acc_df5$id == 33, 1, 0)
-covariates_acc_df34$treated_aux <- ifelse(covariates_acc_df5$id == 34, 1, 0)
-covariates_acc_df36$treated_aux <- ifelse(covariates_acc_df5$id == 36, 1, 0)
-covariates_acc_df37$treated_aux <- ifelse(covariates_acc_df5$id == 37, 1, 0)
-covariates_acc_df39$treated_aux <- ifelse(covariates_acc_df5$id == 39, 1, 0)
-covariates_acc_df40$treated_aux <- ifelse(covariates_acc_df5$id == 40, 1, 0)
-covariates_acc_df41$treated_aux <- ifelse(covariates_acc_df5$id == 41, 1, 0)
-covariates_acc_df44$treated_aux <- ifelse(covariates_acc_df5$id == 44, 1, 0)
-covariates_acc_df45$treated_aux <- ifelse(covariates_acc_df5$id == 45, 1, 0)
-covariates_acc_df47$treated_aux <- ifelse(covariates_acc_df5$id == 47, 1, 0)
-covariates_acc_df50$treated_aux <- ifelse(covariates_acc_df5$id == 50, 1, 0)
-covariates_acc_df51$treated_aux <- ifelse(covariates_acc_df5$id == 51, 1, 0)
-covariates_acc_df53$treated_aux <- ifelse(covariates_acc_df5$id == 53, 1, 0)
-covariates_acc_df54$treated_aux <- ifelse(covariates_acc_df5$id == 54, 1, 0)
-covariates_acc_df55$treated_aux <- ifelse(covariates_acc_df5$id == 55, 1, 0)
+covariates_acc_df10$treated_aux <- ifelse(covariates_acc_df10$id == 10, 1, 0)
+covariates_acc_df11$treated_aux <- ifelse(covariates_acc_df11$id == 11, 1, 0)
+covariates_acc_df12$treated_aux <- ifelse(covariates_acc_df12$id == 12, 1, 0)
+covariates_acc_df13$treated_aux <- ifelse(covariates_acc_df13$id == 13, 1, 0)
+covariates_acc_df15$treated_aux <- ifelse(covariates_acc_df15$id == 15, 1, 0)
+covariates_acc_df17$treated_aux <- ifelse(covariates_acc_df17$id == 17, 1, 0)
+covariates_acc_df19$treated_aux <- ifelse(covariates_acc_df19$id == 19, 1, 0)
+covariates_acc_df21$treated_aux <- ifelse(covariates_acc_df21$id == 21, 1, 0)
+covariates_acc_df23$treated_aux <- ifelse(covariates_acc_df23$id == 23, 1, 0)
+covariates_acc_df24$treated_aux <- ifelse(covariates_acc_df24$id == 24, 1, 0)
+covariates_acc_df25$treated_aux <- ifelse(covariates_acc_df25$id == 25, 1, 0)
+covariates_acc_df26$treated_aux <- ifelse(covariates_acc_df26$id == 26, 1, 0)
+covariates_acc_df28$treated_aux <- ifelse(covariates_acc_df28$id == 28, 1, 0)
+covariates_acc_df29$treated_aux <- ifelse(covariates_acc_df29$id == 29, 1, 0)
+covariates_acc_df30$treated_aux <- ifelse(covariates_acc_df30$id == 30, 1, 0)
+covariates_acc_df31$treated_aux <- ifelse(covariates_acc_df31$id == 31, 1, 0)
+covariates_acc_df32$treated_aux <- ifelse(covariates_acc_df32$id == 32, 1, 0)
+covariates_acc_df33$treated_aux <- ifelse(covariates_acc_df33$id == 33, 1, 0)
+covariates_acc_df34$treated_aux <- ifelse(covariates_acc_df34$id == 34, 1, 0)
+covariates_acc_df36$treated_aux <- ifelse(covariates_acc_df36$id == 36, 1, 0)
+covariates_acc_df37$treated_aux <- ifelse(covariates_acc_df37$id == 37, 1, 0)
+covariates_acc_df39$treated_aux <- ifelse(covariates_acc_df39$id == 39, 1, 0)
+covariates_acc_df40$treated_aux <- ifelse(covariates_acc_df40$id == 40, 1, 0)
+covariates_acc_df41$treated_aux <- ifelse(covariates_acc_df41$id == 41, 1, 0)
+covariates_acc_df44$treated_aux <- ifelse(covariates_acc_df44$id == 44, 1, 0)
+covariates_acc_df45$treated_aux <- ifelse(covariates_acc_df45$id == 45, 1, 0)
+covariates_acc_df47$treated_aux <- ifelse(covariates_acc_df47$id == 47, 1, 0)
+covariates_acc_df50$treated_aux <- ifelse(covariates_acc_df50$id == 50, 1, 0)
+covariates_acc_df51$treated_aux <- ifelse(covariates_acc_df51$id == 51, 1, 0)
+covariates_acc_df53$treated_aux <- ifelse(covariates_acc_df53$id == 53, 1, 0)
+covariates_acc_df54$treated_aux <- ifelse(covariates_acc_df54$id == 54, 1, 0)
+covariates_acc_df55$treated_aux <- ifelse(covariates_acc_df55$id == 55, 1, 0)
 covariates_acc_df_list <- list(covariates_acc_df1,covariates_acc_df2,covariates_acc_df5,
                                covariates_acc_df10,covariates_acc_df11,covariates_acc_df12,
                                covariates_acc_df13,covariates_acc_df15,covariates_acc_df17,
@@ -1350,3 +1350,827 @@ covariates_acc_array_55 <- array(as.matrix(covariates_acc_df_list[[35]][,4:15]),
 
 
 ########## Pennsylvania ##########
+
+##### Quantity of Nursing Homes #####
+### PA - Get DID, SC, and SDID estimates, as well as a data set with difference in outcomes for spaghetti graphs ###
+# Restrict data to actual treated state and control states by expenditure type (code = 10 for nursing home care), and get in panel form for synthdid #
+q_nursing_homes_pa_df <- as.data.frame(subset(CON_NursingHome, code == 10))
+q_nursing_homes_pa_df$treated <- as.integer(ifelse(q_nursing_homes_pa_df$name == "Pennsylvania" & q_nursing_homes_pa_df$year >= 1996, 1, 0))
+q_nursing_homes_pa_df <- q_nursing_homes_pa_df[order(q_nursing_homes_pa_df$year, q_nursing_homes_pa_df$treated_pa_aux, q_nursing_homes_pa_df$name),]
+q_nursing_homes_pa_df <- subset(q_nursing_homes_pa_df, alwaysconpa == 1 | name == "Pennsylvania", select=c(name, year, Q_SkilledNursingHomes_pcp, treated))
+setup_q_nh_pa <- panel.matrices(q_nursing_homes_pa_df, unit = 1, time = 2, outcome = 3, treatment = 4)
+# DID #
+q_nh_est_did_pa <- did_estimate(setup_q_nh_pa$Y, setup_q_nh_pa$N0, setup_q_nh_pa$T0, X = covariates_acc_pa_array)
+q_nh_est_did_plot_pa <- synthdid_plot(q_nh_est_did_pa)
+q_nh_est_did_plot_data_aux_pa <- ggplot_build(q_nh_est_did_plot_pa)
+q_nh_est_did_plot_data_long_pa <- data.frame(q_nh_est_did_plot_data_aux_pa$data[[1]]$x, q_nh_est_did_plot_data_aux_pa$data[[1]]$y, q_nh_est_did_plot_data_aux_pa$data[[1]]$group)
+colnames(q_nh_est_did_plot_data_long_pa) <- c('year', 'outcome', 'treated')
+q_nh_est_did_plot_data_long_pa$treated <- q_nh_est_did_plot_data_long_pa$treated - 1
+q_nh_est_did_plot_data_wide_pa <- reshape(data=q_nh_est_did_plot_data_long_pa,
+                                          idvar = "year",
+                                          v.names = "outcome",
+                                          timevar = "treated",
+                                          direction = "wide")
+q_nh_est_did_plot_data_wide_pa$diff <- q_nh_est_did_plot_data_wide_pa$outcome.1 - q_nh_est_did_plot_data_wide_pa$outcome.0
+# SC #
+q_nh_est_sc_pa <- sc_estimate(setup_q_nh_pa$Y, setup_q_nh_pa$N0, setup_q_nh_pa$T0, X = covariates_acc_pa_array)
+q_nh_est_sc_plot_pa <- synthdid_plot(q_nh_est_sc_pa)
+q_nh_est_sc_plot_data_aux_pa <- ggplot_build(q_nh_est_sc_plot_pa)
+q_nh_est_sc_plot_data_long_pa <- data.frame(q_nh_est_sc_plot_data_aux_pa$data[[1]]$x, q_nh_est_sc_plot_data_aux_pa$data[[1]]$y, q_nh_est_sc_plot_data_aux_pa$data[[1]]$group)
+colnames(q_nh_est_sc_plot_data_long_pa) <- c('year', 'outcome', 'treated')
+q_nh_est_sc_plot_data_long_pa$treated <- q_nh_est_sc_plot_data_long_pa$treated - 1
+q_nh_est_sc_plot_data_wide_pa <- reshape(data=q_nh_est_sc_plot_data_long_pa,
+                                         idvar = "year",
+                                         v.names = "outcome",
+                                         timevar = "treated",
+                                         direction = "wide")
+q_nh_est_sc_plot_data_wide_pa$diff <- q_nh_est_sc_plot_data_wide_pa$outcome.1 - q_nh_est_sc_plot_data_wide_pa$outcome.0
+# SDID #
+q_nh_est_sdid_pa <- synthdid_estimate(setup_q_nh_pa$Y, setup_q_nh_pa$N0, setup_q_nh_pa$T0, X = covariates_acc_pa_array)
+q_nh_est_sdid_plot_pa <- synthdid_plot(q_nh_est_sdid_pa)
+q_nh_est_sdid_plot_data_aux_pa <- ggplot_build(q_nh_est_sdid_plot_pa)
+q_nh_est_sdid_plot_data_long_pa <- data.frame(q_nh_est_sdid_plot_data_aux_pa$data[[1]]$x, q_nh_est_sdid_plot_data_aux_pa$data[[1]]$y, q_nh_est_sdid_plot_data_aux_pa$data[[1]]$group)
+colnames(q_nh_est_sdid_plot_data_long_pa) <- c('year', 'outcome', 'treated')
+q_nh_est_sdid_plot_data_long_pa$treated <- q_nh_est_sdid_plot_data_long_pa$treated - 1
+q_nh_est_sdid_plot_data_wide_pa <- reshape(data=q_nh_est_sdid_plot_data_long_pa,
+                                           idvar = "year",
+                                           v.names = "outcome",
+                                           timevar = "treated",
+                                           direction = "wide")
+q_nh_est_sdid_plot_data_wide_pa$diff <- q_nh_est_sdid_plot_data_wide_pa$outcome.1 - q_nh_est_sdid_plot_data_wide_pa$outcome.0
+### Control States - Get DID, SC, and SDID estimates, as well as a data set with difference in outcomes for spaghetti graphs ###
+# Restrict data to "placebo treated" state and other control states by expenditure type (code = 10 for nursing home care), and get in panel form for synthdid #
+for(i in unique(controls.df$id)) {
+  assign(paste0("q_nh_df", i), subset(CON_NursingHome, alwaysconpa == 1))
+}
+q_nh_df1$treated_aux <- ifelse(q_nh_df1$id == 1, 1, 0)
+q_nh_df2$treated_aux <- ifelse(q_nh_df2$id == 2, 1, 0)
+q_nh_df5$treated_aux <- ifelse(q_nh_df5$id == 5, 1, 0)
+q_nh_df10$treated_aux <- ifelse(q_nh_df10$id == 10, 1, 0)
+q_nh_df11$treated_aux <- ifelse(q_nh_df11$id == 11, 1, 0)
+q_nh_df12$treated_aux <- ifelse(q_nh_df12$id == 12, 1, 0)
+q_nh_df13$treated_aux <- ifelse(q_nh_df13$id == 13, 1, 0)
+q_nh_df15$treated_aux <- ifelse(q_nh_df15$id == 15, 1, 0)
+q_nh_df17$treated_aux <- ifelse(q_nh_df17$id == 17, 1, 0)
+q_nh_df19$treated_aux <- ifelse(q_nh_df19$id == 19, 1, 0)
+q_nh_df21$treated_aux <- ifelse(q_nh_df21$id == 21, 1, 0)
+q_nh_df23$treated_aux <- ifelse(q_nh_df23$id == 23, 1, 0)
+q_nh_df24$treated_aux <- ifelse(q_nh_df24$id == 24, 1, 0)
+q_nh_df25$treated_aux <- ifelse(q_nh_df25$id == 25, 1, 0)
+q_nh_df26$treated_aux <- ifelse(q_nh_df26$id == 26, 1, 0)
+q_nh_df28$treated_aux <- ifelse(q_nh_df28$id == 28, 1, 0)
+q_nh_df29$treated_aux <- ifelse(q_nh_df29$id == 29, 1, 0)
+q_nh_df30$treated_aux <- ifelse(q_nh_df30$id == 30, 1, 0)
+q_nh_df31$treated_aux <- ifelse(q_nh_df31$id == 31, 1, 0)
+q_nh_df32$treated_aux <- ifelse(q_nh_df32$id == 32, 1, 0)
+q_nh_df33$treated_aux <- ifelse(q_nh_df33$id == 33, 1, 0)
+q_nh_df34$treated_aux <- ifelse(q_nh_df34$id == 34, 1, 0)
+q_nh_df36$treated_aux <- ifelse(q_nh_df36$id == 36, 1, 0)
+q_nh_df37$treated_aux <- ifelse(q_nh_df37$id == 37, 1, 0)
+q_nh_df39$treated_aux <- ifelse(q_nh_df39$id == 39, 1, 0)
+q_nh_df40$treated_aux <- ifelse(q_nh_df40$id == 40, 1, 0)
+q_nh_df41$treated_aux <- ifelse(q_nh_df41$id == 41, 1, 0)
+q_nh_df44$treated_aux <- ifelse(q_nh_df44$id == 44, 1, 0)
+q_nh_df45$treated_aux <- ifelse(q_nh_df45$id == 45, 1, 0)
+q_nh_df47$treated_aux <- ifelse(q_nh_df47$id == 47, 1, 0)
+q_nh_df50$treated_aux <- ifelse(q_nh_df50$id == 50, 1, 0)
+q_nh_df51$treated_aux <- ifelse(q_nh_df51$id == 51, 1, 0)
+q_nh_df53$treated_aux <- ifelse(q_nh_df53$id == 53, 1, 0)
+q_nh_df54$treated_aux <- ifelse(q_nh_df54$id == 54, 1, 0)
+q_nh_df55$treated_aux <- ifelse(q_nh_df55$id == 55, 1, 0)
+q_nh_df1$treated <- as.integer(ifelse(q_nh_df1$id == 1 & q_nh_df1$year >= 1996, 1, 0))
+q_nh_df2$treated <- as.integer(ifelse(q_nh_df2$id == 2 & q_nh_df2$year >= 1996, 1, 0))
+q_nh_df5$treated <- as.integer(ifelse(q_nh_df5$id == 5 & q_nh_df5$year >= 1996, 1, 0))
+q_nh_df10$treated <- as.integer(ifelse(q_nh_df10$id == 10 & q_nh_df10$year >= 1996, 1, 0))
+q_nh_df11$treated <- as.integer(ifelse(q_nh_df11$id == 11 & q_nh_df11$year >= 1996, 1, 0))
+q_nh_df12$treated <- as.integer(ifelse(q_nh_df12$id == 12 & q_nh_df12$year >= 1996, 1, 0))
+q_nh_df13$treated <- as.integer(ifelse(q_nh_df13$id == 13 & q_nh_df13$year >= 1996, 1, 0))
+q_nh_df15$treated <- as.integer(ifelse(q_nh_df15$id == 15 & q_nh_df15$year >= 1996, 1, 0))
+q_nh_df17$treated <- as.integer(ifelse(q_nh_df17$id == 17 & q_nh_df17$year >= 1996, 1, 0))
+q_nh_df19$treated <- as.integer(ifelse(q_nh_df19$id == 19 & q_nh_df19$year >= 1996, 1, 0))
+q_nh_df21$treated <- as.integer(ifelse(q_nh_df21$id == 21 & q_nh_df21$year >= 1996, 1, 0))
+q_nh_df23$treated <- as.integer(ifelse(q_nh_df23$id == 23 & q_nh_df23$year >= 1996, 1, 0))
+q_nh_df24$treated <- as.integer(ifelse(q_nh_df24$id == 24 & q_nh_df24$year >= 1996, 1, 0))
+q_nh_df25$treated <- as.integer(ifelse(q_nh_df25$id == 25 & q_nh_df25$year >= 1996, 1, 0))
+q_nh_df26$treated <- as.integer(ifelse(q_nh_df26$id == 26 & q_nh_df26$year >= 1996, 1, 0))
+q_nh_df28$treated <- as.integer(ifelse(q_nh_df28$id == 28 & q_nh_df28$year >= 1996, 1, 0))
+q_nh_df29$treated <- as.integer(ifelse(q_nh_df29$id == 29 & q_nh_df29$year >= 1996, 1, 0))
+q_nh_df30$treated <- as.integer(ifelse(q_nh_df30$id == 30 & q_nh_df30$year >= 1996, 1, 0))
+q_nh_df31$treated <- as.integer(ifelse(q_nh_df31$id == 31 & q_nh_df31$year >= 1996, 1, 0))
+q_nh_df32$treated <- as.integer(ifelse(q_nh_df32$id == 32 & q_nh_df32$year >= 1996, 1, 0))
+q_nh_df33$treated <- as.integer(ifelse(q_nh_df33$id == 33 & q_nh_df33$year >= 1996, 1, 0))
+q_nh_df34$treated <- as.integer(ifelse(q_nh_df34$id == 34 & q_nh_df34$year >= 1996, 1, 0))
+q_nh_df36$treated <- as.integer(ifelse(q_nh_df36$id == 36 & q_nh_df36$year >= 1996, 1, 0))
+q_nh_df37$treated <- as.integer(ifelse(q_nh_df37$id == 37 & q_nh_df37$year >= 1996, 1, 0))
+q_nh_df39$treated <- as.integer(ifelse(q_nh_df39$id == 39 & q_nh_df39$year >= 1996, 1, 0))
+q_nh_df40$treated <- as.integer(ifelse(q_nh_df40$id == 40 & q_nh_df40$year >= 1996, 1, 0))
+q_nh_df41$treated <- as.integer(ifelse(q_nh_df41$id == 41 & q_nh_df41$year >= 1996, 1, 0))
+q_nh_df44$treated <- as.integer(ifelse(q_nh_df44$id == 44 & q_nh_df44$year >= 1996, 1, 0))
+q_nh_df45$treated <- as.integer(ifelse(q_nh_df45$id == 45 & q_nh_df45$year >= 1996, 1, 0))
+q_nh_df47$treated <- as.integer(ifelse(q_nh_df47$id == 47 & q_nh_df47$year >= 1996, 1, 0))
+q_nh_df50$treated <- as.integer(ifelse(q_nh_df50$id == 50 & q_nh_df50$year >= 1996, 1, 0))
+q_nh_df51$treated <- as.integer(ifelse(q_nh_df51$id == 51 & q_nh_df51$year >= 1996, 1, 0))
+q_nh_df53$treated <- as.integer(ifelse(q_nh_df53$id == 53 & q_nh_df53$year >= 1996, 1, 0))
+q_nh_df54$treated <- as.integer(ifelse(q_nh_df54$id == 54 & q_nh_df54$year >= 1996, 1, 0))
+q_nh_df55$treated <- as.integer(ifelse(q_nh_df55$id == 55 & q_nh_df55$year >= 1996, 1, 0))
+q_nh_df_list <- list(q_nh_df1,q_nh_df2,q_nh_df5,
+                     q_nh_df10,q_nh_df11,q_nh_df12,
+                     q_nh_df13,q_nh_df15,q_nh_df17,
+                     q_nh_df19,q_nh_df21,q_nh_df23,
+                     q_nh_df24,q_nh_df25,q_nh_df26,
+                     q_nh_df28,q_nh_df29,q_nh_df30,
+                     q_nh_df31,q_nh_df32,q_nh_df33,
+                     q_nh_df34,q_nh_df36,q_nh_df37,
+                     q_nh_df39,q_nh_df40,q_nh_df41,
+                     q_nh_df44,q_nh_df45,q_nh_df47,
+                     q_nh_df50,q_nh_df51,q_nh_df53,
+                     q_nh_df54,q_nh_df55)
+rm(q_nh_df1,q_nh_df2,q_nh_df5,
+   q_nh_df10,q_nh_df11,q_nh_df12,
+   q_nh_df13,q_nh_df15,q_nh_df17,
+   q_nh_df19,q_nh_df21,q_nh_df23,
+   q_nh_df24,q_nh_df25,q_nh_df26,
+   q_nh_df28,q_nh_df29,q_nh_df30,
+   q_nh_df31,q_nh_df32,q_nh_df33,
+   q_nh_df34,q_nh_df36,q_nh_df37,
+   q_nh_df39,q_nh_df40,q_nh_df41,
+   q_nh_df44,q_nh_df45,q_nh_df47,
+   q_nh_df50,q_nh_df51,q_nh_df53,
+   q_nh_df54,q_nh_df55)
+q_nh_df_list <- lapply(q_nh_df_list, function(x) {
+  x <- x[order(x$year, x$treated_aux, x$name),]
+  return(x)
+}
+)
+q_nh_df_list <- lapply(q_nh_df_list, function(x) {
+  data.frame(subset(x, alwaysconpa == 1, select=c(name, year, Q_SkilledNursingHomes_pcp, treated)))
+}
+)
+setup_q_nh1 <- panel.matrices(q_nh_df_list[[1]], unit = 1, time = 2, outcome = 3, treatment = 4)
+setup_q_nh2 <- panel.matrices(q_nh_df_list[[2]], unit = 1, time = 2, outcome = 3, treatment = 4)
+setup_q_nh5 <- panel.matrices(q_nh_df_list[[3]], unit = 1, time = 2, outcome = 3, treatment = 4)
+setup_q_nh10 <- panel.matrices(q_nh_df_list[[4]], unit = 1, time = 2, outcome = 3, treatment = 4)
+setup_q_nh11 <- panel.matrices(q_nh_df_list[[5]], unit = 1, time = 2, outcome = 3, treatment = 4)
+setup_q_nh12 <- panel.matrices(q_nh_df_list[[6]], unit = 1, time = 2, outcome = 3, treatment = 4)
+setup_q_nh13 <- panel.matrices(q_nh_df_list[[7]], unit = 1, time = 2, outcome = 3, treatment = 4)
+setup_q_nh15 <- panel.matrices(q_nh_df_list[[8]], unit = 1, time = 2, outcome = 3, treatment = 4)
+setup_q_nh17 <- panel.matrices(q_nh_df_list[[9]], unit = 1, time = 2, outcome = 3, treatment = 4)
+setup_q_nh19 <- panel.matrices(q_nh_df_list[[10]], unit = 1, time = 2, outcome = 3, treatment = 4)
+setup_q_nh21 <- panel.matrices(q_nh_df_list[[11]], unit = 1, time = 2, outcome = 3, treatment = 4)
+setup_q_nh23 <- panel.matrices(q_nh_df_list[[12]], unit = 1, time = 2, outcome = 3, treatment = 4)
+setup_q_nh24 <- panel.matrices(q_nh_df_list[[13]], unit = 1, time = 2, outcome = 3, treatment = 4)
+setup_q_nh25 <- panel.matrices(q_nh_df_list[[14]], unit = 1, time = 2, outcome = 3, treatment = 4)
+setup_q_nh26 <- panel.matrices(q_nh_df_list[[15]], unit = 1, time = 2, outcome = 3, treatment = 4)
+setup_q_nh28 <- panel.matrices(q_nh_df_list[[16]], unit = 1, time = 2, outcome = 3, treatment = 4)
+setup_q_nh29 <- panel.matrices(q_nh_df_list[[17]], unit = 1, time = 2, outcome = 3, treatment = 4)
+setup_q_nh30 <- panel.matrices(q_nh_df_list[[18]], unit = 1, time = 2, outcome = 3, treatment = 4)
+setup_q_nh31 <- panel.matrices(q_nh_df_list[[19]], unit = 1, time = 2, outcome = 3, treatment = 4)
+setup_q_nh32 <- panel.matrices(q_nh_df_list[[20]], unit = 1, time = 2, outcome = 3, treatment = 4)
+setup_q_nh33 <- panel.matrices(q_nh_df_list[[21]], unit = 1, time = 2, outcome = 3, treatment = 4)
+setup_q_nh34 <- panel.matrices(q_nh_df_list[[22]], unit = 1, time = 2, outcome = 3, treatment = 4)
+setup_q_nh36 <- panel.matrices(q_nh_df_list[[23]], unit = 1, time = 2, outcome = 3, treatment = 4)
+setup_q_nh37 <- panel.matrices(q_nh_df_list[[24]], unit = 1, time = 2, outcome = 3, treatment = 4)
+setup_q_nh39 <- panel.matrices(q_nh_df_list[[25]], unit = 1, time = 2, outcome = 3, treatment = 4)
+setup_q_nh40 <- panel.matrices(q_nh_df_list[[26]], unit = 1, time = 2, outcome = 3, treatment = 4)
+setup_q_nh41 <- panel.matrices(q_nh_df_list[[27]], unit = 1, time = 2, outcome = 3, treatment = 4)
+setup_q_nh44 <- panel.matrices(q_nh_df_list[[28]], unit = 1, time = 2, outcome = 3, treatment = 4)
+setup_q_nh45 <- panel.matrices(q_nh_df_list[[29]], unit = 1, time = 2, outcome = 3, treatment = 4)
+setup_q_nh47 <- panel.matrices(q_nh_df_list[[30]], unit = 1, time = 2, outcome = 3, treatment = 4)
+setup_q_nh50 <- panel.matrices(q_nh_df_list[[31]], unit = 1, time = 2, outcome = 3, treatment = 4)
+setup_q_nh51 <- panel.matrices(q_nh_df_list[[32]], unit = 1, time = 2, outcome = 3, treatment = 4)
+setup_q_nh53 <- panel.matrices(q_nh_df_list[[33]], unit = 1, time = 2, outcome = 3, treatment = 4)
+setup_q_nh54 <- panel.matrices(q_nh_df_list[[34]], unit = 1, time = 2, outcome = 3, treatment = 4)
+setup_q_nh55 <- panel.matrices(q_nh_df_list[[35]], unit = 1, time = 2, outcome = 3, treatment = 4)
+setup_q_nh_list <- list(setup_q_nh1,setup_q_nh2,setup_q_nh5,
+                        setup_q_nh10,setup_q_nh11,setup_q_nh12,
+                        setup_q_nh13,setup_q_nh15,setup_q_nh17,
+                        setup_q_nh19,setup_q_nh21,setup_q_nh23,
+                        setup_q_nh24,setup_q_nh25,setup_q_nh26,
+                        setup_q_nh28,setup_q_nh29,setup_q_nh30,
+                        setup_q_nh31,setup_q_nh32,setup_q_nh33,
+                        setup_q_nh34,setup_q_nh36,setup_q_nh37,
+                        setup_q_nh39,setup_q_nh40,setup_q_nh41,
+                        setup_q_nh44,setup_q_nh45,setup_q_nh47,
+                        setup_q_nh50,setup_q_nh51,setup_q_nh53,
+                        setup_q_nh54,setup_q_nh55)
+rm(setup_q_nh1,setup_q_nh2,setup_q_nh5,
+   setup_q_nh10,setup_q_nh11,setup_q_nh12,
+   setup_q_nh13,setup_q_nh15,setup_q_nh17,
+   setup_q_nh19,setup_q_nh21,setup_q_nh23,
+   setup_q_nh24,setup_q_nh25,setup_q_nh26,
+   setup_q_nh28,setup_q_nh29,setup_q_nh30,
+   setup_q_nh31,setup_q_nh32,setup_q_nh33,
+   setup_q_nh34,setup_q_nh36,setup_q_nh37,
+   setup_q_nh39,setup_q_nh40,setup_q_nh41,
+   setup_q_nh44,setup_q_nh45,setup_q_nh47,
+   setup_q_nh50,setup_q_nh51,setup_q_nh53,
+   setup_q_nh54,setup_q_nh55)
+# DID #
+q_nh_est_did1 <- did_estimate(setup_q_nh_list[[1]]$Y, setup_q_nh_list[[1]]$N0, setup_q_nh_list[[1]]$T0, X = covariates_acc_array_1)
+q_nh_est_did2 <- did_estimate(setup_q_nh_list[[2]]$Y, setup_q_nh_list[[2]]$N0, setup_q_nh_list[[2]]$T0, X = covariates_acc_array_2)
+q_nh_est_did5 <- did_estimate(setup_q_nh_list[[3]]$Y, setup_q_nh_list[[3]]$N0, setup_q_nh_list[[3]]$T0, X = covariates_acc_array_5)
+q_nh_est_did10 <- did_estimate(setup_q_nh_list[[4]]$Y, setup_q_nh_list[[4]]$N0, setup_q_nh_list[[4]]$T0, X = covariates_acc_array_10)
+q_nh_est_did11 <- did_estimate(setup_q_nh_list[[5]]$Y, setup_q_nh_list[[5]]$N0, setup_q_nh_list[[5]]$T0, X = covariates_acc_array_11)
+q_nh_est_did12 <- did_estimate(setup_q_nh_list[[6]]$Y, setup_q_nh_list[[6]]$N0, setup_q_nh_list[[6]]$T0, X = covariates_acc_array_12)
+q_nh_est_did13 <- did_estimate(setup_q_nh_list[[7]]$Y, setup_q_nh_list[[7]]$N0, setup_q_nh_list[[7]]$T0, X = covariates_acc_array_13)
+q_nh_est_did15 <- did_estimate(setup_q_nh_list[[8]]$Y, setup_q_nh_list[[8]]$N0, setup_q_nh_list[[8]]$T0, X = covariates_acc_array_15)
+q_nh_est_did17 <- did_estimate(setup_q_nh_list[[9]]$Y, setup_q_nh_list[[9]]$N0, setup_q_nh_list[[9]]$T0, X = covariates_acc_array_17)
+q_nh_est_did19 <- did_estimate(setup_q_nh_list[[10]]$Y, setup_q_nh_list[[10]]$N0, setup_q_nh_list[[10]]$T0, X = covariates_acc_array_19)
+q_nh_est_did21 <- did_estimate(setup_q_nh_list[[11]]$Y, setup_q_nh_list[[11]]$N0, setup_q_nh_list[[11]]$T0, X = covariates_acc_array_21)
+q_nh_est_did23 <- did_estimate(setup_q_nh_list[[12]]$Y, setup_q_nh_list[[12]]$N0, setup_q_nh_list[[12]]$T0, X = covariates_acc_array_23)
+q_nh_est_did24 <- did_estimate(setup_q_nh_list[[13]]$Y, setup_q_nh_list[[13]]$N0, setup_q_nh_list[[13]]$T0, X = covariates_acc_array_24)
+q_nh_est_did25 <- did_estimate(setup_q_nh_list[[14]]$Y, setup_q_nh_list[[14]]$N0, setup_q_nh_list[[14]]$T0, X = covariates_acc_array_25)
+q_nh_est_did26 <- did_estimate(setup_q_nh_list[[15]]$Y, setup_q_nh_list[[15]]$N0, setup_q_nh_list[[15]]$T0, X = covariates_acc_array_26)
+q_nh_est_did28 <- did_estimate(setup_q_nh_list[[16]]$Y, setup_q_nh_list[[16]]$N0, setup_q_nh_list[[16]]$T0, X = covariates_acc_array_28)
+q_nh_est_did29 <- did_estimate(setup_q_nh_list[[17]]$Y, setup_q_nh_list[[17]]$N0, setup_q_nh_list[[17]]$T0, X = covariates_acc_array_29)
+q_nh_est_did30 <- did_estimate(setup_q_nh_list[[18]]$Y, setup_q_nh_list[[18]]$N0, setup_q_nh_list[[18]]$T0, X = covariates_acc_array_30)
+q_nh_est_did31 <- did_estimate(setup_q_nh_list[[19]]$Y, setup_q_nh_list[[19]]$N0, setup_q_nh_list[[19]]$T0, X = covariates_acc_array_31)
+q_nh_est_did32 <- did_estimate(setup_q_nh_list[[20]]$Y, setup_q_nh_list[[20]]$N0, setup_q_nh_list[[20]]$T0, X = covariates_acc_array_32)
+q_nh_est_did33 <- did_estimate(setup_q_nh_list[[21]]$Y, setup_q_nh_list[[21]]$N0, setup_q_nh_list[[21]]$T0, X = covariates_acc_array_33)
+q_nh_est_did34 <- did_estimate(setup_q_nh_list[[22]]$Y, setup_q_nh_list[[22]]$N0, setup_q_nh_list[[22]]$T0, X = covariates_acc_array_34)
+q_nh_est_did36 <- did_estimate(setup_q_nh_list[[23]]$Y, setup_q_nh_list[[23]]$N0, setup_q_nh_list[[23]]$T0, X = covariates_acc_array_36)
+q_nh_est_did37 <- did_estimate(setup_q_nh_list[[24]]$Y, setup_q_nh_list[[24]]$N0, setup_q_nh_list[[24]]$T0, X = covariates_acc_array_37)
+q_nh_est_did39 <- did_estimate(setup_q_nh_list[[25]]$Y, setup_q_nh_list[[25]]$N0, setup_q_nh_list[[25]]$T0, X = covariates_acc_array_39)
+q_nh_est_did40 <- did_estimate(setup_q_nh_list[[26]]$Y, setup_q_nh_list[[26]]$N0, setup_q_nh_list[[26]]$T0, X = covariates_acc_array_40)
+q_nh_est_did41 <- did_estimate(setup_q_nh_list[[27]]$Y, setup_q_nh_list[[27]]$N0, setup_q_nh_list[[27]]$T0, X = covariates_acc_array_41)
+q_nh_est_did44 <- did_estimate(setup_q_nh_list[[28]]$Y, setup_q_nh_list[[28]]$N0, setup_q_nh_list[[28]]$T0, X = covariates_acc_array_44)
+q_nh_est_did45 <- did_estimate(setup_q_nh_list[[29]]$Y, setup_q_nh_list[[29]]$N0, setup_q_nh_list[[29]]$T0, X = covariates_acc_array_45)
+q_nh_est_did47 <- did_estimate(setup_q_nh_list[[30]]$Y, setup_q_nh_list[[30]]$N0, setup_q_nh_list[[30]]$T0, X = covariates_acc_array_47)
+q_nh_est_did50 <- did_estimate(setup_q_nh_list[[31]]$Y, setup_q_nh_list[[31]]$N0, setup_q_nh_list[[31]]$T0, X = covariates_acc_array_50)
+q_nh_est_did51 <- did_estimate(setup_q_nh_list[[32]]$Y, setup_q_nh_list[[32]]$N0, setup_q_nh_list[[32]]$T0, X = covariates_acc_array_51)
+q_nh_est_did53 <- did_estimate(setup_q_nh_list[[33]]$Y, setup_q_nh_list[[33]]$N0, setup_q_nh_list[[33]]$T0, X = covariates_acc_array_53)
+q_nh_est_did54 <- did_estimate(setup_q_nh_list[[34]]$Y, setup_q_nh_list[[34]]$N0, setup_q_nh_list[[34]]$T0, X = covariates_acc_array_54)
+q_nh_est_did55 <- did_estimate(setup_q_nh_list[[35]]$Y, setup_q_nh_list[[35]]$N0, setup_q_nh_list[[35]]$T0, X = covariates_acc_array_55)
+q_nh_est_did_list <- list(q_nh_est_did1,q_nh_est_did2,q_nh_est_did5,
+                          q_nh_est_did10,q_nh_est_did11,q_nh_est_did12,
+                          q_nh_est_did13,q_nh_est_did15,q_nh_est_did17,
+                          q_nh_est_did19,q_nh_est_did21,q_nh_est_did23,
+                          q_nh_est_did24,q_nh_est_did25,q_nh_est_did26,
+                          q_nh_est_did28,q_nh_est_did29,q_nh_est_did30,
+                          q_nh_est_did31,q_nh_est_did32,q_nh_est_did33,
+                          q_nh_est_did34,q_nh_est_did36,q_nh_est_did37,
+                          q_nh_est_did39,q_nh_est_did40,q_nh_est_did41,
+                          q_nh_est_did44,q_nh_est_did45,q_nh_est_did47,
+                          q_nh_est_did50,q_nh_est_did51,q_nh_est_did53,
+                          q_nh_est_did54,q_nh_est_did55)
+rm(q_nh_est_did1,q_nh_est_did2,q_nh_est_did5,
+   q_nh_est_did10,q_nh_est_did11,q_nh_est_did12,
+   q_nh_est_did13,q_nh_est_did15,q_nh_est_did17,
+   q_nh_est_did19,q_nh_est_did21,q_nh_est_did23,
+   q_nh_est_did24,q_nh_est_did25,q_nh_est_did26,
+   q_nh_est_did28,q_nh_est_did29,q_nh_est_did30,
+   q_nh_est_did31,q_nh_est_did32,q_nh_est_did33,
+   q_nh_est_did34,q_nh_est_did36,q_nh_est_did37,
+   q_nh_est_did39,q_nh_est_did40,q_nh_est_did41,
+   q_nh_est_did44,q_nh_est_did45,q_nh_est_did47,
+   q_nh_est_did50,q_nh_est_did51,q_nh_est_did53,
+   q_nh_est_did54,q_nh_est_did55)
+for(i in 1:35) {
+  assign(paste0("q_nh_est_did_plot", i), synthdid_plot(q_nh_est_did_list[i]))
+}
+q_nh_est_did_plot_data_aux1 <- ggplot_build(q_nh_est_did_plot1)
+q_nh_est_did_plot_data_aux2 <- ggplot_build(q_nh_est_did_plot2)
+q_nh_est_did_plot_data_aux3 <- ggplot_build(q_nh_est_did_plot3)
+q_nh_est_did_plot_data_aux4 <- ggplot_build(q_nh_est_did_plot4)
+q_nh_est_did_plot_data_aux5 <- ggplot_build(q_nh_est_did_plot5)
+q_nh_est_did_plot_data_aux6 <- ggplot_build(q_nh_est_did_plot6)
+q_nh_est_did_plot_data_aux7 <- ggplot_build(q_nh_est_did_plot7)
+q_nh_est_did_plot_data_aux8 <- ggplot_build(q_nh_est_did_plot8)
+q_nh_est_did_plot_data_aux9 <- ggplot_build(q_nh_est_did_plot9)
+q_nh_est_did_plot_data_aux10 <- ggplot_build(q_nh_est_did_plot10)
+q_nh_est_did_plot_data_aux11 <- ggplot_build(q_nh_est_did_plot11)
+q_nh_est_did_plot_data_aux12 <- ggplot_build(q_nh_est_did_plot12)
+q_nh_est_did_plot_data_aux13 <- ggplot_build(q_nh_est_did_plot13)
+q_nh_est_did_plot_data_aux14 <- ggplot_build(q_nh_est_did_plot14)
+q_nh_est_did_plot_data_aux15 <- ggplot_build(q_nh_est_did_plot15)
+q_nh_est_did_plot_data_aux16 <- ggplot_build(q_nh_est_did_plot16)
+q_nh_est_did_plot_data_aux17 <- ggplot_build(q_nh_est_did_plot17)
+q_nh_est_did_plot_data_aux18 <- ggplot_build(q_nh_est_did_plot18)
+q_nh_est_did_plot_data_aux19 <- ggplot_build(q_nh_est_did_plot19)
+q_nh_est_did_plot_data_aux20 <- ggplot_build(q_nh_est_did_plot20)
+q_nh_est_did_plot_data_aux21 <- ggplot_build(q_nh_est_did_plot21)
+q_nh_est_did_plot_data_aux22 <- ggplot_build(q_nh_est_did_plot22)
+q_nh_est_did_plot_data_aux23 <- ggplot_build(q_nh_est_did_plot23)
+q_nh_est_did_plot_data_aux24 <- ggplot_build(q_nh_est_did_plot24)
+q_nh_est_did_plot_data_aux25 <- ggplot_build(q_nh_est_did_plot25)
+q_nh_est_did_plot_data_aux26 <- ggplot_build(q_nh_est_did_plot26)
+q_nh_est_did_plot_data_aux27 <- ggplot_build(q_nh_est_did_plot27)
+q_nh_est_did_plot_data_aux28 <- ggplot_build(q_nh_est_did_plot28)
+q_nh_est_did_plot_data_aux29 <- ggplot_build(q_nh_est_did_plot29)
+q_nh_est_did_plot_data_aux30 <- ggplot_build(q_nh_est_did_plot30)
+q_nh_est_did_plot_data_aux31 <- ggplot_build(q_nh_est_did_plot31)
+q_nh_est_did_plot_data_aux32 <- ggplot_build(q_nh_est_did_plot32)
+q_nh_est_did_plot_data_aux33 <- ggplot_build(q_nh_est_did_plot33)
+q_nh_est_did_plot_data_aux34 <- ggplot_build(q_nh_est_did_plot34)
+q_nh_est_did_plot_data_aux35 <- ggplot_build(q_nh_est_did_plot35)
+q_nh_est_did_plot_data_aux_list <- list(q_nh_est_did_plot_data_aux1,q_nh_est_did_plot_data_aux2,q_nh_est_did_plot_data_aux3,
+                                        q_nh_est_did_plot_data_aux4,q_nh_est_did_plot_data_aux5,q_nh_est_did_plot_data_aux6,
+                                        q_nh_est_did_plot_data_aux7,q_nh_est_did_plot_data_aux8,q_nh_est_did_plot_data_aux9,
+                                        q_nh_est_did_plot_data_aux10,q_nh_est_did_plot_data_aux11,q_nh_est_did_plot_data_aux12,
+                                        q_nh_est_did_plot_data_aux13,q_nh_est_did_plot_data_aux14,q_nh_est_did_plot_data_aux15,
+                                        q_nh_est_did_plot_data_aux16,q_nh_est_did_plot_data_aux17,q_nh_est_did_plot_data_aux18,
+                                        q_nh_est_did_plot_data_aux19,q_nh_est_did_plot_data_aux20,q_nh_est_did_plot_data_aux21,
+                                        q_nh_est_did_plot_data_aux22,q_nh_est_did_plot_data_aux23,q_nh_est_did_plot_data_aux24,
+                                        q_nh_est_did_plot_data_aux25,q_nh_est_did_plot_data_aux26,q_nh_est_did_plot_data_aux27,
+                                        q_nh_est_did_plot_data_aux28,q_nh_est_did_plot_data_aux29,q_nh_est_did_plot_data_aux30,
+                                        q_nh_est_did_plot_data_aux31,q_nh_est_did_plot_data_aux32,q_nh_est_did_plot_data_aux33,
+                                        q_nh_est_did_plot_data_aux34,q_nh_est_did_plot_data_aux35)
+rm(q_nh_est_did_plot_data_aux1,q_nh_est_did_plot_data_aux2,q_nh_est_did_plot_data_aux3,
+   q_nh_est_did_plot_data_aux4,q_nh_est_did_plot_data_aux5,q_nh_est_did_plot_data_aux6,
+   q_nh_est_did_plot_data_aux7,q_nh_est_did_plot_data_aux8,q_nh_est_did_plot_data_aux9,
+   q_nh_est_did_plot_data_aux10,q_nh_est_did_plot_data_aux11,q_nh_est_did_plot_data_aux12,
+   q_nh_est_did_plot_data_aux13,q_nh_est_did_plot_data_aux14,q_nh_est_did_plot_data_aux15,
+   q_nh_est_did_plot_data_aux16,q_nh_est_did_plot_data_aux17,q_nh_est_did_plot_data_aux18,
+   q_nh_est_did_plot_data_aux19,q_nh_est_did_plot_data_aux20,q_nh_est_did_plot_data_aux21,
+   q_nh_est_did_plot_data_aux22,q_nh_est_did_plot_data_aux23,q_nh_est_did_plot_data_aux24,
+   q_nh_est_did_plot_data_aux25,q_nh_est_did_plot_data_aux26,q_nh_est_did_plot_data_aux27,
+   q_nh_est_did_plot_data_aux28,q_nh_est_did_plot_data_aux29,q_nh_est_did_plot_data_aux30,
+   q_nh_est_did_plot_data_aux31,q_nh_est_did_plot_data_aux32,q_nh_est_did_plot_data_aux33,
+   q_nh_est_did_plot_data_aux34,q_nh_est_did_plot_data_aux35)
+rm(q_nh_est_did_plot1,q_nh_est_did_plot2,q_nh_est_did_plot3,
+   q_nh_est_did_plot4,q_nh_est_did_plot5,q_nh_est_did_plot6,
+   q_nh_est_did_plot7,q_nh_est_did_plot8,q_nh_est_did_plot9,
+   q_nh_est_did_plot10,q_nh_est_did_plot11,q_nh_est_did_plot12,
+   q_nh_est_did_plot13,q_nh_est_did_plot14,q_nh_est_did_plot15,
+   q_nh_est_did_plot16,q_nh_est_did_plot17,q_nh_est_did_plot18,
+   q_nh_est_did_plot19,q_nh_est_did_plot20,q_nh_est_did_plot21,
+   q_nh_est_did_plot22,q_nh_est_did_plot23,q_nh_est_did_plot24,
+   q_nh_est_did_plot25,q_nh_est_did_plot26,q_nh_est_did_plot27,
+   q_nh_est_did_plot28,q_nh_est_did_plot29,q_nh_est_did_plot30,
+   q_nh_est_did_plot31,q_nh_est_did_plot32,q_nh_est_did_plot33,
+   q_nh_est_did_plot34,q_nh_est_did_plot35)
+for(i in 1:35) {
+  assign(paste0("q_nh_est_did_plot_data_long", i), data.frame(q_nh_est_did_plot_data_aux_list[[1]]$data[[1]]$x, q_nh_est_did_plot_data_aux_list[[1]]$data[[1]]$y, q_nh_est_did_plot_data_aux_list[[1]]$data[[1]]$group))
+}
+q_nh_est_did_plot_data_long_list <- list(q_nh_est_did_plot_data_long1,q_nh_est_did_plot_data_long2,q_nh_est_did_plot_data_long3,
+                                         q_nh_est_did_plot_data_long4,q_nh_est_did_plot_data_long5,q_nh_est_did_plot_data_long6,
+                                         q_nh_est_did_plot_data_long7,q_nh_est_did_plot_data_long8,q_nh_est_did_plot_data_long9,
+                                         q_nh_est_did_plot_data_long10,q_nh_est_did_plot_data_long11,q_nh_est_did_plot_data_long12,
+                                         q_nh_est_did_plot_data_long13,q_nh_est_did_plot_data_long14,q_nh_est_did_plot_data_long15,
+                                         q_nh_est_did_plot_data_long16,q_nh_est_did_plot_data_long17,q_nh_est_did_plot_data_long18,
+                                         q_nh_est_did_plot_data_long19,q_nh_est_did_plot_data_long20,q_nh_est_did_plot_data_long21,
+                                         q_nh_est_did_plot_data_long22,q_nh_est_did_plot_data_long23,q_nh_est_did_plot_data_long24,
+                                         q_nh_est_did_plot_data_long25,q_nh_est_did_plot_data_long26,q_nh_est_did_plot_data_long27,
+                                         q_nh_est_did_plot_data_long28,q_nh_est_did_plot_data_long29,q_nh_est_did_plot_data_long30,
+                                         q_nh_est_did_plot_data_long31,q_nh_est_did_plot_data_long32,q_nh_est_did_plot_data_long33,
+                                         q_nh_est_did_plot_data_long34,q_nh_est_did_plot_data_long35)
+rm(q_nh_est_did_plot_data_long1,q_nh_est_did_plot_data_long2,q_nh_est_did_plot_data_long3,
+   q_nh_est_did_plot_data_long4,q_nh_est_did_plot_data_long5,q_nh_est_did_plot_data_long6,
+   q_nh_est_did_plot_data_long7,q_nh_est_did_plot_data_long8,q_nh_est_did_plot_data_long9,
+   q_nh_est_did_plot_data_long10,q_nh_est_did_plot_data_long11,q_nh_est_did_plot_data_long12,
+   q_nh_est_did_plot_data_long13,q_nh_est_did_plot_data_long14,q_nh_est_did_plot_data_long15,
+   q_nh_est_did_plot_data_long16,q_nh_est_did_plot_data_long17,q_nh_est_did_plot_data_long18,
+   q_nh_est_did_plot_data_long19,q_nh_est_did_plot_data_long20,q_nh_est_did_plot_data_long21,
+   q_nh_est_did_plot_data_long22,q_nh_est_did_plot_data_long23,q_nh_est_did_plot_data_long24,
+   q_nh_est_did_plot_data_long25,q_nh_est_did_plot_data_long26,q_nh_est_did_plot_data_long27,
+   q_nh_est_did_plot_data_long28,q_nh_est_did_plot_data_long29,q_nh_est_did_plot_data_long30,
+   q_nh_est_did_plot_data_long31,q_nh_est_did_plot_data_long32,q_nh_est_did_plot_data_long33,
+   q_nh_est_did_plot_data_long34,q_nh_est_did_plot_data_long35)
+q_nh_est_did_plot_data_long_list <- lapply(q_nh_est_did_plot_data_long_list, function(x) {
+  colnames(x) <- c('year', 'outcome', 'treated')  
+  x$treated <- x$treated - 1
+  return(x)
+}
+)
+for(i in 1:35) {
+  assign(paste0("q_nh_est_did_plot_data_wide", i), reshape(data=q_nh_est_did_plot_data_long_list[[i]],
+                                                           idvar = "year",
+                                                           v.names = "outcome",
+                                                           timevar = "treated",
+                                                           direction = "wide"))
+}
+q_nh_est_did_plot_data_wide_list <- list(q_nh_est_did_plot_data_wide1,q_nh_est_did_plot_data_wide2,q_nh_est_did_plot_data_wide3,
+                                         q_nh_est_did_plot_data_wide4,q_nh_est_did_plot_data_wide5,q_nh_est_did_plot_data_wide6,
+                                         q_nh_est_did_plot_data_wide7,q_nh_est_did_plot_data_wide8,q_nh_est_did_plot_data_wide9,
+                                         q_nh_est_did_plot_data_wide10,q_nh_est_did_plot_data_wide11,q_nh_est_did_plot_data_wide12,
+                                         q_nh_est_did_plot_data_wide13,q_nh_est_did_plot_data_wide14,q_nh_est_did_plot_data_wide15,
+                                         q_nh_est_did_plot_data_wide16,q_nh_est_did_plot_data_wide17,q_nh_est_did_plot_data_wide18,
+                                         q_nh_est_did_plot_data_wide19,q_nh_est_did_plot_data_wide20,q_nh_est_did_plot_data_wide21,
+                                         q_nh_est_did_plot_data_wide22,q_nh_est_did_plot_data_wide23,q_nh_est_did_plot_data_wide24,
+                                         q_nh_est_did_plot_data_wide25,q_nh_est_did_plot_data_wide26,q_nh_est_did_plot_data_wide27,
+                                         q_nh_est_did_plot_data_wide28,q_nh_est_did_plot_data_wide29,q_nh_est_did_plot_data_wide30,
+                                         q_nh_est_did_plot_data_wide31,q_nh_est_did_plot_data_wide32,q_nh_est_did_plot_data_wide33,
+                                         q_nh_est_did_plot_data_wide34,q_nh_est_did_plot_data_wide35)
+rm(q_nh_est_did_plot_data_wide1,q_nh_est_did_plot_data_wide2,q_nh_est_did_plot_data_wide3,
+   q_nh_est_did_plot_data_wide4,q_nh_est_did_plot_data_wide5,q_nh_est_did_plot_data_wide6,
+   q_nh_est_did_plot_data_wide7,q_nh_est_did_plot_data_wide8,q_nh_est_did_plot_data_wide9,
+   q_nh_est_did_plot_data_wide10,q_nh_est_did_plot_data_wide11,q_nh_est_did_plot_data_wide12,
+   q_nh_est_did_plot_data_wide13,q_nh_est_did_plot_data_wide14,q_nh_est_did_plot_data_wide15,
+   q_nh_est_did_plot_data_wide16,q_nh_est_did_plot_data_wide17,q_nh_est_did_plot_data_wide18,
+   q_nh_est_did_plot_data_wide19,q_nh_est_did_plot_data_wide20,q_nh_est_did_plot_data_wide21,
+   q_nh_est_did_plot_data_wide22,q_nh_est_did_plot_data_wide23,q_nh_est_did_plot_data_wide24,
+   q_nh_est_did_plot_data_wide25,q_nh_est_did_plot_data_wide26,q_nh_est_did_plot_data_wide27,
+   q_nh_est_did_plot_data_wide28,q_nh_est_did_plot_data_wide29,q_nh_est_did_plot_data_wide30,
+   q_nh_est_did_plot_data_wide31,q_nh_est_did_plot_data_wide32,q_nh_est_did_plot_data_wide33,
+   q_nh_est_did_plot_data_wide34,q_nh_est_did_plot_data_wide35)
+q_nh_est_did_plot_data_wide_list <- lapply(q_nh_est_did_plot_data_wide_list, function(x) {
+  x$diff <- x$outcome.1 - x$outcome.0
+  return(x)
+}
+)
+# SC #
+q_nh_est_sc1 <- sc_estimate(setup_q_nh_list[[1]]$Y, setup_q_nh_list[[1]]$N0, setup_q_nh_list[[1]]$T0, X = covariates_acc_array_1)
+q_nh_est_sc2 <- sc_estimate(setup_q_nh_list[[2]]$Y, setup_q_nh_list[[2]]$N0, setup_q_nh_list[[2]]$T0, X = covariates_acc_array_2)
+q_nh_est_sc5 <- sc_estimate(setup_q_nh_list[[3]]$Y, setup_q_nh_list[[3]]$N0, setup_q_nh_list[[3]]$T0, X = covariates_acc_array_5)
+q_nh_est_sc10 <- sc_estimate(setup_q_nh_list[[4]]$Y, setup_q_nh_list[[4]]$N0, setup_q_nh_list[[4]]$T0, X = covariates_acc_array_10)
+q_nh_est_sc11 <- sc_estimate(setup_q_nh_list[[5]]$Y, setup_q_nh_list[[5]]$N0, setup_q_nh_list[[5]]$T0, X = covariates_acc_array_11)
+q_nh_est_sc12 <- sc_estimate(setup_q_nh_list[[6]]$Y, setup_q_nh_list[[6]]$N0, setup_q_nh_list[[6]]$T0, X = covariates_acc_array_12)
+q_nh_est_sc13 <- sc_estimate(setup_q_nh_list[[7]]$Y, setup_q_nh_list[[7]]$N0, setup_q_nh_list[[7]]$T0, X = covariates_acc_array_13)
+q_nh_est_sc15 <- sc_estimate(setup_q_nh_list[[8]]$Y, setup_q_nh_list[[8]]$N0, setup_q_nh_list[[8]]$T0, X = covariates_acc_array_15)
+q_nh_est_sc17 <- sc_estimate(setup_q_nh_list[[9]]$Y, setup_q_nh_list[[9]]$N0, setup_q_nh_list[[9]]$T0, X = covariates_acc_array_17)
+q_nh_est_sc19 <- sc_estimate(setup_q_nh_list[[10]]$Y, setup_q_nh_list[[10]]$N0, setup_q_nh_list[[10]]$T0, X = covariates_acc_array_19)
+q_nh_est_sc21 <- sc_estimate(setup_q_nh_list[[11]]$Y, setup_q_nh_list[[11]]$N0, setup_q_nh_list[[11]]$T0, X = covariates_acc_array_21)
+q_nh_est_sc23 <- sc_estimate(setup_q_nh_list[[12]]$Y, setup_q_nh_list[[12]]$N0, setup_q_nh_list[[12]]$T0, X = covariates_acc_array_23)
+q_nh_est_sc24 <- sc_estimate(setup_q_nh_list[[13]]$Y, setup_q_nh_list[[13]]$N0, setup_q_nh_list[[13]]$T0, X = covariates_acc_array_24)
+q_nh_est_sc25 <- sc_estimate(setup_q_nh_list[[14]]$Y, setup_q_nh_list[[14]]$N0, setup_q_nh_list[[14]]$T0, X = covariates_acc_array_25)
+q_nh_est_sc26 <- sc_estimate(setup_q_nh_list[[15]]$Y, setup_q_nh_list[[15]]$N0, setup_q_nh_list[[15]]$T0, X = covariates_acc_array_26)
+q_nh_est_sc28 <- sc_estimate(setup_q_nh_list[[16]]$Y, setup_q_nh_list[[16]]$N0, setup_q_nh_list[[16]]$T0, X = covariates_acc_array_28)
+q_nh_est_sc29 <- sc_estimate(setup_q_nh_list[[17]]$Y, setup_q_nh_list[[17]]$N0, setup_q_nh_list[[17]]$T0, X = covariates_acc_array_29)
+q_nh_est_sc30 <- sc_estimate(setup_q_nh_list[[18]]$Y, setup_q_nh_list[[18]]$N0, setup_q_nh_list[[18]]$T0, X = covariates_acc_array_30)
+q_nh_est_sc31 <- sc_estimate(setup_q_nh_list[[19]]$Y, setup_q_nh_list[[19]]$N0, setup_q_nh_list[[19]]$T0, X = covariates_acc_array_31)
+q_nh_est_sc32 <- sc_estimate(setup_q_nh_list[[20]]$Y, setup_q_nh_list[[20]]$N0, setup_q_nh_list[[20]]$T0, X = covariates_acc_array_32)
+q_nh_est_sc33 <- sc_estimate(setup_q_nh_list[[21]]$Y, setup_q_nh_list[[21]]$N0, setup_q_nh_list[[21]]$T0, X = covariates_acc_array_33)
+q_nh_est_sc34 <- sc_estimate(setup_q_nh_list[[22]]$Y, setup_q_nh_list[[22]]$N0, setup_q_nh_list[[22]]$T0, X = covariates_acc_array_34)
+q_nh_est_sc36 <- sc_estimate(setup_q_nh_list[[23]]$Y, setup_q_nh_list[[23]]$N0, setup_q_nh_list[[23]]$T0, X = covariates_acc_array_36)
+q_nh_est_sc37 <- sc_estimate(setup_q_nh_list[[24]]$Y, setup_q_nh_list[[24]]$N0, setup_q_nh_list[[24]]$T0, X = covariates_acc_array_37)
+q_nh_est_sc39 <- sc_estimate(setup_q_nh_list[[25]]$Y, setup_q_nh_list[[25]]$N0, setup_q_nh_list[[25]]$T0, X = covariates_acc_array_39)
+q_nh_est_sc40 <- sc_estimate(setup_q_nh_list[[26]]$Y, setup_q_nh_list[[26]]$N0, setup_q_nh_list[[26]]$T0, X = covariates_acc_array_40)
+q_nh_est_sc41 <- sc_estimate(setup_q_nh_list[[27]]$Y, setup_q_nh_list[[27]]$N0, setup_q_nh_list[[27]]$T0, X = covariates_acc_array_41)
+q_nh_est_sc44 <- sc_estimate(setup_q_nh_list[[28]]$Y, setup_q_nh_list[[28]]$N0, setup_q_nh_list[[28]]$T0, X = covariates_acc_array_44)
+q_nh_est_sc45 <- sc_estimate(setup_q_nh_list[[29]]$Y, setup_q_nh_list[[29]]$N0, setup_q_nh_list[[29]]$T0, X = covariates_acc_array_45)
+q_nh_est_sc47 <- sc_estimate(setup_q_nh_list[[30]]$Y, setup_q_nh_list[[30]]$N0, setup_q_nh_list[[30]]$T0, X = covariates_acc_array_47)
+q_nh_est_sc50 <- sc_estimate(setup_q_nh_list[[31]]$Y, setup_q_nh_list[[31]]$N0, setup_q_nh_list[[31]]$T0, X = covariates_acc_array_50)
+q_nh_est_sc51 <- sc_estimate(setup_q_nh_list[[32]]$Y, setup_q_nh_list[[32]]$N0, setup_q_nh_list[[32]]$T0, X = covariates_acc_array_51)
+q_nh_est_sc53 <- sc_estimate(setup_q_nh_list[[33]]$Y, setup_q_nh_list[[33]]$N0, setup_q_nh_list[[33]]$T0, X = covariates_acc_array_53)
+q_nh_est_sc54 <- sc_estimate(setup_q_nh_list[[34]]$Y, setup_q_nh_list[[34]]$N0, setup_q_nh_list[[34]]$T0, X = covariates_acc_array_54)
+q_nh_est_sc55 <- sc_estimate(setup_q_nh_list[[35]]$Y, setup_q_nh_list[[35]]$N0, setup_q_nh_list[[35]]$T0, X = covariates_acc_array_55)
+q_nh_est_sc_list <- list(q_nh_est_sc1,q_nh_est_sc2,q_nh_est_sc5,
+                         q_nh_est_sc10,q_nh_est_sc11,q_nh_est_sc12,
+                         q_nh_est_sc13,q_nh_est_sc15,q_nh_est_sc17,
+                         q_nh_est_sc19,q_nh_est_sc21,q_nh_est_sc23,
+                         q_nh_est_sc24,q_nh_est_sc25,q_nh_est_sc26,
+                         q_nh_est_sc28,q_nh_est_sc29,q_nh_est_sc30,
+                         q_nh_est_sc31,q_nh_est_sc32,q_nh_est_sc33,
+                         q_nh_est_sc34,q_nh_est_sc36,q_nh_est_sc37,
+                         q_nh_est_sc39,q_nh_est_sc40,q_nh_est_sc41,
+                         q_nh_est_sc44,q_nh_est_sc45,q_nh_est_sc47,
+                         q_nh_est_sc50,q_nh_est_sc51,q_nh_est_sc53,
+                         q_nh_est_sc54,q_nh_est_sc55)
+rm(q_nh_est_sc1,q_nh_est_sc2,q_nh_est_sc5,
+   q_nh_est_sc10,q_nh_est_sc11,q_nh_est_sc12,
+   q_nh_est_sc13,q_nh_est_sc15,q_nh_est_sc17,
+   q_nh_est_sc19,q_nh_est_sc21,q_nh_est_sc23,
+   q_nh_est_sc24,q_nh_est_sc25,q_nh_est_sc26,
+   q_nh_est_sc28,q_nh_est_sc29,q_nh_est_sc30,
+   q_nh_est_sc31,q_nh_est_sc32,q_nh_est_sc33,
+   q_nh_est_sc34,q_nh_est_sc36,q_nh_est_sc37,
+   q_nh_est_sc39,q_nh_est_sc40,q_nh_est_sc41,
+   q_nh_est_sc44,q_nh_est_sc45,q_nh_est_sc47,
+   q_nh_est_sc50,q_nh_est_sc51,q_nh_est_sc53,
+   q_nh_est_sc54,q_nh_est_sc55)
+for(i in 1:35) {
+  assign(paste0("q_nh_est_sc_plot", i), synthdid_plot(q_nh_est_sc_list[i]))
+}
+q_nh_est_sc_plot_data_aux1 <- ggplot_build(q_nh_est_sc_plot1)
+q_nh_est_sc_plot_data_aux2 <- ggplot_build(q_nh_est_sc_plot2)
+q_nh_est_sc_plot_data_aux3 <- ggplot_build(q_nh_est_sc_plot3)
+q_nh_est_sc_plot_data_aux4 <- ggplot_build(q_nh_est_sc_plot4)
+q_nh_est_sc_plot_data_aux5 <- ggplot_build(q_nh_est_sc_plot5)
+q_nh_est_sc_plot_data_aux6 <- ggplot_build(q_nh_est_sc_plot6)
+q_nh_est_sc_plot_data_aux7 <- ggplot_build(q_nh_est_sc_plot7)
+q_nh_est_sc_plot_data_aux8 <- ggplot_build(q_nh_est_sc_plot8)
+q_nh_est_sc_plot_data_aux9 <- ggplot_build(q_nh_est_sc_plot9)
+q_nh_est_sc_plot_data_aux10 <- ggplot_build(q_nh_est_sc_plot10)
+q_nh_est_sc_plot_data_aux11 <- ggplot_build(q_nh_est_sc_plot11)
+q_nh_est_sc_plot_data_aux12 <- ggplot_build(q_nh_est_sc_plot12)
+q_nh_est_sc_plot_data_aux13 <- ggplot_build(q_nh_est_sc_plot13)
+q_nh_est_sc_plot_data_aux14 <- ggplot_build(q_nh_est_sc_plot14)
+q_nh_est_sc_plot_data_aux15 <- ggplot_build(q_nh_est_sc_plot15)
+q_nh_est_sc_plot_data_aux16 <- ggplot_build(q_nh_est_sc_plot16)
+q_nh_est_sc_plot_data_aux17 <- ggplot_build(q_nh_est_sc_plot17)
+q_nh_est_sc_plot_data_aux18 <- ggplot_build(q_nh_est_sc_plot18)
+q_nh_est_sc_plot_data_aux19 <- ggplot_build(q_nh_est_sc_plot19)
+q_nh_est_sc_plot_data_aux20 <- ggplot_build(q_nh_est_sc_plot20)
+q_nh_est_sc_plot_data_aux21 <- ggplot_build(q_nh_est_sc_plot21)
+q_nh_est_sc_plot_data_aux22 <- ggplot_build(q_nh_est_sc_plot22)
+q_nh_est_sc_plot_data_aux23 <- ggplot_build(q_nh_est_sc_plot23)
+q_nh_est_sc_plot_data_aux24 <- ggplot_build(q_nh_est_sc_plot24)
+q_nh_est_sc_plot_data_aux25 <- ggplot_build(q_nh_est_sc_plot25)
+q_nh_est_sc_plot_data_aux26 <- ggplot_build(q_nh_est_sc_plot26)
+q_nh_est_sc_plot_data_aux27 <- ggplot_build(q_nh_est_sc_plot27)
+q_nh_est_sc_plot_data_aux28 <- ggplot_build(q_nh_est_sc_plot28)
+q_nh_est_sc_plot_data_aux29 <- ggplot_build(q_nh_est_sc_plot29)
+q_nh_est_sc_plot_data_aux30 <- ggplot_build(q_nh_est_sc_plot30)
+q_nh_est_sc_plot_data_aux31 <- ggplot_build(q_nh_est_sc_plot31)
+q_nh_est_sc_plot_data_aux32 <- ggplot_build(q_nh_est_sc_plot32)
+q_nh_est_sc_plot_data_aux33 <- ggplot_build(q_nh_est_sc_plot33)
+q_nh_est_sc_plot_data_aux34 <- ggplot_build(q_nh_est_sc_plot34)
+q_nh_est_sc_plot_data_aux35 <- ggplot_build(q_nh_est_sc_plot35)
+q_nh_est_sc_plot_data_aux_list <- list(q_nh_est_sc_plot_data_aux1,q_nh_est_sc_plot_data_aux2,q_nh_est_sc_plot_data_aux3,
+                                       q_nh_est_sc_plot_data_aux4,q_nh_est_sc_plot_data_aux5,q_nh_est_sc_plot_data_aux6,
+                                       q_nh_est_sc_plot_data_aux7,q_nh_est_sc_plot_data_aux8,q_nh_est_sc_plot_data_aux9,
+                                       q_nh_est_sc_plot_data_aux10,q_nh_est_sc_plot_data_aux11,q_nh_est_sc_plot_data_aux12,
+                                       q_nh_est_sc_plot_data_aux13,q_nh_est_sc_plot_data_aux14,q_nh_est_sc_plot_data_aux15,
+                                       q_nh_est_sc_plot_data_aux16,q_nh_est_sc_plot_data_aux17,q_nh_est_sc_plot_data_aux18,
+                                       q_nh_est_sc_plot_data_aux19,q_nh_est_sc_plot_data_aux20,q_nh_est_sc_plot_data_aux21,
+                                       q_nh_est_sc_plot_data_aux22,q_nh_est_sc_plot_data_aux23,q_nh_est_sc_plot_data_aux24,
+                                       q_nh_est_sc_plot_data_aux25,q_nh_est_sc_plot_data_aux26,q_nh_est_sc_plot_data_aux27,
+                                       q_nh_est_sc_plot_data_aux28,q_nh_est_sc_plot_data_aux29,q_nh_est_sc_plot_data_aux30,
+                                       q_nh_est_sc_plot_data_aux31,q_nh_est_sc_plot_data_aux32,q_nh_est_sc_plot_data_aux33,
+                                       q_nh_est_sc_plot_data_aux34,q_nh_est_sc_plot_data_aux35)
+rm(q_nh_est_sc_plot_data_aux1,q_nh_est_sc_plot_data_aux2,q_nh_est_sc_plot_data_aux3,
+   q_nh_est_sc_plot_data_aux4,q_nh_est_sc_plot_data_aux5,q_nh_est_sc_plot_data_aux6,
+   q_nh_est_sc_plot_data_aux7,q_nh_est_sc_plot_data_aux8,q_nh_est_sc_plot_data_aux9,
+   q_nh_est_sc_plot_data_aux10,q_nh_est_sc_plot_data_aux11,q_nh_est_sc_plot_data_aux12,
+   q_nh_est_sc_plot_data_aux13,q_nh_est_sc_plot_data_aux14,q_nh_est_sc_plot_data_aux15,
+   q_nh_est_sc_plot_data_aux16,q_nh_est_sc_plot_data_aux17,q_nh_est_sc_plot_data_aux18,
+   q_nh_est_sc_plot_data_aux19,q_nh_est_sc_plot_data_aux20,q_nh_est_sc_plot_data_aux21,
+   q_nh_est_sc_plot_data_aux22,q_nh_est_sc_plot_data_aux23,q_nh_est_sc_plot_data_aux24,
+   q_nh_est_sc_plot_data_aux25,q_nh_est_sc_plot_data_aux26,q_nh_est_sc_plot_data_aux27,
+   q_nh_est_sc_plot_data_aux28,q_nh_est_sc_plot_data_aux29,q_nh_est_sc_plot_data_aux30,
+   q_nh_est_sc_plot_data_aux31,q_nh_est_sc_plot_data_aux32,q_nh_est_sc_plot_data_aux33,
+   q_nh_est_sc_plot_data_aux34,q_nh_est_sc_plot_data_aux35)
+rm(q_nh_est_sc_plot1,q_nh_est_sc_plot2,q_nh_est_sc_plot3,
+   q_nh_est_sc_plot4,q_nh_est_sc_plot5,q_nh_est_sc_plot6,
+   q_nh_est_sc_plot7,q_nh_est_sc_plot8,q_nh_est_sc_plot9,
+   q_nh_est_sc_plot10,q_nh_est_sc_plot11,q_nh_est_sc_plot12,
+   q_nh_est_sc_plot13,q_nh_est_sc_plot14,q_nh_est_sc_plot15,
+   q_nh_est_sc_plot16,q_nh_est_sc_plot17,q_nh_est_sc_plot18,
+   q_nh_est_sc_plot19,q_nh_est_sc_plot20,q_nh_est_sc_plot21,
+   q_nh_est_sc_plot22,q_nh_est_sc_plot23,q_nh_est_sc_plot24,
+   q_nh_est_sc_plot25,q_nh_est_sc_plot26,q_nh_est_sc_plot27,
+   q_nh_est_sc_plot28,q_nh_est_sc_plot29,q_nh_est_sc_plot30,
+   q_nh_est_sc_plot31,q_nh_est_sc_plot32,q_nh_est_sc_plot33,
+   q_nh_est_sc_plot34,q_nh_est_sc_plot35)
+for(i in 1:35) {
+  assign(paste0("q_nh_est_sc_plot_data_long", i), data.frame(q_nh_est_sc_plot_data_aux_list[[1]]$data[[1]]$x, q_nh_est_sc_plot_data_aux_list[[1]]$data[[1]]$y, q_nh_est_sc_plot_data_aux_list[[1]]$data[[1]]$group))
+}
+q_nh_est_sc_plot_data_long_list <- list(q_nh_est_sc_plot_data_long1,q_nh_est_sc_plot_data_long2,q_nh_est_sc_plot_data_long3,
+                                        q_nh_est_sc_plot_data_long4,q_nh_est_sc_plot_data_long5,q_nh_est_sc_plot_data_long6,
+                                        q_nh_est_sc_plot_data_long7,q_nh_est_sc_plot_data_long8,q_nh_est_sc_plot_data_long9,
+                                        q_nh_est_sc_plot_data_long10,q_nh_est_sc_plot_data_long11,q_nh_est_sc_plot_data_long12,
+                                        q_nh_est_sc_plot_data_long13,q_nh_est_sc_plot_data_long14,q_nh_est_sc_plot_data_long15,
+                                        q_nh_est_sc_plot_data_long16,q_nh_est_sc_plot_data_long17,q_nh_est_sc_plot_data_long18,
+                                        q_nh_est_sc_plot_data_long19,q_nh_est_sc_plot_data_long20,q_nh_est_sc_plot_data_long21,
+                                        q_nh_est_sc_plot_data_long22,q_nh_est_sc_plot_data_long23,q_nh_est_sc_plot_data_long24,
+                                        q_nh_est_sc_plot_data_long25,q_nh_est_sc_plot_data_long26,q_nh_est_sc_plot_data_long27,
+                                        q_nh_est_sc_plot_data_long28,q_nh_est_sc_plot_data_long29,q_nh_est_sc_plot_data_long30,
+                                        q_nh_est_sc_plot_data_long31,q_nh_est_sc_plot_data_long32,q_nh_est_sc_plot_data_long33,
+                                        q_nh_est_sc_plot_data_long34,q_nh_est_sc_plot_data_long35)
+rm(q_nh_est_sc_plot_data_long1,q_nh_est_sc_plot_data_long2,q_nh_est_sc_plot_data_long3,
+   q_nh_est_sc_plot_data_long4,q_nh_est_sc_plot_data_long5,q_nh_est_sc_plot_data_long6,
+   q_nh_est_sc_plot_data_long7,q_nh_est_sc_plot_data_long8,q_nh_est_sc_plot_data_long9,
+   q_nh_est_sc_plot_data_long10,q_nh_est_sc_plot_data_long11,q_nh_est_sc_plot_data_long12,
+   q_nh_est_sc_plot_data_long13,q_nh_est_sc_plot_data_long14,q_nh_est_sc_plot_data_long15,
+   q_nh_est_sc_plot_data_long16,q_nh_est_sc_plot_data_long17,q_nh_est_sc_plot_data_long18,
+   q_nh_est_sc_plot_data_long19,q_nh_est_sc_plot_data_long20,q_nh_est_sc_plot_data_long21,
+   q_nh_est_sc_plot_data_long22,q_nh_est_sc_plot_data_long23,q_nh_est_sc_plot_data_long24,
+   q_nh_est_sc_plot_data_long25,q_nh_est_sc_plot_data_long26,q_nh_est_sc_plot_data_long27,
+   q_nh_est_sc_plot_data_long28,q_nh_est_sc_plot_data_long29,q_nh_est_sc_plot_data_long30,
+   q_nh_est_sc_plot_data_long31,q_nh_est_sc_plot_data_long32,q_nh_est_sc_plot_data_long33,
+   q_nh_est_sc_plot_data_long34,q_nh_est_sc_plot_data_long35)
+q_nh_est_sc_plot_data_long_list <- lapply(q_nh_est_sc_plot_data_long_list, function(x) {
+  colnames(x) <- c('year', 'outcome', 'treated')  
+  x$treated <- x$treated - 1
+  return(x)
+}
+)
+for(i in 1:35) {
+  assign(paste0("q_nh_est_sc_plot_data_wide", i), reshape(data=q_nh_est_sc_plot_data_long_list[[i]],
+                                                          idvar = "year",
+                                                          v.names = "outcome",
+                                                          timevar = "treated",
+                                                          direction = "wide"))
+}
+q_nh_est_sc_plot_data_wide_list <- list(q_nh_est_sc_plot_data_wide1,q_nh_est_sc_plot_data_wide2,q_nh_est_sc_plot_data_wide3,
+                                        q_nh_est_sc_plot_data_wide4,q_nh_est_sc_plot_data_wide5,q_nh_est_sc_plot_data_wide6,
+                                        q_nh_est_sc_plot_data_wide7,q_nh_est_sc_plot_data_wide8,q_nh_est_sc_plot_data_wide9,
+                                        q_nh_est_sc_plot_data_wide10,q_nh_est_sc_plot_data_wide11,q_nh_est_sc_plot_data_wide12,
+                                        q_nh_est_sc_plot_data_wide13,q_nh_est_sc_plot_data_wide14,q_nh_est_sc_plot_data_wide15,
+                                        q_nh_est_sc_plot_data_wide16,q_nh_est_sc_plot_data_wide17,q_nh_est_sc_plot_data_wide18,
+                                        q_nh_est_sc_plot_data_wide19,q_nh_est_sc_plot_data_wide20,q_nh_est_sc_plot_data_wide21,
+                                        q_nh_est_sc_plot_data_wide22,q_nh_est_sc_plot_data_wide23,q_nh_est_sc_plot_data_wide24,
+                                        q_nh_est_sc_plot_data_wide25,q_nh_est_sc_plot_data_wide26,q_nh_est_sc_plot_data_wide27,
+                                        q_nh_est_sc_plot_data_wide28,q_nh_est_sc_plot_data_wide29,q_nh_est_sc_plot_data_wide30,
+                                        q_nh_est_sc_plot_data_wide31,q_nh_est_sc_plot_data_wide32,q_nh_est_sc_plot_data_wide33,
+                                        q_nh_est_sc_plot_data_wide34,q_nh_est_sc_plot_data_wide35)
+rm(q_nh_est_sc_plot_data_wide1,q_nh_est_sc_plot_data_wide2,q_nh_est_sc_plot_data_wide3,
+   q_nh_est_sc_plot_data_wide4,q_nh_est_sc_plot_data_wide5,q_nh_est_sc_plot_data_wide6,
+   q_nh_est_sc_plot_data_wide7,q_nh_est_sc_plot_data_wide8,q_nh_est_sc_plot_data_wide9,
+   q_nh_est_sc_plot_data_wide10,q_nh_est_sc_plot_data_wide11,q_nh_est_sc_plot_data_wide12,
+   q_nh_est_sc_plot_data_wide13,q_nh_est_sc_plot_data_wide14,q_nh_est_sc_plot_data_wide15,
+   q_nh_est_sc_plot_data_wide16,q_nh_est_sc_plot_data_wide17,q_nh_est_sc_plot_data_wide18,
+   q_nh_est_sc_plot_data_wide19,q_nh_est_sc_plot_data_wide20,q_nh_est_sc_plot_data_wide21,
+   q_nh_est_sc_plot_data_wide22,q_nh_est_sc_plot_data_wide23,q_nh_est_sc_plot_data_wide24,
+   q_nh_est_sc_plot_data_wide25,q_nh_est_sc_plot_data_wide26,q_nh_est_sc_plot_data_wide27,
+   q_nh_est_sc_plot_data_wide28,q_nh_est_sc_plot_data_wide29,q_nh_est_sc_plot_data_wide30,
+   q_nh_est_sc_plot_data_wide31,q_nh_est_sc_plot_data_wide32,q_nh_est_sc_plot_data_wide33,
+   q_nh_est_sc_plot_data_wide34,q_nh_est_sc_plot_data_wide35)
+q_nh_est_sc_plot_data_wide_list <- lapply(q_nh_est_sc_plot_data_wide_list, function(x) {
+  x$diff <- x$outcome.1 - x$outcome.0
+  return(x)
+}
+)
+# SDID #
+q_nh_est_sdid1 <- synthdid_estimate(setup_q_nh_list[[1]]$Y, setup_q_nh_list[[1]]$N0, setup_q_nh_list[[1]]$T0, X = covariates_acc_array_1)
+q_nh_est_sdid2 <- synthdid_estimate(setup_q_nh_list[[2]]$Y, setup_q_nh_list[[2]]$N0, setup_q_nh_list[[2]]$T0, X = covariates_acc_array_2)
+q_nh_est_sdid5 <- synthdid_estimate(setup_q_nh_list[[3]]$Y, setup_q_nh_list[[3]]$N0, setup_q_nh_list[[3]]$T0, X = covariates_acc_array_5)
+q_nh_est_sdid10 <- synthdid_estimate(setup_q_nh_list[[4]]$Y, setup_q_nh_list[[4]]$N0, setup_q_nh_list[[4]]$T0, X = covariates_acc_array_10)
+q_nh_est_sdid11 <- synthdid_estimate(setup_q_nh_list[[5]]$Y, setup_q_nh_list[[5]]$N0, setup_q_nh_list[[5]]$T0, X = covariates_acc_array_11)
+q_nh_est_sdid12 <- synthdid_estimate(setup_q_nh_list[[6]]$Y, setup_q_nh_list[[6]]$N0, setup_q_nh_list[[6]]$T0, X = covariates_acc_array_12)
+q_nh_est_sdid13 <- synthdid_estimate(setup_q_nh_list[[7]]$Y, setup_q_nh_list[[7]]$N0, setup_q_nh_list[[7]]$T0, X = covariates_acc_array_13)
+q_nh_est_sdid15 <- synthdid_estimate(setup_q_nh_list[[8]]$Y, setup_q_nh_list[[8]]$N0, setup_q_nh_list[[8]]$T0, X = covariates_acc_array_15)
+q_nh_est_sdid17 <- synthdid_estimate(setup_q_nh_list[[9]]$Y, setup_q_nh_list[[9]]$N0, setup_q_nh_list[[9]]$T0, X = covariates_acc_array_17)
+q_nh_est_sdid19 <- synthdid_estimate(setup_q_nh_list[[10]]$Y, setup_q_nh_list[[10]]$N0, setup_q_nh_list[[10]]$T0, X = covariates_acc_array_19)
+q_nh_est_sdid21 <- synthdid_estimate(setup_q_nh_list[[11]]$Y, setup_q_nh_list[[11]]$N0, setup_q_nh_list[[11]]$T0, X = covariates_acc_array_21)
+q_nh_est_sdid23 <- synthdid_estimate(setup_q_nh_list[[12]]$Y, setup_q_nh_list[[12]]$N0, setup_q_nh_list[[12]]$T0, X = covariates_acc_array_23)
+q_nh_est_sdid24 <- synthdid_estimate(setup_q_nh_list[[13]]$Y, setup_q_nh_list[[13]]$N0, setup_q_nh_list[[13]]$T0, X = covariates_acc_array_24)
+q_nh_est_sdid25 <- synthdid_estimate(setup_q_nh_list[[14]]$Y, setup_q_nh_list[[14]]$N0, setup_q_nh_list[[14]]$T0, X = covariates_acc_array_25)
+q_nh_est_sdid26 <- synthdid_estimate(setup_q_nh_list[[15]]$Y, setup_q_nh_list[[15]]$N0, setup_q_nh_list[[15]]$T0, X = covariates_acc_array_26)
+q_nh_est_sdid28 <- synthdid_estimate(setup_q_nh_list[[16]]$Y, setup_q_nh_list[[16]]$N0, setup_q_nh_list[[16]]$T0, X = covariates_acc_array_28)
+q_nh_est_sdid29 <- synthdid_estimate(setup_q_nh_list[[17]]$Y, setup_q_nh_list[[17]]$N0, setup_q_nh_list[[17]]$T0, X = covariates_acc_array_29)
+q_nh_est_sdid30 <- synthdid_estimate(setup_q_nh_list[[18]]$Y, setup_q_nh_list[[18]]$N0, setup_q_nh_list[[18]]$T0, X = covariates_acc_array_30)
+q_nh_est_sdid31 <- synthdid_estimate(setup_q_nh_list[[19]]$Y, setup_q_nh_list[[19]]$N0, setup_q_nh_list[[19]]$T0, X = covariates_acc_array_31)
+q_nh_est_sdid32 <- synthdid_estimate(setup_q_nh_list[[20]]$Y, setup_q_nh_list[[20]]$N0, setup_q_nh_list[[20]]$T0, X = covariates_acc_array_32)
+q_nh_est_sdid33 <- synthdid_estimate(setup_q_nh_list[[21]]$Y, setup_q_nh_list[[21]]$N0, setup_q_nh_list[[21]]$T0, X = covariates_acc_array_33)
+q_nh_est_sdid34 <- synthdid_estimate(setup_q_nh_list[[22]]$Y, setup_q_nh_list[[22]]$N0, setup_q_nh_list[[22]]$T0, X = covariates_acc_array_34)
+q_nh_est_sdid36 <- synthdid_estimate(setup_q_nh_list[[23]]$Y, setup_q_nh_list[[23]]$N0, setup_q_nh_list[[23]]$T0, X = covariates_acc_array_36)
+q_nh_est_sdid37 <- synthdid_estimate(setup_q_nh_list[[24]]$Y, setup_q_nh_list[[24]]$N0, setup_q_nh_list[[24]]$T0, X = covariates_acc_array_37)
+q_nh_est_sdid39 <- synthdid_estimate(setup_q_nh_list[[25]]$Y, setup_q_nh_list[[25]]$N0, setup_q_nh_list[[25]]$T0, X = covariates_acc_array_39)
+q_nh_est_sdid40 <- synthdid_estimate(setup_q_nh_list[[26]]$Y, setup_q_nh_list[[26]]$N0, setup_q_nh_list[[26]]$T0, X = covariates_acc_array_40)
+q_nh_est_sdid41 <- synthdid_estimate(setup_q_nh_list[[27]]$Y, setup_q_nh_list[[27]]$N0, setup_q_nh_list[[27]]$T0, X = covariates_acc_array_41)
+q_nh_est_sdid44 <- synthdid_estimate(setup_q_nh_list[[28]]$Y, setup_q_nh_list[[28]]$N0, setup_q_nh_list[[28]]$T0, X = covariates_acc_array_44)
+q_nh_est_sdid45 <- synthdid_estimate(setup_q_nh_list[[29]]$Y, setup_q_nh_list[[29]]$N0, setup_q_nh_list[[29]]$T0, X = covariates_acc_array_45)
+q_nh_est_sdid47 <- synthdid_estimate(setup_q_nh_list[[30]]$Y, setup_q_nh_list[[30]]$N0, setup_q_nh_list[[30]]$T0, X = covariates_acc_array_47)
+q_nh_est_sdid50 <- synthdid_estimate(setup_q_nh_list[[31]]$Y, setup_q_nh_list[[31]]$N0, setup_q_nh_list[[31]]$T0, X = covariates_acc_array_50)
+q_nh_est_sdid51 <- synthdid_estimate(setup_q_nh_list[[32]]$Y, setup_q_nh_list[[32]]$N0, setup_q_nh_list[[32]]$T0, X = covariates_acc_array_51)
+q_nh_est_sdid53 <- synthdid_estimate(setup_q_nh_list[[33]]$Y, setup_q_nh_list[[33]]$N0, setup_q_nh_list[[33]]$T0, X = covariates_acc_array_53)
+q_nh_est_sdid54 <- synthdid_estimate(setup_q_nh_list[[34]]$Y, setup_q_nh_list[[34]]$N0, setup_q_nh_list[[34]]$T0, X = covariates_acc_array_54)
+q_nh_est_sdid55 <- synthdid_estimate(setup_q_nh_list[[35]]$Y, setup_q_nh_list[[35]]$N0, setup_q_nh_list[[35]]$T0, X = covariates_acc_array_55)
+q_nh_est_sdid_list <- list(q_nh_est_sdid1,q_nh_est_sdid2,q_nh_est_sdid5,
+                           q_nh_est_sdid10,q_nh_est_sdid11,q_nh_est_sdid12,
+                           q_nh_est_sdid13,q_nh_est_sdid15,q_nh_est_sdid17,
+                           q_nh_est_sdid19,q_nh_est_sdid21,q_nh_est_sdid23,
+                           q_nh_est_sdid24,q_nh_est_sdid25,q_nh_est_sdid26,
+                           q_nh_est_sdid28,q_nh_est_sdid29,q_nh_est_sdid30,
+                           q_nh_est_sdid31,q_nh_est_sdid32,q_nh_est_sdid33,
+                           q_nh_est_sdid34,q_nh_est_sdid36,q_nh_est_sdid37,
+                           q_nh_est_sdid39,q_nh_est_sdid40,q_nh_est_sdid41,
+                           q_nh_est_sdid44,q_nh_est_sdid45,q_nh_est_sdid47,
+                           q_nh_est_sdid50,q_nh_est_sdid51,q_nh_est_sdid53,
+                           q_nh_est_sdid54,q_nh_est_sdid55)
+rm(q_nh_est_sdid1,q_nh_est_sdid2,q_nh_est_sdid5,
+   q_nh_est_sdid10,q_nh_est_sdid11,q_nh_est_sdid12,
+   q_nh_est_sdid13,q_nh_est_sdid15,q_nh_est_sdid17,
+   q_nh_est_sdid19,q_nh_est_sdid21,q_nh_est_sdid23,
+   q_nh_est_sdid24,q_nh_est_sdid25,q_nh_est_sdid26,
+   q_nh_est_sdid28,q_nh_est_sdid29,q_nh_est_sdid30,
+   q_nh_est_sdid31,q_nh_est_sdid32,q_nh_est_sdid33,
+   q_nh_est_sdid34,q_nh_est_sdid36,q_nh_est_sdid37,
+   q_nh_est_sdid39,q_nh_est_sdid40,q_nh_est_sdid41,
+   q_nh_est_sdid44,q_nh_est_sdid45,q_nh_est_sdid47,
+   q_nh_est_sdid50,q_nh_est_sdid51,q_nh_est_sdid53,
+   q_nh_est_sdid54,q_nh_est_sdid55)
+for(i in 1:35) {
+  assign(paste0("q_nh_est_sdid_plot", i), synthdid_plot(q_nh_est_sdid_list[i]))
+}
+q_nh_est_sdid_plot_data_aux1 <- ggplot_build(q_nh_est_sdid_plot1)
+q_nh_est_sdid_plot_data_aux2 <- ggplot_build(q_nh_est_sdid_plot2)
+q_nh_est_sdid_plot_data_aux3 <- ggplot_build(q_nh_est_sdid_plot3)
+q_nh_est_sdid_plot_data_aux4 <- ggplot_build(q_nh_est_sdid_plot4)
+q_nh_est_sdid_plot_data_aux5 <- ggplot_build(q_nh_est_sdid_plot5)
+q_nh_est_sdid_plot_data_aux6 <- ggplot_build(q_nh_est_sdid_plot6)
+q_nh_est_sdid_plot_data_aux7 <- ggplot_build(q_nh_est_sdid_plot7)
+q_nh_est_sdid_plot_data_aux8 <- ggplot_build(q_nh_est_sdid_plot8)
+q_nh_est_sdid_plot_data_aux9 <- ggplot_build(q_nh_est_sdid_plot9)
+q_nh_est_sdid_plot_data_aux10 <- ggplot_build(q_nh_est_sdid_plot10)
+q_nh_est_sdid_plot_data_aux11 <- ggplot_build(q_nh_est_sdid_plot11)
+q_nh_est_sdid_plot_data_aux12 <- ggplot_build(q_nh_est_sdid_plot12)
+q_nh_est_sdid_plot_data_aux13 <- ggplot_build(q_nh_est_sdid_plot13)
+q_nh_est_sdid_plot_data_aux14 <- ggplot_build(q_nh_est_sdid_plot14)
+q_nh_est_sdid_plot_data_aux15 <- ggplot_build(q_nh_est_sdid_plot15)
+q_nh_est_sdid_plot_data_aux16 <- ggplot_build(q_nh_est_sdid_plot16)
+q_nh_est_sdid_plot_data_aux17 <- ggplot_build(q_nh_est_sdid_plot17)
+q_nh_est_sdid_plot_data_aux18 <- ggplot_build(q_nh_est_sdid_plot18)
+q_nh_est_sdid_plot_data_aux19 <- ggplot_build(q_nh_est_sdid_plot19)
+q_nh_est_sdid_plot_data_aux20 <- ggplot_build(q_nh_est_sdid_plot20)
+q_nh_est_sdid_plot_data_aux21 <- ggplot_build(q_nh_est_sdid_plot21)
+q_nh_est_sdid_plot_data_aux22 <- ggplot_build(q_nh_est_sdid_plot22)
+q_nh_est_sdid_plot_data_aux23 <- ggplot_build(q_nh_est_sdid_plot23)
+q_nh_est_sdid_plot_data_aux24 <- ggplot_build(q_nh_est_sdid_plot24)
+q_nh_est_sdid_plot_data_aux25 <- ggplot_build(q_nh_est_sdid_plot25)
+q_nh_est_sdid_plot_data_aux26 <- ggplot_build(q_nh_est_sdid_plot26)
+q_nh_est_sdid_plot_data_aux27 <- ggplot_build(q_nh_est_sdid_plot27)
+q_nh_est_sdid_plot_data_aux28 <- ggplot_build(q_nh_est_sdid_plot28)
+q_nh_est_sdid_plot_data_aux29 <- ggplot_build(q_nh_est_sdid_plot29)
+q_nh_est_sdid_plot_data_aux30 <- ggplot_build(q_nh_est_sdid_plot30)
+q_nh_est_sdid_plot_data_aux31 <- ggplot_build(q_nh_est_sdid_plot31)
+q_nh_est_sdid_plot_data_aux32 <- ggplot_build(q_nh_est_sdid_plot32)
+q_nh_est_sdid_plot_data_aux33 <- ggplot_build(q_nh_est_sdid_plot33)
+q_nh_est_sdid_plot_data_aux34 <- ggplot_build(q_nh_est_sdid_plot34)
+q_nh_est_sdid_plot_data_aux35 <- ggplot_build(q_nh_est_sdid_plot35)
+q_nh_est_sdid_plot_data_aux_list <- list(q_nh_est_sdid_plot_data_aux1,q_nh_est_sdid_plot_data_aux2,q_nh_est_sdid_plot_data_aux3,
+                                         q_nh_est_sdid_plot_data_aux4,q_nh_est_sdid_plot_data_aux5,q_nh_est_sdid_plot_data_aux6,
+                                         q_nh_est_sdid_plot_data_aux7,q_nh_est_sdid_plot_data_aux8,q_nh_est_sdid_plot_data_aux9,
+                                         q_nh_est_sdid_plot_data_aux10,q_nh_est_sdid_plot_data_aux11,q_nh_est_sdid_plot_data_aux12,
+                                         q_nh_est_sdid_plot_data_aux13,q_nh_est_sdid_plot_data_aux14,q_nh_est_sdid_plot_data_aux15,
+                                         q_nh_est_sdid_plot_data_aux16,q_nh_est_sdid_plot_data_aux17,q_nh_est_sdid_plot_data_aux18,
+                                         q_nh_est_sdid_plot_data_aux19,q_nh_est_sdid_plot_data_aux20,q_nh_est_sdid_plot_data_aux21,
+                                         q_nh_est_sdid_plot_data_aux22,q_nh_est_sdid_plot_data_aux23,q_nh_est_sdid_plot_data_aux24,
+                                         q_nh_est_sdid_plot_data_aux25,q_nh_est_sdid_plot_data_aux26,q_nh_est_sdid_plot_data_aux27,
+                                         q_nh_est_sdid_plot_data_aux28,q_nh_est_sdid_plot_data_aux29,q_nh_est_sdid_plot_data_aux30,
+                                         q_nh_est_sdid_plot_data_aux31,q_nh_est_sdid_plot_data_aux32,q_nh_est_sdid_plot_data_aux33,
+                                         q_nh_est_sdid_plot_data_aux34,q_nh_est_sdid_plot_data_aux35)
+rm(q_nh_est_sdid_plot_data_aux1,q_nh_est_sdid_plot_data_aux2,q_nh_est_sdid_plot_data_aux3,
+   q_nh_est_sdid_plot_data_aux4,q_nh_est_sdid_plot_data_aux5,q_nh_est_sdid_plot_data_aux6,
+   q_nh_est_sdid_plot_data_aux7,q_nh_est_sdid_plot_data_aux8,q_nh_est_sdid_plot_data_aux9,
+   q_nh_est_sdid_plot_data_aux10,q_nh_est_sdid_plot_data_aux11,q_nh_est_sdid_plot_data_aux12,
+   q_nh_est_sdid_plot_data_aux13,q_nh_est_sdid_plot_data_aux14,q_nh_est_sdid_plot_data_aux15,
+   q_nh_est_sdid_plot_data_aux16,q_nh_est_sdid_plot_data_aux17,q_nh_est_sdid_plot_data_aux18,
+   q_nh_est_sdid_plot_data_aux19,q_nh_est_sdid_plot_data_aux20,q_nh_est_sdid_plot_data_aux21,
+   q_nh_est_sdid_plot_data_aux22,q_nh_est_sdid_plot_data_aux23,q_nh_est_sdid_plot_data_aux24,
+   q_nh_est_sdid_plot_data_aux25,q_nh_est_sdid_plot_data_aux26,q_nh_est_sdid_plot_data_aux27,
+   q_nh_est_sdid_plot_data_aux28,q_nh_est_sdid_plot_data_aux29,q_nh_est_sdid_plot_data_aux30,
+   q_nh_est_sdid_plot_data_aux31,q_nh_est_sdid_plot_data_aux32,q_nh_est_sdid_plot_data_aux33,
+   q_nh_est_sdid_plot_data_aux34,q_nh_est_sdid_plot_data_aux35)
+rm(q_nh_est_sdid_plot1,q_nh_est_sdid_plot2,q_nh_est_sdid_plot3,
+   q_nh_est_sdid_plot4,q_nh_est_sdid_plot5,q_nh_est_sdid_plot6,
+   q_nh_est_sdid_plot7,q_nh_est_sdid_plot8,q_nh_est_sdid_plot9,
+   q_nh_est_sdid_plot10,q_nh_est_sdid_plot11,q_nh_est_sdid_plot12,
+   q_nh_est_sdid_plot13,q_nh_est_sdid_plot14,q_nh_est_sdid_plot15,
+   q_nh_est_sdid_plot16,q_nh_est_sdid_plot17,q_nh_est_sdid_plot18,
+   q_nh_est_sdid_plot19,q_nh_est_sdid_plot20,q_nh_est_sdid_plot21,
+   q_nh_est_sdid_plot22,q_nh_est_sdid_plot23,q_nh_est_sdid_plot24,
+   q_nh_est_sdid_plot25,q_nh_est_sdid_plot26,q_nh_est_sdid_plot27,
+   q_nh_est_sdid_plot28,q_nh_est_sdid_plot29,q_nh_est_sdid_plot30,
+   q_nh_est_sdid_plot31,q_nh_est_sdid_plot32,q_nh_est_sdid_plot33,
+   q_nh_est_sdid_plot34,q_nh_est_sdid_plot35)
+for(i in 1:35) {
+  assign(paste0("q_nh_est_sdid_plot_data_long", i), data.frame(q_nh_est_sdid_plot_data_aux_list[[1]]$data[[1]]$x, q_nh_est_sdid_plot_data_aux_list[[1]]$data[[1]]$y, q_nh_est_sdid_plot_data_aux_list[[1]]$data[[1]]$group))
+}
+q_nh_est_sdid_plot_data_long_list <- list(q_nh_est_sdid_plot_data_long1,q_nh_est_sdid_plot_data_long2,q_nh_est_sdid_plot_data_long3,
+                                          q_nh_est_sdid_plot_data_long4,q_nh_est_sdid_plot_data_long5,q_nh_est_sdid_plot_data_long6,
+                                          q_nh_est_sdid_plot_data_long7,q_nh_est_sdid_plot_data_long8,q_nh_est_sdid_plot_data_long9,
+                                          q_nh_est_sdid_plot_data_long10,q_nh_est_sdid_plot_data_long11,q_nh_est_sdid_plot_data_long12,
+                                          q_nh_est_sdid_plot_data_long13,q_nh_est_sdid_plot_data_long14,q_nh_est_sdid_plot_data_long15,
+                                          q_nh_est_sdid_plot_data_long16,q_nh_est_sdid_plot_data_long17,q_nh_est_sdid_plot_data_long18,
+                                          q_nh_est_sdid_plot_data_long19,q_nh_est_sdid_plot_data_long20,q_nh_est_sdid_plot_data_long21,
+                                          q_nh_est_sdid_plot_data_long22,q_nh_est_sdid_plot_data_long23,q_nh_est_sdid_plot_data_long24,
+                                          q_nh_est_sdid_plot_data_long25,q_nh_est_sdid_plot_data_long26,q_nh_est_sdid_plot_data_long27,
+                                          q_nh_est_sdid_plot_data_long28,q_nh_est_sdid_plot_data_long29,q_nh_est_sdid_plot_data_long30,
+                                          q_nh_est_sdid_plot_data_long31,q_nh_est_sdid_plot_data_long32,q_nh_est_sdid_plot_data_long33,
+                                          q_nh_est_sdid_plot_data_long34,q_nh_est_sdid_plot_data_long35)
+rm(q_nh_est_sdid_plot_data_long1,q_nh_est_sdid_plot_data_long2,q_nh_est_sdid_plot_data_long3,
+   q_nh_est_sdid_plot_data_long4,q_nh_est_sdid_plot_data_long5,q_nh_est_sdid_plot_data_long6,
+   q_nh_est_sdid_plot_data_long7,q_nh_est_sdid_plot_data_long8,q_nh_est_sdid_plot_data_long9,
+   q_nh_est_sdid_plot_data_long10,q_nh_est_sdid_plot_data_long11,q_nh_est_sdid_plot_data_long12,
+   q_nh_est_sdid_plot_data_long13,q_nh_est_sdid_plot_data_long14,q_nh_est_sdid_plot_data_long15,
+   q_nh_est_sdid_plot_data_long16,q_nh_est_sdid_plot_data_long17,q_nh_est_sdid_plot_data_long18,
+   q_nh_est_sdid_plot_data_long19,q_nh_est_sdid_plot_data_long20,q_nh_est_sdid_plot_data_long21,
+   q_nh_est_sdid_plot_data_long22,q_nh_est_sdid_plot_data_long23,q_nh_est_sdid_plot_data_long24,
+   q_nh_est_sdid_plot_data_long25,q_nh_est_sdid_plot_data_long26,q_nh_est_sdid_plot_data_long27,
+   q_nh_est_sdid_plot_data_long28,q_nh_est_sdid_plot_data_long29,q_nh_est_sdid_plot_data_long30,
+   q_nh_est_sdid_plot_data_long31,q_nh_est_sdid_plot_data_long32,q_nh_est_sdid_plot_data_long33,
+   q_nh_est_sdid_plot_data_long34,q_nh_est_sdid_plot_data_long35)
+q_nh_est_sdid_plot_data_long_list <- lapply(q_nh_est_sdid_plot_data_long_list, function(x) {
+  colnames(x) <- c('year', 'outcome', 'treated')  
+  x$treated <- x$treated - 1
+  return(x)
+}
+)
+for(i in 1:35) {
+  assign(paste0("q_nh_est_sdid_plot_data_wide", i), reshape(data=q_nh_est_sdid_plot_data_long_list[[i]],
+                                                            idvar = "year",
+                                                            v.names = "outcome",
+                                                            timevar = "treated",
+                                                            direction = "wide"))
+}
+q_nh_est_sdid_plot_data_wide_list <- list(q_nh_est_sdid_plot_data_wide1,q_nh_est_sdid_plot_data_wide2,q_nh_est_sdid_plot_data_wide3,
+                                          q_nh_est_sdid_plot_data_wide4,q_nh_est_sdid_plot_data_wide5,q_nh_est_sdid_plot_data_wide6,
+                                          q_nh_est_sdid_plot_data_wide7,q_nh_est_sdid_plot_data_wide8,q_nh_est_sdid_plot_data_wide9,
+                                          q_nh_est_sdid_plot_data_wide10,q_nh_est_sdid_plot_data_wide11,q_nh_est_sdid_plot_data_wide12,
+                                          q_nh_est_sdid_plot_data_wide13,q_nh_est_sdid_plot_data_wide14,q_nh_est_sdid_plot_data_wide15,
+                                          q_nh_est_sdid_plot_data_wide16,q_nh_est_sdid_plot_data_wide17,q_nh_est_sdid_plot_data_wide18,
+                                          q_nh_est_sdid_plot_data_wide19,q_nh_est_sdid_plot_data_wide20,q_nh_est_sdid_plot_data_wide21,
+                                          q_nh_est_sdid_plot_data_wide22,q_nh_est_sdid_plot_data_wide23,q_nh_est_sdid_plot_data_wide24,
+                                          q_nh_est_sdid_plot_data_wide25,q_nh_est_sdid_plot_data_wide26,q_nh_est_sdid_plot_data_wide27,
+                                          q_nh_est_sdid_plot_data_wide28,q_nh_est_sdid_plot_data_wide29,q_nh_est_sdid_plot_data_wide30,
+                                          q_nh_est_sdid_plot_data_wide31,q_nh_est_sdid_plot_data_wide32,q_nh_est_sdid_plot_data_wide33,
+                                          q_nh_est_sdid_plot_data_wide34,q_nh_est_sdid_plot_data_wide35)
+rm(q_nh_est_sdid_plot_data_wide1,q_nh_est_sdid_plot_data_wide2,q_nh_est_sdid_plot_data_wide3,
+   q_nh_est_sdid_plot_data_wide4,q_nh_est_sdid_plot_data_wide5,q_nh_est_sdid_plot_data_wide6,
+   q_nh_est_sdid_plot_data_wide7,q_nh_est_sdid_plot_data_wide8,q_nh_est_sdid_plot_data_wide9,
+   q_nh_est_sdid_plot_data_wide10,q_nh_est_sdid_plot_data_wide11,q_nh_est_sdid_plot_data_wide12,
+   q_nh_est_sdid_plot_data_wide13,q_nh_est_sdid_plot_data_wide14,q_nh_est_sdid_plot_data_wide15,
+   q_nh_est_sdid_plot_data_wide16,q_nh_est_sdid_plot_data_wide17,q_nh_est_sdid_plot_data_wide18,
+   q_nh_est_sdid_plot_data_wide19,q_nh_est_sdid_plot_data_wide20,q_nh_est_sdid_plot_data_wide21,
+   q_nh_est_sdid_plot_data_wide22,q_nh_est_sdid_plot_data_wide23,q_nh_est_sdid_plot_data_wide24,
+   q_nh_est_sdid_plot_data_wide25,q_nh_est_sdid_plot_data_wide26,q_nh_est_sdid_plot_data_wide27,
+   q_nh_est_sdid_plot_data_wide28,q_nh_est_sdid_plot_data_wide29,q_nh_est_sdid_plot_data_wide30,
+   q_nh_est_sdid_plot_data_wide31,q_nh_est_sdid_plot_data_wide32,q_nh_est_sdid_plot_data_wide33,
+   q_nh_est_sdid_plot_data_wide34,q_nh_est_sdid_plot_data_wide35)
+q_nh_est_sdid_plot_data_wide_list <- lapply(q_nh_est_sdid_plot_data_wide_list, function(x) {
+  x$diff <- x$outcome.1 - x$outcome.0
+  return(x)
+}
+)
