@@ -1700,7 +1700,7 @@ rm(q_nh_est_did_plot1,q_nh_est_did_plot2,q_nh_est_did_plot3,
    q_nh_est_did_plot31,q_nh_est_did_plot32,q_nh_est_did_plot33,
    q_nh_est_did_plot34,q_nh_est_did_plot35)
 for(i in 1:35) {
-  assign(paste0("q_nh_est_did_plot_data_long", i), data.frame(q_nh_est_did_plot_data_aux_list[[1]]$data[[1]]$x, q_nh_est_did_plot_data_aux_list[[1]]$data[[1]]$y, q_nh_est_did_plot_data_aux_list[[1]]$data[[1]]$group))
+  assign(paste0("q_nh_est_did_plot_data_long", i), data.frame(q_nh_est_did_plot_data_aux_list[[i]]$data[[1]]$x, q_nh_est_did_plot_data_aux_list[[i]]$data[[1]]$y, q_nh_est_did_plot_data_aux_list[[i]]$data[[1]]$group))
 }
 q_nh_est_did_plot_data_long_list <- list(q_nh_est_did_plot_data_long1,q_nh_est_did_plot_data_long2,q_nh_est_did_plot_data_long3,
                                          q_nh_est_did_plot_data_long4,q_nh_est_did_plot_data_long5,q_nh_est_did_plot_data_long6,
@@ -1903,7 +1903,7 @@ rm(q_nh_est_sc_plot1,q_nh_est_sc_plot2,q_nh_est_sc_plot3,
    q_nh_est_sc_plot31,q_nh_est_sc_plot32,q_nh_est_sc_plot33,
    q_nh_est_sc_plot34,q_nh_est_sc_plot35)
 for(i in 1:35) {
-  assign(paste0("q_nh_est_sc_plot_data_long", i), data.frame(q_nh_est_sc_plot_data_aux_list[[1]]$data[[1]]$x, q_nh_est_sc_plot_data_aux_list[[1]]$data[[1]]$y, q_nh_est_sc_plot_data_aux_list[[1]]$data[[1]]$group))
+  assign(paste0("q_nh_est_sc_plot_data_long", i), data.frame(q_nh_est_sc_plot_data_aux_list[[i]]$data[[1]]$x, q_nh_est_sc_plot_data_aux_list[[i]]$data[[1]]$y, q_nh_est_sc_plot_data_aux_list[[i]]$data[[1]]$group))
 }
 q_nh_est_sc_plot_data_long_list <- list(q_nh_est_sc_plot_data_long1,q_nh_est_sc_plot_data_long2,q_nh_est_sc_plot_data_long3,
                                         q_nh_est_sc_plot_data_long4,q_nh_est_sc_plot_data_long5,q_nh_est_sc_plot_data_long6,
@@ -2106,7 +2106,7 @@ rm(q_nh_est_sdid_plot1,q_nh_est_sdid_plot2,q_nh_est_sdid_plot3,
    q_nh_est_sdid_plot31,q_nh_est_sdid_plot32,q_nh_est_sdid_plot33,
    q_nh_est_sdid_plot34,q_nh_est_sdid_plot35)
 for(i in 1:35) {
-  assign(paste0("q_nh_est_sdid_plot_data_long", i), data.frame(q_nh_est_sdid_plot_data_aux_list[[1]]$data[[1]]$x, q_nh_est_sdid_plot_data_aux_list[[1]]$data[[1]]$y, q_nh_est_sdid_plot_data_aux_list[[1]]$data[[1]]$group))
+  assign(paste0("q_nh_est_sdid_plot_data_long", i), data.frame(q_nh_est_sdid_plot_data_aux_list[[i]]$data[[1]]$x, q_nh_est_sdid_plot_data_aux_list[[i]]$data[[1]]$y, q_nh_est_sdid_plot_data_aux_list[[i]]$data[[1]]$group))
 }
 q_nh_est_sdid_plot_data_long_list <- list(q_nh_est_sdid_plot_data_long1,q_nh_est_sdid_plot_data_long2,q_nh_est_sdid_plot_data_long3,
                                           q_nh_est_sdid_plot_data_long4,q_nh_est_sdid_plot_data_long5,q_nh_est_sdid_plot_data_long6,
@@ -2174,3 +2174,292 @@ q_nh_est_sdid_plot_data_wide_list <- lapply(q_nh_est_sdid_plot_data_wide_list, f
   return(x)
 }
 )
+
+##### Spaghetti and Placebo Distribution Plots #####
+# Spaghetti plots #
+q_nh_est_did_plot_data_wide_pa$did_facet_title <- "Diff-in-Diff"
+q_nh_est_sc_plot_data_wide_pa$sc_facet_title <- "Synthetic Control"
+q_nh_est_sdid_plot_data_wide_pa$sdid_facet_title <- "Synthetic Diff-in-Diff"
+q_nh_est_did_plot_data_wide_pa$diff_relative <- q_nh_est_did_plot_data_wide_pa$diff - q_nh_est_did_plot_data_wide_pa$diff[5]
+for(i in 1:35) {
+  q_nh_est_did_plot_data_wide_list[[i]]$diff_relative <- q_nh_est_did_plot_data_wide_list[[i]]$diff - q_nh_est_did_plot_data_wide_list[[i]]$diff[5]
+}
+q_nh_spag_did_plot <- ggplot(q_nh_est_did_plot_data_wide_pa, aes(year,diff_relative)) +
+  geom_vline(xintercept = 1995, size = 1, color = "grey70", alpha = 0.75) +
+  geom_line(data = q_nh_est_did_plot_data_wide_list[[1]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = q_nh_est_did_plot_data_wide_list[[2]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = q_nh_est_did_plot_data_wide_list[[3]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = q_nh_est_did_plot_data_wide_list[[4]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = q_nh_est_did_plot_data_wide_list[[5]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = q_nh_est_did_plot_data_wide_list[[6]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = q_nh_est_did_plot_data_wide_list[[7]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = q_nh_est_did_plot_data_wide_list[[8]], color = "#F8766D", alpha = 0.4) +    
+  geom_line(data = q_nh_est_did_plot_data_wide_list[[9]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = q_nh_est_did_plot_data_wide_list[[10]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = q_nh_est_did_plot_data_wide_list[[11]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = q_nh_est_did_plot_data_wide_list[[12]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = q_nh_est_did_plot_data_wide_list[[13]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = q_nh_est_did_plot_data_wide_list[[14]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = q_nh_est_did_plot_data_wide_list[[15]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = q_nh_est_did_plot_data_wide_list[[16]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = q_nh_est_did_plot_data_wide_list[[17]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = q_nh_est_did_plot_data_wide_list[[18]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = q_nh_est_did_plot_data_wide_list[[19]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = q_nh_est_did_plot_data_wide_list[[20]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = q_nh_est_did_plot_data_wide_list[[21]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = q_nh_est_did_plot_data_wide_list[[22]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = q_nh_est_did_plot_data_wide_list[[23]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = q_nh_est_did_plot_data_wide_list[[24]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = q_nh_est_did_plot_data_wide_list[[25]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = q_nh_est_did_plot_data_wide_list[[26]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = q_nh_est_did_plot_data_wide_list[[27]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = q_nh_est_did_plot_data_wide_list[[28]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = q_nh_est_did_plot_data_wide_list[[29]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = q_nh_est_did_plot_data_wide_list[[30]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = q_nh_est_did_plot_data_wide_list[[31]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = q_nh_est_did_plot_data_wide_list[[32]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = q_nh_est_did_plot_data_wide_list[[33]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = q_nh_est_did_plot_data_wide_list[[34]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = q_nh_est_did_plot_data_wide_list[[35]], color = "#F8766D", alpha = 0.4) +
+  geom_line(size = 1.25, color = "#00BFC4") +
+  labs(y= "Gap in Quantity of Nursing Homes \n (Per 100,000)") +
+  facet_grid(. ~ did_facet_title) +
+  theme(aspect.ratio=1,
+        panel.spacing.x=unit(1, "lines"),
+        panel.background = element_blank(),
+        panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank(), 
+        panel.grid.major.y = element_line(size=.25, color='grey90'),
+        panel.grid.minor.y = element_blank(),
+        axis.text.x = element_text(angle = 45, hjust=1, size = 8),
+        axis.text.y = element_text(size = 8),
+        axis.title.y = element_text(size=8),
+        axis.title.x = element_blank(),
+        strip.background = element_rect(fill="grey70", size=1),
+        strip.text = element_text(size=8, face="bold", color = "white"),
+        axis.ticks = element_line(color = "grey70"),
+        panel.border = element_rect(color = "grey70", fill = NA, size = 0.5)
+  )
+q_nh_spag_sc_plot <- ggplot(q_nh_est_sc_plot_data_wide_pa, aes(year,diff)) +
+  geom_vline(xintercept = 1995, size = 1, color = "grey70", alpha = 0.75) +
+  geom_line(data = q_nh_est_sc_plot_data_wide_list[[1]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = q_nh_est_sc_plot_data_wide_list[[2]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = q_nh_est_sc_plot_data_wide_list[[3]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = q_nh_est_sc_plot_data_wide_list[[4]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = q_nh_est_sc_plot_data_wide_list[[5]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = q_nh_est_sc_plot_data_wide_list[[6]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = q_nh_est_sc_plot_data_wide_list[[7]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = q_nh_est_sc_plot_data_wide_list[[8]], color = "#F8766D", alpha = 0.4) +    
+  geom_line(data = q_nh_est_sc_plot_data_wide_list[[9]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = q_nh_est_sc_plot_data_wide_list[[10]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = q_nh_est_sc_plot_data_wide_list[[11]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = q_nh_est_sc_plot_data_wide_list[[12]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = q_nh_est_sc_plot_data_wide_list[[13]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = q_nh_est_sc_plot_data_wide_list[[14]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = q_nh_est_sc_plot_data_wide_list[[15]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = q_nh_est_sc_plot_data_wide_list[[16]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = q_nh_est_sc_plot_data_wide_list[[17]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = q_nh_est_sc_plot_data_wide_list[[18]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = q_nh_est_sc_plot_data_wide_list[[19]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = q_nh_est_sc_plot_data_wide_list[[20]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = q_nh_est_sc_plot_data_wide_list[[21]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = q_nh_est_sc_plot_data_wide_list[[22]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = q_nh_est_sc_plot_data_wide_list[[23]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = q_nh_est_sc_plot_data_wide_list[[24]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = q_nh_est_sc_plot_data_wide_list[[25]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = q_nh_est_sc_plot_data_wide_list[[26]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = q_nh_est_sc_plot_data_wide_list[[27]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = q_nh_est_sc_plot_data_wide_list[[28]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = q_nh_est_sc_plot_data_wide_list[[29]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = q_nh_est_sc_plot_data_wide_list[[30]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = q_nh_est_sc_plot_data_wide_list[[31]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = q_nh_est_sc_plot_data_wide_list[[32]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = q_nh_est_sc_plot_data_wide_list[[33]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = q_nh_est_sc_plot_data_wide_list[[34]], color = "#F8766D", alpha = 0.4) +
+  geom_line(aes(y = diff, color = "Control States"),data = q_nh_est_sc_plot_data_wide_list[[35]], alpha = 0.4) +
+  geom_line(aes(y = diff, color = "Pennsylvania"),data = q_nh_est_sc_plot_data_wide_pa, size = 1.25) +
+  scale_color_manual(values = c("Placebos" = "#F8766D", "Pennsylvania" = "#00BFC4")) +
+  labs(x= "Year") +
+  facet_grid(. ~ sc_facet_title) +
+  theme(aspect.ratio=1,
+        panel.spacing.x=unit(1, "lines"),
+        panel.background = element_blank(),
+        panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank(), 
+        panel.grid.major.y = element_line(size=.25, color='grey90'),
+        panel.grid.minor.y = element_blank(),
+        axis.text.x = element_text(angle = 45, hjust=1, size = 8),
+        axis.text.y = element_text(size = 8),
+        axis.title.y = element_blank(),
+        axis.title.x = element_text(size=8),
+        strip.background = element_rect(fill="grey70", size=1),
+        strip.text = element_text(size=8, face="bold", color = "white"),
+        legend.position='top', 
+        legend.text = element_text(size=7.75),
+        legend.direction='horizontal',
+        legend.key = element_blank(),
+        legend.title = element_blank(),
+        axis.ticks = element_line(color = "grey70"),
+        panel.border = element_rect(color = "grey70", fill = NA, size = 0.5)
+  )
+q_nh_est_sdid_plot_data_wide_pa$diff_relative <- q_nh_est_sdid_plot_data_wide_pa$diff - q_nh_est_sdid_plot_data_wide_pa$diff[5]
+for(i in 1:35) {
+  q_nh_est_sdid_plot_data_wide_list[[i]]$diff_relative <- q_nh_est_sdid_plot_data_wide_list[[i]]$diff - q_nh_est_sdid_plot_data_wide_list[[i]]$diff[5]
+}
+q_nh_spag_sdid_plot <- ggplot(q_nh_est_sdid_plot_data_wide_pa, aes(year,diff_relative)) +
+  geom_vline(xintercept = 1995, size = 1, color = "grey70", alpha = 0.75) +
+  geom_line(data = q_nh_est_sdid_plot_data_wide_list[[1]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = q_nh_est_sdid_plot_data_wide_list[[2]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = q_nh_est_sdid_plot_data_wide_list[[3]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = q_nh_est_sdid_plot_data_wide_list[[4]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = q_nh_est_sdid_plot_data_wide_list[[5]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = q_nh_est_sdid_plot_data_wide_list[[6]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = q_nh_est_sdid_plot_data_wide_list[[7]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = q_nh_est_sdid_plot_data_wide_list[[8]], color = "#F8766D", alpha = 0.4) +    
+  geom_line(data = q_nh_est_sdid_plot_data_wide_list[[9]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = q_nh_est_sdid_plot_data_wide_list[[10]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = q_nh_est_sdid_plot_data_wide_list[[11]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = q_nh_est_sdid_plot_data_wide_list[[12]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = q_nh_est_sdid_plot_data_wide_list[[13]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = q_nh_est_sdid_plot_data_wide_list[[14]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = q_nh_est_sdid_plot_data_wide_list[[15]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = q_nh_est_sdid_plot_data_wide_list[[16]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = q_nh_est_sdid_plot_data_wide_list[[17]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = q_nh_est_sdid_plot_data_wide_list[[18]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = q_nh_est_sdid_plot_data_wide_list[[19]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = q_nh_est_sdid_plot_data_wide_list[[20]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = q_nh_est_sdid_plot_data_wide_list[[21]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = q_nh_est_sdid_plot_data_wide_list[[22]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = q_nh_est_sdid_plot_data_wide_list[[23]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = q_nh_est_sdid_plot_data_wide_list[[24]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = q_nh_est_sdid_plot_data_wide_list[[25]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = q_nh_est_sdid_plot_data_wide_list[[26]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = q_nh_est_sdid_plot_data_wide_list[[27]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = q_nh_est_sdid_plot_data_wide_list[[28]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = q_nh_est_sdid_plot_data_wide_list[[29]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = q_nh_est_sdid_plot_data_wide_list[[30]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = q_nh_est_sdid_plot_data_wide_list[[31]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = q_nh_est_sdid_plot_data_wide_list[[32]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = q_nh_est_sdid_plot_data_wide_list[[33]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = q_nh_est_sdid_plot_data_wide_list[[34]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = q_nh_est_sdid_plot_data_wide_list[[35]], color = "#F8766D", alpha = 0.4) +
+  geom_line(size = 1.25, color = "#00BFC4") +
+  facet_grid(. ~ sdid_facet_title) +
+  theme(aspect.ratio=1,
+        panel.spacing.x=unit(1, "lines"),
+        panel.background = element_blank(),
+        panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank(), 
+        panel.grid.major.y = element_line(size=.25, color='grey90'),
+        panel.grid.minor.y = element_blank(),
+        axis.text.x = element_text(angle = 45, hjust=1, size = 8),
+        axis.text.y = element_text(size = 8),
+        axis.title.y = element_blank(),
+        axis.title.x = element_blank(),
+        strip.background = element_rect(fill="grey70", size=1),
+        strip.text = element_text(size=8, face="bold", color = "white"),
+        axis.ticks = element_line(color = "grey70"),
+        panel.border = element_rect(color = "grey70", fill = NA, size = 0.5)
+  )
+# Placebo Distribution Plots #
+q_nh_est_did_vec <- c(q_nh_est_did_pa)
+for (i in 1:35) {
+  q_nh_est_did_vec_aux <- q_nh_est_did_list[[i]][1]
+  q_nh_est_did_vec <- c(q_nh_est_did_vec,q_nh_est_did_vec_aux)
+}
+q_nh_est_did_df <- data.frame(q_nh_est_did_vec)
+q_nh_hist_did_plot_aux <- ggplot(data = NULL, aes(x = q_nh_est_did_vec)) +
+  geom_histogram(data = q_nh_est_did_df, aes(x = q_nh_est_did_vec, y = ..count..) ,alpha = .5, color = "#F8766D", fill = "#F8766D", bins = 25) +
+  labs(y= "Frequency") +  
+  theme(aspect.ratio=1,
+        panel.spacing.x=unit(1, "lines"),
+        panel.background = element_blank(),
+        panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank(), 
+        panel.grid.major.y = element_line(size=.25, color='grey90'),
+        panel.grid.minor.y = element_blank(),
+        axis.text.x = element_text(angle = 45, hjust=1, size = 8),
+        axis.text.y = element_text(size = 8),
+        axis.title.y = element_text(size = 8),
+        axis.title.x = element_blank(),
+        strip.background = element_rect(fill="grey70", size=1),
+        strip.text = element_text(size=8, face="bold", color = "white"),
+        axis.ticks = element_line(color = "grey70"),
+        panel.border = element_rect(color = "grey70", fill = NA, size = 0.5)
+  )
+q_nh_hist_did_plot1_ylim <- ggplot_build(q_nh_hist_did_plot_aux)$layout$panel_scales_y[[1]]$range$range[2]
+q_nh_hist_did_plot <- q_nh_hist_did_plot_aux +
+  expand_limits(y=q_nh_hist_did_plot1_ylim+.15) +
+  geom_segment(aes(x = c(q_nh_est_did_vec[1], mean(q_nh_est_did_vec[2:36])), xend = c(q_nh_est_did_vec[1],mean(q_nh_est_did_vec[2:36])), y = c(0,0), yend = c(q_nh_hist_did_plot1_ylim,q_nh_hist_did_plot1_ylim)),
+               color = c("#00BFC4","grey50"), alpha = c(.75,.75), size = c(1.25,1.25)) +
+  geom_text(aes(x = c(q_nh_est_did_vec[1], mean(q_nh_est_did_vec[2:36])), y = c(q_nh_hist_did_plot1_ylim,q_nh_hist_did_plot1_ylim), label = c(paste0("hat(tau)[tr]==",signif(q_nh_est_did_vec[1], 2)),paste0("bar(tau)[controls]==",signif(mean(q_nh_est_did_vec[2:36]),2)))),
+            parse = TRUE, vjust = c(-.3,-.5), color = c("#00BFC4","grey40"), size = c(1.5,1.5))
+
+q_nh_est_sc_vec <- c(q_nh_est_sc_pa)
+for (i in 1:35) {
+  q_nh_est_sc_vec_aux <- q_nh_est_sc_list[[i]][1]
+  q_nh_est_sc_vec <- c(q_nh_est_sc_vec,q_nh_est_sc_vec_aux)
+}
+q_nh_est_sc_df <- data.frame(q_nh_est_sc_vec)
+q_nh_hist_sc_plot_aux <- ggplot(data = NULL, aes(x = q_nh_est_sc_vec)) +
+  geom_histogram(data = q_nh_est_sc_df, aes(x = q_nh_est_sc_vec, y = ..count..) ,alpha = .5, color = "#F8766D", fill = "#F8766D", bins = 25) +
+  labs(x= expression("Average Treatment Effect"~(hat(tau)))) +  
+  theme(aspect.ratio=1,
+        panel.spacing.x=unit(1, "lines"),
+        panel.background = element_blank(),
+        panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank(), 
+        panel.grid.major.y = element_line(size=.25, color='grey90'),
+        panel.grid.minor.y = element_blank(),
+        axis.text.x = element_text(angle = 45, hjust=1, size = 8),
+        axis.text.y = element_text(size = 8),
+        axis.title.x = element_text(size=8),
+        axis.title.y = element_blank(),
+        strip.background = element_rect(fill="grey70", size=1),
+        strip.text = element_text(size=8, face="bold", color = "white"),
+        axis.ticks = element_line(color = "grey70"),
+        panel.border = element_rect(color = "grey70", fill = NA, size = 0.5)
+  )
+q_nh_hist_sc_plot1_ylim <- ggplot_build(q_nh_hist_sc_plot_aux)$layout$panel_scales_y[[1]]$range$range[2]
+q_nh_hist_sc_plot <- q_nh_hist_sc_plot_aux +
+  expand_limits(y=q_nh_hist_sc_plot1_ylim+.15) +
+  geom_segment(aes(x = c(q_nh_est_sc_vec[1], mean(q_nh_est_sc_vec[2:36])), xend = c(q_nh_est_sc_vec[1],mean(q_nh_est_sc_vec[2:36])), y = c(0,0), yend = c(q_nh_hist_sc_plot1_ylim,q_nh_hist_sc_plot1_ylim)),
+               color = c("#00BFC4","grey50"), alpha = c(.75,.75), size = c(1.25,1.25)) +
+  geom_text(aes(x = c(q_nh_est_sc_vec[1], mean(q_nh_est_sc_vec[2:36])), y = c(q_nh_hist_sc_plot1_ylim,q_nh_hist_sc_plot1_ylim), label = c(paste0("hat(tau)[tr]==",signif(q_nh_est_sc_vec[1], 2)),paste0("bar(tau)[controls]==",signif(mean(q_nh_est_sc_vec[2:36]),2)))),
+            parse = TRUE, vjust = c(-.3,-.5), color = c("#00BFC4","grey40"), size = c(1.5,1.5))
+
+q_nh_est_sdid_vec <- c(q_nh_est_sdid_pa)
+for (i in 1:35) {
+  q_nh_est_sdid_vec_aux <- q_nh_est_sdid_list[[i]][1]
+  q_nh_est_sdid_vec <- c(q_nh_est_sdid_vec,q_nh_est_sdid_vec_aux)
+}
+q_nh_est_sdid_df <- data.frame(q_nh_est_sdid_vec)
+q_nh_hist_sdid_plot_aux <- ggplot(data = NULL, aes(x = q_nh_est_sdid_vec)) +
+  geom_histogram(data = q_nh_est_sdid_df, aes(x = q_nh_est_sdid_vec, y = ..count..) ,alpha = .5, color = "#F8766D", fill = "#F8766D", bins = 25) +
+  theme(aspect.ratio=1,
+        panel.spacing.x=unit(1, "lines"),
+        panel.background = element_blank(),
+        panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank(), 
+        panel.grid.major.y = element_line(size=.25, color='grey90'),
+        panel.grid.minor.y = element_blank(),
+        axis.text.x = element_text(angle = 45, hjust=1, size = 8),
+        axis.text.y = element_text(size = 8),
+        axis.title.x = element_blank(),
+        axis.title.y = element_blank(),
+        strip.background = element_rect(fill="grey70", size=1),
+        strip.text = element_text(size=8, face="bold", color = "white"),
+        axis.ticks = element_line(color = "grey70"),
+        panel.border = element_rect(color = "grey70", fill = NA, size = 0.5)
+  )
+q_nh_hist_sdid_plot1_ylim <- ggplot_build(q_nh_hist_sdid_plot_aux)$layout$panel_scales_y[[1]]$range$range[2]
+q_nh_hist_sdid_plot <- q_nh_hist_sdid_plot_aux +
+  expand_limits(y=q_nh_hist_sdid_plot1_ylim+.15) +
+  geom_segment(aes(x = c(q_nh_est_sdid_vec[1], mean(q_nh_est_sdid_vec[2:36])), xend = c(q_nh_est_sdid_vec[1],mean(q_nh_est_sdid_vec[2:36])), y = c(0,0), yend = c(q_nh_hist_sdid_plot1_ylim,q_nh_hist_sdid_plot1_ylim)),
+               color = c("#00BFC4","grey50"), alpha = c(.75,.75), size = c(1.25,1.25)) +
+  geom_text(aes(x = c(q_nh_est_sdid_vec[1], mean(q_nh_est_sdid_vec[2:36])), y = c(q_nh_hist_sdid_plot1_ylim,q_nh_hist_sdid_plot1_ylim), label = c(paste0("hat(tau)[tr]==",signif(q_nh_est_sdid_vec[1], 2)),paste0("bar(tau)[controls]==",signif(mean(q_nh_est_sdid_vec[2:36]),2)))),
+            parse = TRUE, vjust = c(-.3,-.5), color = c("#00BFC4","grey40"), size = c(1.5,1.5))
+pdf(file='SynthDID_Figs_and_Tables/q_nh_spag_dist_plots_PA.pdf')
+(q_nh_spag_dist_plots_PA <- q_nh_spag_did_plot + q_nh_spag_sc_plot + q_nh_spag_sdid_plot + q_nh_hist_did_plot + q_nh_hist_sc_plot + q_nh_hist_sdid_plot + plot_layout(ncol = 3))
+dev.off()
+
