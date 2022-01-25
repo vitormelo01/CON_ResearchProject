@@ -31,16 +31,16 @@ View(CON_NursingHome)
 
 ##### Create 3D array of time-varying covariates for synthetic matching - CON_Expenditure #####
 CON_Expenditure$treated_pa_aux <- ifelse(CON_Expenditure$name == "Pennsylvania", 1, 0)
-covariates_pa_exp_df <- subset(CON_Expenditure, alwaysconpa == 1 | name == "Pennsylvania")
+covariates_pa_exp_df <- subset(CON_Expenditure, (alwaysconpa == 1 & id != 11) | name == "Pennsylvania")
 covariates_pa_exp_df <- covariates_pa_exp_df[order(covariates_pa_exp_df$year, covariates_pa_exp_df$treated_pa_aux, covariates_pa_exp_df$name),]
 covariates_pa_exp_df <- as.data.frame(subset(covariates_pa_exp_df, code == 10, select=c(name, year, income_pcp_adj, pop_density, unemp_rate, top1_adj, gini, prop_age_25to45_bsy, prop_age_45to65_bsy, prop_age_over65_bsy, prop_bach_degree_bsy, prop_male_bsy, prop_married_bsy, prop_white_bsy)))
 covariates_pa_exp_df$income_pcp_adj <- covariates_pa_exp_df$income_pcp_adj/100000    # there seems to be a problem with the scalability of covariates - see Github issues page #
 covariates_pa_exp_df$unemp_rate <- covariates_pa_exp_df$unemp_rate/100    # there seems to be a problem with the scalability of covariates - see Github issues page #
 covariates_pa_exp_df$top1_adj <- covariates_pa_exp_df$top1_adj/100    # there seems to be a problem with the scalability of covariates - see Github issues page #
 column.names_exp_pa <- c(1980:2014)
-row.names_exp_pa <- c(covariates_pa_exp_df[1:36,1])
+row.names_exp_pa <- c(covariates_pa_exp_df[1:35,1])
 matrix.names_exp_pa <- c("income_pcp_adj", "pop_density", "unemp_rate", "top1_adj", "gini", "prop_age_25to45_bsy", "prop_age_45to65_bsy", "prop_age_over65_bsy", "prop_bach_degree_bsy", "prop_male_bsy", "prop_married_bsy", "prop_white_bsy")
-covariates_exp_pa_array <- array(as.matrix(covariates_pa_exp_df[,3:14]), dim = c(36,35,12), dimnames = list(row.names_exp_pa, column.names_exp_pa, matrix.names_exp_pa))
+covariates_exp_pa_array <- array(as.matrix(covariates_pa_exp_df[,3:14]), dim = c(35,35,12), dimnames = list(row.names_exp_pa, column.names_exp_pa, matrix.names_exp_pa))
 
 ##### Create 3D array of time-varying covariates for synthetic matching - CON_NursingHome #####
 CON_NursingHome$treated_pa_aux <- ifelse(CON_NursingHome$name == "Pennsylvania", 1, 0)
@@ -205,7 +205,7 @@ dev.off()
 ### Total Expenditure ###
 # Restrict to treated state and control states by expenditure type (code = 10 for nursing home care), and get in panel form for synthdid #
 CON_Expenditure$treated <- as.integer(ifelse(CON_Expenditure$name == "Pennsylvania" & CON_Expenditure$year >= 1996, 1, 0))
-total_exp_pa_df <- as.data.frame(subset(CON_Expenditure, code == 10))
+total_exp_pa_df <- as.data.frame(subset(CON_Expenditure, code == 10 & id != 11))
 total_exp_pa_df <- total_exp_pa_df[order(total_exp_pa_df$year, total_exp_pa_df$treated_pa_aux, total_exp_pa_df$name),]
 total_exp_pa_df <- subset(total_exp_pa_df, alwaysconpa == 1 | name == "Pennsylvania", select=c(name, year, total_exp, treated))
 setup_total_exp_pa <- panel.matrices(total_exp_pa_df, unit = 1, time = 2, outcome = 3, treatment = 4)
@@ -278,7 +278,7 @@ dev.off()
 ### Medicaid Expenditure ###
 # Restrict to treated state and control states by expenditure type (code = 10 for nursing home care), and get in panel form for synthdid #
 CON_Expenditure$treated <- as.integer(ifelse(CON_Expenditure$name == "Pennsylvania" & CON_Expenditure$year >= 1996, 1, 0))
-medicaid_exp_pa_df <- as.data.frame(subset(CON_Expenditure, code == 10))
+medicaid_exp_pa_df <- as.data.frame(subset(CON_Expenditure, code == 10 & id != 11))
 medicaid_exp_pa_df <- medicaid_exp_pa_df[order(medicaid_exp_pa_df$year, medicaid_exp_pa_df$treated_pa_aux, medicaid_exp_pa_df$name),]
 medicaid_exp_pa_df <- subset(medicaid_exp_pa_df, alwaysconpa == 1 | name == "Pennsylvania", select=c(name, year, medicaid_exp, treated))
 setup_medicaid_exp_pa <- panel.matrices(medicaid_exp_pa_df, unit = 1, time = 2, outcome = 3, treatment = 4)
@@ -353,16 +353,16 @@ dev.off()
 
 ##### Create 3D array of time-varying covariates for synthetic matching - CON_Expenditure #####
 CON_Expenditure$treated_in_aux <- ifelse(CON_Expenditure$name == "Indiana", 1, 0)
-covariates_in_exp_df <- subset(CON_Expenditure, alwaysconpa == 1 | name == "Indiana")
+covariates_in_exp_df <- subset(CON_Expenditure, (alwaysconpa == 1 & id != 11) | name == "Indiana")
 covariates_in_exp_df <- covariates_in_exp_df[order(covariates_in_exp_df$year, covariates_in_exp_df$treated_in_aux, covariates_in_exp_df$name),]
 covariates_in_exp_df <- as.data.frame(subset(covariates_in_exp_df, code == 10, select=c(name, year, income_pcp_adj, pop_density, unemp_rate, top1_adj, gini, prop_age_25to45_bsy, prop_age_45to65_bsy, prop_age_over65_bsy, prop_bach_degree_bsy, prop_male_bsy, prop_married_bsy, prop_white_bsy)))
 covariates_in_exp_df$income_pcp_adj <- covariates_in_exp_df$income_pcp_adj/100000    # there seems to be a problem with the scalability of covariates - see Github issues page #
 covariates_in_exp_df$unemp_rate <- covariates_in_exp_df$unemp_rate/100    # there seems to be a problem with the scalability of covariates - see Github issues page #
 covariates_in_exp_df$top1_adj <- covariates_in_exp_df$top1_adj/100    # there seems to be a problem with the scalability of covariates - see Github issues page #
 column.names_exp_in <- c(1980:2014)
-row.names_exp_in <- c(covariates_in_exp_df[1:36,1])
+row.names_exp_in <- c(covariates_in_exp_df[1:35,1])
 matrix.names_exp_in <- c("income_pcp_adj", "pop_density", "unemp_rate", "top1_adj", "gini", "prop_age_25to45_bsy", "prop_age_45to65_bsy", "prop_age_over65_bsy", "prop_bach_degree_bsy", "prop_male_bsy", "prop_married_bsy", "prop_white_bsy")
-covariates_exp_in_array <- array(as.matrix(covariates_in_exp_df[,3:14]), dim = c(36,35,12), dimnames = list(row.names_exp_in, column.names_exp_in, matrix.names_exp_in))
+covariates_exp_in_array <- array(as.matrix(covariates_in_exp_df[,3:14]), dim = c(35,35,12), dimnames = list(row.names_exp_in, column.names_exp_in, matrix.names_exp_in))
 
 ##### Create 3D array of time-varying covariates for synthetic matching - CON_NursingHome #####
 CON_NursingHome$treated_in_aux <- ifelse(CON_NursingHome$name == "Indiana", 1, 0)
@@ -526,7 +526,7 @@ dev.off()
 ### Total Expenditure ###
 # Restrict to treated state and control states by expenditure type (code = 10 for nursing home care), and get in panel form for synthdid #
 CON_Expenditure$treated <- as.integer(ifelse(CON_Expenditure$name == "Indiana" & CON_Expenditure$year >= 1999, 1, 0))
-total_exp_in_df <- as.data.frame(subset(CON_Expenditure, code == 10))
+total_exp_in_df <- as.data.frame(subset(CON_Expenditure, code == 10 & id != 11))
 total_exp_in_df <- total_exp_in_df[order(total_exp_in_df$year, total_exp_in_df$treated_in_aux, total_exp_in_df$name),]
 total_exp_in_df <- subset(total_exp_in_df, alwaysconpa == 1 | name == "Indiana", select=c(name, year, total_exp, treated))
 setup_total_exp_in <- panel.matrices(total_exp_in_df, unit = 1, time = 2, outcome = 3, treatment = 4)
@@ -599,7 +599,7 @@ dev.off()
 ### Medicaid Expenditure ###
 # Restrict to treated state and control states by expenditure type (code = 10 for nursing home care), and get in panel form for synthdid #
 CON_Expenditure$treated <- as.integer(ifelse(CON_Expenditure$name == "Indiana" & CON_Expenditure$year >= 1999, 1, 0))
-medicaid_exp_in_df <- as.data.frame(subset(CON_Expenditure, code == 10))
+medicaid_exp_in_df <- as.data.frame(subset(CON_Expenditure, code == 10 & id != 11))
 medicaid_exp_in_df <- medicaid_exp_in_df[order(medicaid_exp_in_df$year, medicaid_exp_in_df$treated_in_aux, medicaid_exp_in_df$name),]
 medicaid_exp_in_df <- subset(medicaid_exp_in_df, alwaysconpa == 1 | name == "Indiana", select=c(name, year, medicaid_exp, treated))
 setup_medicaid_exp_in <- panel.matrices(medicaid_exp_in_df, unit = 1, time = 2, outcome = 3, treatment = 4)
@@ -675,16 +675,16 @@ dev.off()
 
 ##### Create 3D array of time-varying covariates for synthetic matching - CON_Expenditure #####
 CON_Expenditure$treated_nd_aux <- ifelse(CON_Expenditure$name == "North Dakota", 1, 0)
-covariates_nd_exp_df <- subset(CON_Expenditure, alwaysconpa == 1 | name == "North Dakota")
+covariates_nd_exp_df <- subset(CON_Expenditure, (alwaysconpa == 1 & id != 11) | name == "North Dakota")
 covariates_nd_exp_df <- covariates_nd_exp_df[order(covariates_nd_exp_df$year, covariates_nd_exp_df$treated_nd_aux, covariates_nd_exp_df$name),]
 covariates_nd_exp_df <- as.data.frame(subset(covariates_nd_exp_df, code == 10, select=c(name, year, income_pcp_adj, pop_density, unemp_rate, top1_adj, gini, prop_age_25to45_bsy, prop_age_45to65_bsy, prop_age_over65_bsy, prop_bach_degree_bsy, prop_male_bsy, prop_married_bsy, prop_white_bsy)))
 covariates_nd_exp_df$income_pcp_adj <- covariates_nd_exp_df$income_pcp_adj/100000    # there seems to be a problem with the scalability of covariates - see Github issues page #
 covariates_nd_exp_df$unemp_rate <- covariates_nd_exp_df$unemp_rate/100    # there seems to be a problem with the scalability of covariates - see Github issues page #
 covariates_nd_exp_df$top1_adj <- covariates_nd_exp_df$top1_adj/100    # there seems to be a problem with the scalability of covariates - see Github issues page #
 column.names_exp_nd <- c(1980:2014)
-row.names_exp_nd <- c(covariates_nd_exp_df[1:36,1])
+row.names_exp_nd <- c(covariates_nd_exp_df[1:35,1])
 matrix.names_exp_nd <- c("income_pcp_adj", "pop_density", "unemp_rate", "top1_adj", "gini", "prop_age_25to45_bsy", "prop_age_45to65_bsy", "prop_age_over65_bsy", "prop_bach_degree_bsy", "prop_male_bsy", "prop_married_bsy", "prop_white_bsy")
-covariates_exp_nd_array <- array(as.matrix(covariates_nd_exp_df[,3:14]), dim = c(36,35,12), dimnames = list(row.names_exp_nd, column.names_exp_nd, matrix.names_exp_nd))
+covariates_exp_nd_array <- array(as.matrix(covariates_nd_exp_df[,3:14]), dim = c(35,35,12), dimnames = list(row.names_exp_nd, column.names_exp_nd, matrix.names_exp_nd))
 
 ##### Create 3D array of time-varying covariates for synthetic matching - CON_NursingHome #####
 CON_NursingHome$treated_nd_aux <- ifelse(CON_NursingHome$name == "North Dakota", 1, 0)
@@ -848,7 +848,7 @@ dev.off()
 ### Total Expenditure ###
 # Restrict to treated state and control states by expenditure type (code = 10 for nursing home care), and get in panel form for synthdid #
 CON_Expenditure$treated <- as.integer(ifelse(CON_Expenditure$name == "North Dakota" & CON_Expenditure$year >= 1995, 1, 0))
-total_exp_nd_df <- as.data.frame(subset(CON_Expenditure, code == 10))
+total_exp_nd_df <- as.data.frame(subset(CON_Expenditure, code == 10 & id != 11))
 total_exp_nd_df <- total_exp_nd_df[order(total_exp_nd_df$year, total_exp_nd_df$treated_nd_aux, total_exp_nd_df$name),]
 total_exp_nd_df <- subset(total_exp_nd_df, alwaysconpa == 1 | name == "North Dakota", select=c(name, year, total_exp, treated))
 setup_total_exp_nd <- panel.matrices(total_exp_nd_df, unit = 1, time = 2, outcome = 3, treatment = 4)
@@ -920,7 +920,7 @@ dev.off()
 ### Medicaid Expenditure ###
 # Restrict to treated state and control states by expenditure type (code = 10 for nursing home care), and get in panel form for synthdid #
 CON_Expenditure$treated <- as.integer(ifelse(CON_Expenditure$name == "North Dakota" & CON_Expenditure$year >= 1995, 1, 0))
-medicaid_exp_nd_df <- as.data.frame(subset(CON_Expenditure, code == 10))
+medicaid_exp_nd_df <- as.data.frame(subset(CON_Expenditure, code == 10 & id != 11))
 medicaid_exp_nd_df <- medicaid_exp_nd_df[order(medicaid_exp_nd_df$year, medicaid_exp_nd_df$treated_nd_aux, medicaid_exp_nd_df$name),]
 medicaid_exp_nd_df <- subset(medicaid_exp_nd_df, alwaysconpa == 1 | name == "North Dakota", select=c(name, year, medicaid_exp, treated))
 setup_medicaid_exp_nd <- panel.matrices(medicaid_exp_nd_df, unit = 1, time = 2, outcome = 3, treatment = 4)
@@ -988,8 +988,6 @@ medicaid_expenditure_control_plots_ND <- synthdid_units_plot(medicaid_exp_nd_est
         legend.title = element_text(size=8, face="bold"))
 medicaid_expenditure_plots_ND + medicaid_expenditure_control_plots_ND + plot_layout(ncol=1)
 dev.off()
-
-
 
 
 ############### Spaghetti and Placebo Distribution Plots ###############
