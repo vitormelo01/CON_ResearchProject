@@ -3582,3 +3582,2235 @@ pdf(file='SynthDID_Figs_and_Tables/q_nhb_spag_dist_plots_PA.pdf', paper = "USr",
 (q_nhb_pa_spag_dist_plots_PA <- q_nhb_pa_spag_did_plot + q_nhb_pa_spag_sc_plot + q_nhb_pa_spag_sdid_plot + q_nhb_pa_hist_did_plot + q_nhb_pa_hist_sc_plot + q_nhb_pa_hist_sdid_plot + plot_layout(ncol = 3))
 dev.off()
 
+
+##### Total Expenditure #####
+### PA - Get DID, SC, and SDID estimates, as well as a data set with difference in outcomes for spaghetti graphs ###
+# Restrict data to actual treated state and control states by expenditure type (code = 10 for nursing home care), and get in panel form for synthdid #
+tot_exp_pa_df <- as.data.frame(subset(CON_Expenditure, code == 10))
+tot_exp_pa_df$treated <- as.integer(ifelse(tot_exp_pa_df$name == "Pennsylvania" & tot_exp_pa_df$year >= 1996, 1, 0))
+tot_exp_pa_df <- tot_exp_pa_df[order(tot_exp_pa_df$year, tot_exp_pa_df$treated_pa_aux, tot_exp_pa_df$name),]
+tot_exp_pa_df <- subset(tot_exp_pa_df, alwaysconpa == 1 | name == "Pennsylvania", select=c(name, year, total_exp, treated))
+setup_tot_exp_pa <- panel.matrices(tot_exp_pa_df, unit = 1, time = 2, outcome = 3, treatment = 4)
+# DID #
+tot_exp_est_did_pa <- did_estimate(setup_tot_exp_pa$Y, setup_tot_exp_pa$N0, setup_tot_exp_pa$T0, X = covariates_exp_pa_array)
+tot_exp_est_did_plot_pa <- synthdid_plot(tot_exp_est_did_pa)
+tot_exp_est_did_plot_data_aux_pa <- ggplot_build(tot_exp_est_did_plot_pa)
+tot_exp_est_did_plot_data_long_pa <- data.frame(tot_exp_est_did_plot_data_aux_pa$data[[1]]$x, tot_exp_est_did_plot_data_aux_pa$data[[1]]$y, tot_exp_est_did_plot_data_aux_pa$data[[1]]$group)
+colnames(tot_exp_est_did_plot_data_long_pa) <- c('year', 'outcome', 'treated')
+tot_exp_est_did_plot_data_long_pa$treated <- tot_exp_est_did_plot_data_long_pa$treated - 1
+tot_exp_est_did_plot_data_wide_pa <- reshape(data=tot_exp_est_did_plot_data_long_pa,
+                                          idvar = "year",
+                                          v.names = "outcome",
+                                          timevar = "treated",
+                                          direction = "wide")
+tot_exp_est_did_plot_data_wide_pa$diff <- tot_exp_est_did_plot_data_wide_pa$outcome.1 - tot_exp_est_did_plot_data_wide_pa$outcome.0
+# SC #
+tot_exp_est_sc_pa <- sc_estimate(setup_tot_exp_pa$Y, setup_tot_exp_pa$N0, setup_tot_exp_pa$T0, X = covariates_exp_pa_array)
+tot_exp_est_sc_plot_pa <- synthdid_plot(tot_exp_est_sc_pa)
+tot_exp_est_sc_plot_data_aux_pa <- ggplot_build(tot_exp_est_sc_plot_pa)
+tot_exp_est_sc_plot_data_long_pa <- data.frame(tot_exp_est_sc_plot_data_aux_pa$data[[1]]$x, tot_exp_est_sc_plot_data_aux_pa$data[[1]]$y, tot_exp_est_sc_plot_data_aux_pa$data[[1]]$group)
+colnames(tot_exp_est_sc_plot_data_long_pa) <- c('year', 'outcome', 'treated')
+tot_exp_est_sc_plot_data_long_pa$treated <- tot_exp_est_sc_plot_data_long_pa$treated - 1
+tot_exp_est_sc_plot_data_wide_pa <- reshape(data=tot_exp_est_sc_plot_data_long_pa,
+                                         idvar = "year",
+                                         v.names = "outcome",
+                                         timevar = "treated",
+                                         direction = "wide")
+tot_exp_est_sc_plot_data_wide_pa$diff <- tot_exp_est_sc_plot_data_wide_pa$outcome.1 - tot_exp_est_sc_plot_data_wide_pa$outcome.0
+# SDID #
+tot_exp_est_sdid_pa <- synthdid_estimate(setup_tot_exp_pa$Y, setup_tot_exp_pa$N0, setup_tot_exp_pa$T0, X = covariates_exp_pa_array)
+tot_exp_est_sdid_plot_pa <- synthdid_plot(tot_exp_est_sdid_pa)
+tot_exp_est_sdid_plot_data_aux_pa <- ggplot_build(tot_exp_est_sdid_plot_pa)
+tot_exp_est_sdid_plot_data_long_pa <- data.frame(tot_exp_est_sdid_plot_data_aux_pa$data[[1]]$x, tot_exp_est_sdid_plot_data_aux_pa$data[[1]]$y, tot_exp_est_sdid_plot_data_aux_pa$data[[1]]$group)
+colnames(tot_exp_est_sdid_plot_data_long_pa) <- c('year', 'outcome', 'treated')
+tot_exp_est_sdid_plot_data_long_pa$treated <- tot_exp_est_sdid_plot_data_long_pa$treated - 1
+tot_exp_est_sdid_plot_data_wide_pa <- reshape(data=tot_exp_est_sdid_plot_data_long_pa,
+                                           idvar = "year",
+                                           v.names = "outcome",
+                                           timevar = "treated",
+                                           direction = "wide")
+tot_exp_est_sdid_plot_data_wide_pa$diff <- tot_exp_est_sdid_plot_data_wide_pa$outcome.1 - tot_exp_est_sdid_plot_data_wide_pa$outcome.0
+### Control States - Get DID, SC, and SDID estimates, as well as a data set with difference in outcomes for spaghetti graphs ###
+# Restrict data to "placebo treated" state and other control states by expenditure type (code = 10 for nursing home care), and get in panel form for synthdid #
+for(i in unique(controls.df$id)) {
+  assign(paste0("tot_exp_pa_df", i), subset(CON_Expenditure, alwaysconpa == 1 & code == 10))
+}
+tot_exp_pa_df1$treated_aux <- ifelse(tot_exp_pa_df1$id == 1, 1, 0)
+tot_exp_pa_df2$treated_aux <- ifelse(tot_exp_pa_df2$id == 2, 1, 0)
+tot_exp_pa_df5$treated_aux <- ifelse(tot_exp_pa_df5$id == 5, 1, 0)
+tot_exp_pa_df10$treated_aux <- ifelse(tot_exp_pa_df10$id == 10, 1, 0)
+tot_exp_pa_df11$treated_aux <- ifelse(tot_exp_pa_df11$id == 11, 1, 0)
+tot_exp_pa_df12$treated_aux <- ifelse(tot_exp_pa_df12$id == 12, 1, 0)
+tot_exp_pa_df13$treated_aux <- ifelse(tot_exp_pa_df13$id == 13, 1, 0)
+tot_exp_pa_df15$treated_aux <- ifelse(tot_exp_pa_df15$id == 15, 1, 0)
+tot_exp_pa_df17$treated_aux <- ifelse(tot_exp_pa_df17$id == 17, 1, 0)
+tot_exp_pa_df19$treated_aux <- ifelse(tot_exp_pa_df19$id == 19, 1, 0)
+tot_exp_pa_df21$treated_aux <- ifelse(tot_exp_pa_df21$id == 21, 1, 0)
+tot_exp_pa_df23$treated_aux <- ifelse(tot_exp_pa_df23$id == 23, 1, 0)
+tot_exp_pa_df24$treated_aux <- ifelse(tot_exp_pa_df24$id == 24, 1, 0)
+tot_exp_pa_df25$treated_aux <- ifelse(tot_exp_pa_df25$id == 25, 1, 0)
+tot_exp_pa_df26$treated_aux <- ifelse(tot_exp_pa_df26$id == 26, 1, 0)
+tot_exp_pa_df28$treated_aux <- ifelse(tot_exp_pa_df28$id == 28, 1, 0)
+tot_exp_pa_df29$treated_aux <- ifelse(tot_exp_pa_df29$id == 29, 1, 0)
+tot_exp_pa_df30$treated_aux <- ifelse(tot_exp_pa_df30$id == 30, 1, 0)
+tot_exp_pa_df31$treated_aux <- ifelse(tot_exp_pa_df31$id == 31, 1, 0)
+tot_exp_pa_df32$treated_aux <- ifelse(tot_exp_pa_df32$id == 32, 1, 0)
+tot_exp_pa_df33$treated_aux <- ifelse(tot_exp_pa_df33$id == 33, 1, 0)
+tot_exp_pa_df34$treated_aux <- ifelse(tot_exp_pa_df34$id == 34, 1, 0)
+tot_exp_pa_df36$treated_aux <- ifelse(tot_exp_pa_df36$id == 36, 1, 0)
+tot_exp_pa_df37$treated_aux <- ifelse(tot_exp_pa_df37$id == 37, 1, 0)
+tot_exp_pa_df39$treated_aux <- ifelse(tot_exp_pa_df39$id == 39, 1, 0)
+tot_exp_pa_df40$treated_aux <- ifelse(tot_exp_pa_df40$id == 40, 1, 0)
+tot_exp_pa_df41$treated_aux <- ifelse(tot_exp_pa_df41$id == 41, 1, 0)
+tot_exp_pa_df44$treated_aux <- ifelse(tot_exp_pa_df44$id == 44, 1, 0)
+tot_exp_pa_df45$treated_aux <- ifelse(tot_exp_pa_df45$id == 45, 1, 0)
+tot_exp_pa_df47$treated_aux <- ifelse(tot_exp_pa_df47$id == 47, 1, 0)
+tot_exp_pa_df50$treated_aux <- ifelse(tot_exp_pa_df50$id == 50, 1, 0)
+tot_exp_pa_df51$treated_aux <- ifelse(tot_exp_pa_df51$id == 51, 1, 0)
+tot_exp_pa_df53$treated_aux <- ifelse(tot_exp_pa_df53$id == 53, 1, 0)
+tot_exp_pa_df54$treated_aux <- ifelse(tot_exp_pa_df54$id == 54, 1, 0)
+tot_exp_pa_df55$treated_aux <- ifelse(tot_exp_pa_df55$id == 55, 1, 0)
+tot_exp_pa_df1$treated <- as.integer(ifelse(tot_exp_pa_df1$id == 1 & tot_exp_pa_df1$year >= 1996, 1, 0))
+tot_exp_pa_df2$treated <- as.integer(ifelse(tot_exp_pa_df2$id == 2 & tot_exp_pa_df2$year >= 1996, 1, 0))
+tot_exp_pa_df5$treated <- as.integer(ifelse(tot_exp_pa_df5$id == 5 & tot_exp_pa_df5$year >= 1996, 1, 0))
+tot_exp_pa_df10$treated <- as.integer(ifelse(tot_exp_pa_df10$id == 10 & tot_exp_pa_df10$year >= 1996, 1, 0))
+tot_exp_pa_df11$treated <- as.integer(ifelse(tot_exp_pa_df11$id == 11 & tot_exp_pa_df11$year >= 1996, 1, 0))
+tot_exp_pa_df12$treated <- as.integer(ifelse(tot_exp_pa_df12$id == 12 & tot_exp_pa_df12$year >= 1996, 1, 0))
+tot_exp_pa_df13$treated <- as.integer(ifelse(tot_exp_pa_df13$id == 13 & tot_exp_pa_df13$year >= 1996, 1, 0))
+tot_exp_pa_df15$treated <- as.integer(ifelse(tot_exp_pa_df15$id == 15 & tot_exp_pa_df15$year >= 1996, 1, 0))
+tot_exp_pa_df17$treated <- as.integer(ifelse(tot_exp_pa_df17$id == 17 & tot_exp_pa_df17$year >= 1996, 1, 0))
+tot_exp_pa_df19$treated <- as.integer(ifelse(tot_exp_pa_df19$id == 19 & tot_exp_pa_df19$year >= 1996, 1, 0))
+tot_exp_pa_df21$treated <- as.integer(ifelse(tot_exp_pa_df21$id == 21 & tot_exp_pa_df21$year >= 1996, 1, 0))
+tot_exp_pa_df23$treated <- as.integer(ifelse(tot_exp_pa_df23$id == 23 & tot_exp_pa_df23$year >= 1996, 1, 0))
+tot_exp_pa_df24$treated <- as.integer(ifelse(tot_exp_pa_df24$id == 24 & tot_exp_pa_df24$year >= 1996, 1, 0))
+tot_exp_pa_df25$treated <- as.integer(ifelse(tot_exp_pa_df25$id == 25 & tot_exp_pa_df25$year >= 1996, 1, 0))
+tot_exp_pa_df26$treated <- as.integer(ifelse(tot_exp_pa_df26$id == 26 & tot_exp_pa_df26$year >= 1996, 1, 0))
+tot_exp_pa_df28$treated <- as.integer(ifelse(tot_exp_pa_df28$id == 28 & tot_exp_pa_df28$year >= 1996, 1, 0))
+tot_exp_pa_df29$treated <- as.integer(ifelse(tot_exp_pa_df29$id == 29 & tot_exp_pa_df29$year >= 1996, 1, 0))
+tot_exp_pa_df30$treated <- as.integer(ifelse(tot_exp_pa_df30$id == 30 & tot_exp_pa_df30$year >= 1996, 1, 0))
+tot_exp_pa_df31$treated <- as.integer(ifelse(tot_exp_pa_df31$id == 31 & tot_exp_pa_df31$year >= 1996, 1, 0))
+tot_exp_pa_df32$treated <- as.integer(ifelse(tot_exp_pa_df32$id == 32 & tot_exp_pa_df32$year >= 1996, 1, 0))
+tot_exp_pa_df33$treated <- as.integer(ifelse(tot_exp_pa_df33$id == 33 & tot_exp_pa_df33$year >= 1996, 1, 0))
+tot_exp_pa_df34$treated <- as.integer(ifelse(tot_exp_pa_df34$id == 34 & tot_exp_pa_df34$year >= 1996, 1, 0))
+tot_exp_pa_df36$treated <- as.integer(ifelse(tot_exp_pa_df36$id == 36 & tot_exp_pa_df36$year >= 1996, 1, 0))
+tot_exp_pa_df37$treated <- as.integer(ifelse(tot_exp_pa_df37$id == 37 & tot_exp_pa_df37$year >= 1996, 1, 0))
+tot_exp_pa_df39$treated <- as.integer(ifelse(tot_exp_pa_df39$id == 39 & tot_exp_pa_df39$year >= 1996, 1, 0))
+tot_exp_pa_df40$treated <- as.integer(ifelse(tot_exp_pa_df40$id == 40 & tot_exp_pa_df40$year >= 1996, 1, 0))
+tot_exp_pa_df41$treated <- as.integer(ifelse(tot_exp_pa_df41$id == 41 & tot_exp_pa_df41$year >= 1996, 1, 0))
+tot_exp_pa_df44$treated <- as.integer(ifelse(tot_exp_pa_df44$id == 44 & tot_exp_pa_df44$year >= 1996, 1, 0))
+tot_exp_pa_df45$treated <- as.integer(ifelse(tot_exp_pa_df45$id == 45 & tot_exp_pa_df45$year >= 1996, 1, 0))
+tot_exp_pa_df47$treated <- as.integer(ifelse(tot_exp_pa_df47$id == 47 & tot_exp_pa_df47$year >= 1996, 1, 0))
+tot_exp_pa_df50$treated <- as.integer(ifelse(tot_exp_pa_df50$id == 50 & tot_exp_pa_df50$year >= 1996, 1, 0))
+tot_exp_pa_df51$treated <- as.integer(ifelse(tot_exp_pa_df51$id == 51 & tot_exp_pa_df51$year >= 1996, 1, 0))
+tot_exp_pa_df53$treated <- as.integer(ifelse(tot_exp_pa_df53$id == 53 & tot_exp_pa_df53$year >= 1996, 1, 0))
+tot_exp_pa_df54$treated <- as.integer(ifelse(tot_exp_pa_df54$id == 54 & tot_exp_pa_df54$year >= 1996, 1, 0))
+tot_exp_pa_df55$treated <- as.integer(ifelse(tot_exp_pa_df55$id == 55 & tot_exp_pa_df55$year >= 1996, 1, 0))
+tot_exp_pa_df_list <- list(tot_exp_pa_df1,tot_exp_pa_df2,tot_exp_pa_df5,
+                        tot_exp_pa_df10,tot_exp_pa_df11,tot_exp_pa_df12,
+                        tot_exp_pa_df13,tot_exp_pa_df15,tot_exp_pa_df17,
+                        tot_exp_pa_df19,tot_exp_pa_df21,tot_exp_pa_df23,
+                        tot_exp_pa_df24,tot_exp_pa_df25,tot_exp_pa_df26,
+                        tot_exp_pa_df28,tot_exp_pa_df29,tot_exp_pa_df30,
+                        tot_exp_pa_df31,tot_exp_pa_df32,tot_exp_pa_df33,
+                        tot_exp_pa_df34,tot_exp_pa_df36,tot_exp_pa_df37,
+                        tot_exp_pa_df39,tot_exp_pa_df40,tot_exp_pa_df41,
+                        tot_exp_pa_df44,tot_exp_pa_df45,tot_exp_pa_df47,
+                        tot_exp_pa_df50,tot_exp_pa_df51,tot_exp_pa_df53,
+                        tot_exp_pa_df54,tot_exp_pa_df55)
+rm(tot_exp_pa_df1,tot_exp_pa_df2,tot_exp_pa_df5,
+   tot_exp_pa_df10,tot_exp_pa_df11,tot_exp_pa_df12,
+   tot_exp_pa_df13,tot_exp_pa_df15,tot_exp_pa_df17,
+   tot_exp_pa_df19,tot_exp_pa_df21,tot_exp_pa_df23,
+   tot_exp_pa_df24,tot_exp_pa_df25,tot_exp_pa_df26,
+   tot_exp_pa_df28,tot_exp_pa_df29,tot_exp_pa_df30,
+   tot_exp_pa_df31,tot_exp_pa_df32,tot_exp_pa_df33,
+   tot_exp_pa_df34,tot_exp_pa_df36,tot_exp_pa_df37,
+   tot_exp_pa_df39,tot_exp_pa_df40,tot_exp_pa_df41,
+   tot_exp_pa_df44,tot_exp_pa_df45,tot_exp_pa_df47,
+   tot_exp_pa_df50,tot_exp_pa_df51,tot_exp_pa_df53,
+   tot_exp_pa_df54,tot_exp_pa_df55)
+tot_exp_pa_df_list <- lapply(tot_exp_pa_df_list, function(x) {
+  x <- x[order(x$year, x$treated_aux, x$name),]
+  return(x)
+}
+)
+tot_exp_pa_df_list <- lapply(tot_exp_pa_df_list, function(x) {
+  data.frame(subset(x, alwaysconpa == 1, select=c(name, year, total_exp, treated)))
+}
+)
+setup_tot_exp_pa1 <- panel.matrices(tot_exp_pa_df_list[[1]], unit = 1, time = 2, outcome = 3, treatment = 4)
+setup_tot_exp_pa2 <- panel.matrices(tot_exp_pa_df_list[[2]], unit = 1, time = 2, outcome = 3, treatment = 4)
+setup_tot_exp_pa5 <- panel.matrices(tot_exp_pa_df_list[[3]], unit = 1, time = 2, outcome = 3, treatment = 4)
+setup_tot_exp_pa10 <- panel.matrices(tot_exp_pa_df_list[[4]], unit = 1, time = 2, outcome = 3, treatment = 4)
+setup_tot_exp_pa11 <- panel.matrices(tot_exp_pa_df_list[[5]], unit = 1, time = 2, outcome = 3, treatment = 4)
+setup_tot_exp_pa12 <- panel.matrices(tot_exp_pa_df_list[[6]], unit = 1, time = 2, outcome = 3, treatment = 4)
+setup_tot_exp_pa13 <- panel.matrices(tot_exp_pa_df_list[[7]], unit = 1, time = 2, outcome = 3, treatment = 4)
+setup_tot_exp_pa15 <- panel.matrices(tot_exp_pa_df_list[[8]], unit = 1, time = 2, outcome = 3, treatment = 4)
+setup_tot_exp_pa17 <- panel.matrices(tot_exp_pa_df_list[[9]], unit = 1, time = 2, outcome = 3, treatment = 4)
+setup_tot_exp_pa19 <- panel.matrices(tot_exp_pa_df_list[[10]], unit = 1, time = 2, outcome = 3, treatment = 4)
+setup_tot_exp_pa21 <- panel.matrices(tot_exp_pa_df_list[[11]], unit = 1, time = 2, outcome = 3, treatment = 4)
+setup_tot_exp_pa23 <- panel.matrices(tot_exp_pa_df_list[[12]], unit = 1, time = 2, outcome = 3, treatment = 4)
+setup_tot_exp_pa24 <- panel.matrices(tot_exp_pa_df_list[[13]], unit = 1, time = 2, outcome = 3, treatment = 4)
+setup_tot_exp_pa25 <- panel.matrices(tot_exp_pa_df_list[[14]], unit = 1, time = 2, outcome = 3, treatment = 4)
+setup_tot_exp_pa26 <- panel.matrices(tot_exp_pa_df_list[[15]], unit = 1, time = 2, outcome = 3, treatment = 4)
+setup_tot_exp_pa28 <- panel.matrices(tot_exp_pa_df_list[[16]], unit = 1, time = 2, outcome = 3, treatment = 4)
+setup_tot_exp_pa29 <- panel.matrices(tot_exp_pa_df_list[[17]], unit = 1, time = 2, outcome = 3, treatment = 4)
+setup_tot_exp_pa30 <- panel.matrices(tot_exp_pa_df_list[[18]], unit = 1, time = 2, outcome = 3, treatment = 4)
+setup_tot_exp_pa31 <- panel.matrices(tot_exp_pa_df_list[[19]], unit = 1, time = 2, outcome = 3, treatment = 4)
+setup_tot_exp_pa32 <- panel.matrices(tot_exp_pa_df_list[[20]], unit = 1, time = 2, outcome = 3, treatment = 4)
+setup_tot_exp_pa33 <- panel.matrices(tot_exp_pa_df_list[[21]], unit = 1, time = 2, outcome = 3, treatment = 4)
+setup_tot_exp_pa34 <- panel.matrices(tot_exp_pa_df_list[[22]], unit = 1, time = 2, outcome = 3, treatment = 4)
+setup_tot_exp_pa36 <- panel.matrices(tot_exp_pa_df_list[[23]], unit = 1, time = 2, outcome = 3, treatment = 4)
+setup_tot_exp_pa37 <- panel.matrices(tot_exp_pa_df_list[[24]], unit = 1, time = 2, outcome = 3, treatment = 4)
+setup_tot_exp_pa39 <- panel.matrices(tot_exp_pa_df_list[[25]], unit = 1, time = 2, outcome = 3, treatment = 4)
+setup_tot_exp_pa40 <- panel.matrices(tot_exp_pa_df_list[[26]], unit = 1, time = 2, outcome = 3, treatment = 4)
+setup_tot_exp_pa41 <- panel.matrices(tot_exp_pa_df_list[[27]], unit = 1, time = 2, outcome = 3, treatment = 4)
+setup_tot_exp_pa44 <- panel.matrices(tot_exp_pa_df_list[[28]], unit = 1, time = 2, outcome = 3, treatment = 4)
+setup_tot_exp_pa45 <- panel.matrices(tot_exp_pa_df_list[[29]], unit = 1, time = 2, outcome = 3, treatment = 4)
+setup_tot_exp_pa47 <- panel.matrices(tot_exp_pa_df_list[[30]], unit = 1, time = 2, outcome = 3, treatment = 4)
+setup_tot_exp_pa50 <- panel.matrices(tot_exp_pa_df_list[[31]], unit = 1, time = 2, outcome = 3, treatment = 4)
+setup_tot_exp_pa51 <- panel.matrices(tot_exp_pa_df_list[[32]], unit = 1, time = 2, outcome = 3, treatment = 4)
+setup_tot_exp_pa53 <- panel.matrices(tot_exp_pa_df_list[[33]], unit = 1, time = 2, outcome = 3, treatment = 4)
+setup_tot_exp_pa54 <- panel.matrices(tot_exp_pa_df_list[[34]], unit = 1, time = 2, outcome = 3, treatment = 4)
+setup_tot_exp_pa55 <- panel.matrices(tot_exp_pa_df_list[[35]], unit = 1, time = 2, outcome = 3, treatment = 4)
+setup_tot_exp_pa_list <- list(setup_tot_exp_pa1,setup_tot_exp_pa2,setup_tot_exp_pa5,
+                           setup_tot_exp_pa10,setup_tot_exp_pa11,setup_tot_exp_pa12,
+                           setup_tot_exp_pa13,setup_tot_exp_pa15,setup_tot_exp_pa17,
+                           setup_tot_exp_pa19,setup_tot_exp_pa21,setup_tot_exp_pa23,
+                           setup_tot_exp_pa24,setup_tot_exp_pa25,setup_tot_exp_pa26,
+                           setup_tot_exp_pa28,setup_tot_exp_pa29,setup_tot_exp_pa30,
+                           setup_tot_exp_pa31,setup_tot_exp_pa32,setup_tot_exp_pa33,
+                           setup_tot_exp_pa34,setup_tot_exp_pa36,setup_tot_exp_pa37,
+                           setup_tot_exp_pa39,setup_tot_exp_pa40,setup_tot_exp_pa41,
+                           setup_tot_exp_pa44,setup_tot_exp_pa45,setup_tot_exp_pa47,
+                           setup_tot_exp_pa50,setup_tot_exp_pa51,setup_tot_exp_pa53,
+                           setup_tot_exp_pa54,setup_tot_exp_pa55)
+rm(setup_tot_exp_pa1,setup_tot_exp_pa2,setup_tot_exp_pa5,
+   setup_tot_exp_pa10,setup_tot_exp_pa11,setup_tot_exp_pa12,
+   setup_tot_exp_pa13,setup_tot_exp_pa15,setup_tot_exp_pa17,
+   setup_tot_exp_pa19,setup_tot_exp_pa21,setup_tot_exp_pa23,
+   setup_tot_exp_pa24,setup_tot_exp_pa25,setup_tot_exp_pa26,
+   setup_tot_exp_pa28,setup_tot_exp_pa29,setup_tot_exp_pa30,
+   setup_tot_exp_pa31,setup_tot_exp_pa32,setup_tot_exp_pa33,
+   setup_tot_exp_pa34,setup_tot_exp_pa36,setup_tot_exp_pa37,
+   setup_tot_exp_pa39,setup_tot_exp_pa40,setup_tot_exp_pa41,
+   setup_tot_exp_pa44,setup_tot_exp_pa45,setup_tot_exp_pa47,
+   setup_tot_exp_pa50,setup_tot_exp_pa51,setup_tot_exp_pa53,
+   setup_tot_exp_pa54,setup_tot_exp_pa55)
+# DID #
+tot_exp_pa_est_did1 <- did_estimate(setup_tot_exp_pa_list[[1]]$Y, setup_tot_exp_pa_list[[1]]$N0, setup_tot_exp_pa_list[[1]]$T0, X = covariates_exp_array_1)
+tot_exp_pa_est_did2 <- did_estimate(setup_tot_exp_pa_list[[2]]$Y, setup_tot_exp_pa_list[[2]]$N0, setup_tot_exp_pa_list[[2]]$T0, X = covariates_exp_array_2)
+tot_exp_pa_est_did5 <- did_estimate(setup_tot_exp_pa_list[[3]]$Y, setup_tot_exp_pa_list[[3]]$N0, setup_tot_exp_pa_list[[3]]$T0, X = covariates_exp_array_5)
+tot_exp_pa_est_did10 <- did_estimate(setup_tot_exp_pa_list[[4]]$Y, setup_tot_exp_pa_list[[4]]$N0, setup_tot_exp_pa_list[[4]]$T0, X = covariates_exp_array_10)
+tot_exp_pa_est_did11 <- did_estimate(setup_tot_exp_pa_list[[5]]$Y, setup_tot_exp_pa_list[[5]]$N0, setup_tot_exp_pa_list[[5]]$T0, X = covariates_exp_array_11)
+tot_exp_pa_est_did12 <- did_estimate(setup_tot_exp_pa_list[[6]]$Y, setup_tot_exp_pa_list[[6]]$N0, setup_tot_exp_pa_list[[6]]$T0, X = covariates_exp_array_12)
+tot_exp_pa_est_did13 <- did_estimate(setup_tot_exp_pa_list[[7]]$Y, setup_tot_exp_pa_list[[7]]$N0, setup_tot_exp_pa_list[[7]]$T0, X = covariates_exp_array_13)
+tot_exp_pa_est_did15 <- did_estimate(setup_tot_exp_pa_list[[8]]$Y, setup_tot_exp_pa_list[[8]]$N0, setup_tot_exp_pa_list[[8]]$T0, X = covariates_exp_array_15)
+tot_exp_pa_est_did17 <- did_estimate(setup_tot_exp_pa_list[[9]]$Y, setup_tot_exp_pa_list[[9]]$N0, setup_tot_exp_pa_list[[9]]$T0, X = covariates_exp_array_17)
+tot_exp_pa_est_did19 <- did_estimate(setup_tot_exp_pa_list[[10]]$Y, setup_tot_exp_pa_list[[10]]$N0, setup_tot_exp_pa_list[[10]]$T0, X = covariates_exp_array_19)
+tot_exp_pa_est_did21 <- did_estimate(setup_tot_exp_pa_list[[11]]$Y, setup_tot_exp_pa_list[[11]]$N0, setup_tot_exp_pa_list[[11]]$T0, X = covariates_exp_array_21)
+tot_exp_pa_est_did23 <- did_estimate(setup_tot_exp_pa_list[[12]]$Y, setup_tot_exp_pa_list[[12]]$N0, setup_tot_exp_pa_list[[12]]$T0, X = covariates_exp_array_23)
+tot_exp_pa_est_did24 <- did_estimate(setup_tot_exp_pa_list[[13]]$Y, setup_tot_exp_pa_list[[13]]$N0, setup_tot_exp_pa_list[[13]]$T0, X = covariates_exp_array_24)
+tot_exp_pa_est_did25 <- did_estimate(setup_tot_exp_pa_list[[14]]$Y, setup_tot_exp_pa_list[[14]]$N0, setup_tot_exp_pa_list[[14]]$T0, X = covariates_exp_array_25)
+tot_exp_pa_est_did26 <- did_estimate(setup_tot_exp_pa_list[[15]]$Y, setup_tot_exp_pa_list[[15]]$N0, setup_tot_exp_pa_list[[15]]$T0, X = covariates_exp_array_26)
+tot_exp_pa_est_did28 <- did_estimate(setup_tot_exp_pa_list[[16]]$Y, setup_tot_exp_pa_list[[16]]$N0, setup_tot_exp_pa_list[[16]]$T0, X = covariates_exp_array_28)
+tot_exp_pa_est_did29 <- did_estimate(setup_tot_exp_pa_list[[17]]$Y, setup_tot_exp_pa_list[[17]]$N0, setup_tot_exp_pa_list[[17]]$T0, X = covariates_exp_array_29)
+tot_exp_pa_est_did30 <- did_estimate(setup_tot_exp_pa_list[[18]]$Y, setup_tot_exp_pa_list[[18]]$N0, setup_tot_exp_pa_list[[18]]$T0, X = covariates_exp_array_30)
+tot_exp_pa_est_did31 <- did_estimate(setup_tot_exp_pa_list[[19]]$Y, setup_tot_exp_pa_list[[19]]$N0, setup_tot_exp_pa_list[[19]]$T0, X = covariates_exp_array_31)
+tot_exp_pa_est_did32 <- did_estimate(setup_tot_exp_pa_list[[20]]$Y, setup_tot_exp_pa_list[[20]]$N0, setup_tot_exp_pa_list[[20]]$T0, X = covariates_exp_array_32)
+tot_exp_pa_est_did33 <- did_estimate(setup_tot_exp_pa_list[[21]]$Y, setup_tot_exp_pa_list[[21]]$N0, setup_tot_exp_pa_list[[21]]$T0, X = covariates_exp_array_33)
+tot_exp_pa_est_did34 <- did_estimate(setup_tot_exp_pa_list[[22]]$Y, setup_tot_exp_pa_list[[22]]$N0, setup_tot_exp_pa_list[[22]]$T0, X = covariates_exp_array_34)
+tot_exp_pa_est_did36 <- did_estimate(setup_tot_exp_pa_list[[23]]$Y, setup_tot_exp_pa_list[[23]]$N0, setup_tot_exp_pa_list[[23]]$T0, X = covariates_exp_array_36)
+tot_exp_pa_est_did37 <- did_estimate(setup_tot_exp_pa_list[[24]]$Y, setup_tot_exp_pa_list[[24]]$N0, setup_tot_exp_pa_list[[24]]$T0, X = covariates_exp_array_37)
+tot_exp_pa_est_did39 <- did_estimate(setup_tot_exp_pa_list[[25]]$Y, setup_tot_exp_pa_list[[25]]$N0, setup_tot_exp_pa_list[[25]]$T0, X = covariates_exp_array_39)
+tot_exp_pa_est_did40 <- did_estimate(setup_tot_exp_pa_list[[26]]$Y, setup_tot_exp_pa_list[[26]]$N0, setup_tot_exp_pa_list[[26]]$T0, X = covariates_exp_array_40)
+tot_exp_pa_est_did41 <- did_estimate(setup_tot_exp_pa_list[[27]]$Y, setup_tot_exp_pa_list[[27]]$N0, setup_tot_exp_pa_list[[27]]$T0, X = covariates_exp_array_41)
+tot_exp_pa_est_did44 <- did_estimate(setup_tot_exp_pa_list[[28]]$Y, setup_tot_exp_pa_list[[28]]$N0, setup_tot_exp_pa_list[[28]]$T0, X = covariates_exp_array_44)
+tot_exp_pa_est_did45 <- did_estimate(setup_tot_exp_pa_list[[29]]$Y, setup_tot_exp_pa_list[[29]]$N0, setup_tot_exp_pa_list[[29]]$T0, X = covariates_exp_array_45)
+tot_exp_pa_est_did47 <- did_estimate(setup_tot_exp_pa_list[[30]]$Y, setup_tot_exp_pa_list[[30]]$N0, setup_tot_exp_pa_list[[30]]$T0, X = covariates_exp_array_47)
+tot_exp_pa_est_did50 <- did_estimate(setup_tot_exp_pa_list[[31]]$Y, setup_tot_exp_pa_list[[31]]$N0, setup_tot_exp_pa_list[[31]]$T0, X = covariates_exp_array_50)
+tot_exp_pa_est_did51 <- did_estimate(setup_tot_exp_pa_list[[32]]$Y, setup_tot_exp_pa_list[[32]]$N0, setup_tot_exp_pa_list[[32]]$T0, X = covariates_exp_array_51)
+tot_exp_pa_est_did53 <- did_estimate(setup_tot_exp_pa_list[[33]]$Y, setup_tot_exp_pa_list[[33]]$N0, setup_tot_exp_pa_list[[33]]$T0, X = covariates_exp_array_53)
+tot_exp_pa_est_did54 <- did_estimate(setup_tot_exp_pa_list[[34]]$Y, setup_tot_exp_pa_list[[34]]$N0, setup_tot_exp_pa_list[[34]]$T0, X = covariates_exp_array_54)
+tot_exp_pa_est_did55 <- did_estimate(setup_tot_exp_pa_list[[35]]$Y, setup_tot_exp_pa_list[[35]]$N0, setup_tot_exp_pa_list[[35]]$T0, X = covariates_exp_array_55)
+tot_exp_pa_est_did_list <- list(tot_exp_pa_est_did1,tot_exp_pa_est_did2,tot_exp_pa_est_did5,
+                             tot_exp_pa_est_did10,tot_exp_pa_est_did11,tot_exp_pa_est_did12,
+                             tot_exp_pa_est_did13,tot_exp_pa_est_did15,tot_exp_pa_est_did17,
+                             tot_exp_pa_est_did19,tot_exp_pa_est_did21,tot_exp_pa_est_did23,
+                             tot_exp_pa_est_did24,tot_exp_pa_est_did25,tot_exp_pa_est_did26,
+                             tot_exp_pa_est_did28,tot_exp_pa_est_did29,tot_exp_pa_est_did30,
+                             tot_exp_pa_est_did31,tot_exp_pa_est_did32,tot_exp_pa_est_did33,
+                             tot_exp_pa_est_did34,tot_exp_pa_est_did36,tot_exp_pa_est_did37,
+                             tot_exp_pa_est_did39,tot_exp_pa_est_did40,tot_exp_pa_est_did41,
+                             tot_exp_pa_est_did44,tot_exp_pa_est_did45,tot_exp_pa_est_did47,
+                             tot_exp_pa_est_did50,tot_exp_pa_est_did51,tot_exp_pa_est_did53,
+                             tot_exp_pa_est_did54,tot_exp_pa_est_did55)
+rm(tot_exp_pa_est_did1,tot_exp_pa_est_did2,tot_exp_pa_est_did5,
+   tot_exp_pa_est_did10,tot_exp_pa_est_did11,tot_exp_pa_est_did12,
+   tot_exp_pa_est_did13,tot_exp_pa_est_did15,tot_exp_pa_est_did17,
+   tot_exp_pa_est_did19,tot_exp_pa_est_did21,tot_exp_pa_est_did23,
+   tot_exp_pa_est_did24,tot_exp_pa_est_did25,tot_exp_pa_est_did26,
+   tot_exp_pa_est_did28,tot_exp_pa_est_did29,tot_exp_pa_est_did30,
+   tot_exp_pa_est_did31,tot_exp_pa_est_did32,tot_exp_pa_est_did33,
+   tot_exp_pa_est_did34,tot_exp_pa_est_did36,tot_exp_pa_est_did37,
+   tot_exp_pa_est_did39,tot_exp_pa_est_did40,tot_exp_pa_est_did41,
+   tot_exp_pa_est_did44,tot_exp_pa_est_did45,tot_exp_pa_est_did47,
+   tot_exp_pa_est_did50,tot_exp_pa_est_did51,tot_exp_pa_est_did53,
+   tot_exp_pa_est_did54,tot_exp_pa_est_did55)
+for(i in 1:35) {
+  assign(paste0("tot_exp_pa_est_did_plot", i), synthdid_plot(tot_exp_pa_est_did_list[i]))
+}
+tot_exp_pa_est_did_plot_data_aux1 <- ggplot_build(tot_exp_pa_est_did_plot1)
+tot_exp_pa_est_did_plot_data_aux2 <- ggplot_build(tot_exp_pa_est_did_plot2)
+tot_exp_pa_est_did_plot_data_aux3 <- ggplot_build(tot_exp_pa_est_did_plot3)
+tot_exp_pa_est_did_plot_data_aux4 <- ggplot_build(tot_exp_pa_est_did_plot4)
+tot_exp_pa_est_did_plot_data_aux5 <- ggplot_build(tot_exp_pa_est_did_plot5)
+tot_exp_pa_est_did_plot_data_aux6 <- ggplot_build(tot_exp_pa_est_did_plot6)
+tot_exp_pa_est_did_plot_data_aux7 <- ggplot_build(tot_exp_pa_est_did_plot7)
+tot_exp_pa_est_did_plot_data_aux8 <- ggplot_build(tot_exp_pa_est_did_plot8)
+tot_exp_pa_est_did_plot_data_aux9 <- ggplot_build(tot_exp_pa_est_did_plot9)
+tot_exp_pa_est_did_plot_data_aux10 <- ggplot_build(tot_exp_pa_est_did_plot10)
+tot_exp_pa_est_did_plot_data_aux11 <- ggplot_build(tot_exp_pa_est_did_plot11)
+tot_exp_pa_est_did_plot_data_aux12 <- ggplot_build(tot_exp_pa_est_did_plot12)
+tot_exp_pa_est_did_plot_data_aux13 <- ggplot_build(tot_exp_pa_est_did_plot13)
+tot_exp_pa_est_did_plot_data_aux14 <- ggplot_build(tot_exp_pa_est_did_plot14)
+tot_exp_pa_est_did_plot_data_aux15 <- ggplot_build(tot_exp_pa_est_did_plot15)
+tot_exp_pa_est_did_plot_data_aux16 <- ggplot_build(tot_exp_pa_est_did_plot16)
+tot_exp_pa_est_did_plot_data_aux17 <- ggplot_build(tot_exp_pa_est_did_plot17)
+tot_exp_pa_est_did_plot_data_aux18 <- ggplot_build(tot_exp_pa_est_did_plot18)
+tot_exp_pa_est_did_plot_data_aux19 <- ggplot_build(tot_exp_pa_est_did_plot19)
+tot_exp_pa_est_did_plot_data_aux20 <- ggplot_build(tot_exp_pa_est_did_plot20)
+tot_exp_pa_est_did_plot_data_aux21 <- ggplot_build(tot_exp_pa_est_did_plot21)
+tot_exp_pa_est_did_plot_data_aux22 <- ggplot_build(tot_exp_pa_est_did_plot22)
+tot_exp_pa_est_did_plot_data_aux23 <- ggplot_build(tot_exp_pa_est_did_plot23)
+tot_exp_pa_est_did_plot_data_aux24 <- ggplot_build(tot_exp_pa_est_did_plot24)
+tot_exp_pa_est_did_plot_data_aux25 <- ggplot_build(tot_exp_pa_est_did_plot25)
+tot_exp_pa_est_did_plot_data_aux26 <- ggplot_build(tot_exp_pa_est_did_plot26)
+tot_exp_pa_est_did_plot_data_aux27 <- ggplot_build(tot_exp_pa_est_did_plot27)
+tot_exp_pa_est_did_plot_data_aux28 <- ggplot_build(tot_exp_pa_est_did_plot28)
+tot_exp_pa_est_did_plot_data_aux29 <- ggplot_build(tot_exp_pa_est_did_plot29)
+tot_exp_pa_est_did_plot_data_aux30 <- ggplot_build(tot_exp_pa_est_did_plot30)
+tot_exp_pa_est_did_plot_data_aux31 <- ggplot_build(tot_exp_pa_est_did_plot31)
+tot_exp_pa_est_did_plot_data_aux32 <- ggplot_build(tot_exp_pa_est_did_plot32)
+tot_exp_pa_est_did_plot_data_aux33 <- ggplot_build(tot_exp_pa_est_did_plot33)
+tot_exp_pa_est_did_plot_data_aux34 <- ggplot_build(tot_exp_pa_est_did_plot34)
+tot_exp_pa_est_did_plot_data_aux35 <- ggplot_build(tot_exp_pa_est_did_plot35)
+tot_exp_pa_est_did_plot_data_aux_list <- list(tot_exp_pa_est_did_plot_data_aux1,tot_exp_pa_est_did_plot_data_aux2,tot_exp_pa_est_did_plot_data_aux3,
+                                           tot_exp_pa_est_did_plot_data_aux4,tot_exp_pa_est_did_plot_data_aux5,tot_exp_pa_est_did_plot_data_aux6,
+                                           tot_exp_pa_est_did_plot_data_aux7,tot_exp_pa_est_did_plot_data_aux8,tot_exp_pa_est_did_plot_data_aux9,
+                                           tot_exp_pa_est_did_plot_data_aux10,tot_exp_pa_est_did_plot_data_aux11,tot_exp_pa_est_did_plot_data_aux12,
+                                           tot_exp_pa_est_did_plot_data_aux13,tot_exp_pa_est_did_plot_data_aux14,tot_exp_pa_est_did_plot_data_aux15,
+                                           tot_exp_pa_est_did_plot_data_aux16,tot_exp_pa_est_did_plot_data_aux17,tot_exp_pa_est_did_plot_data_aux18,
+                                           tot_exp_pa_est_did_plot_data_aux19,tot_exp_pa_est_did_plot_data_aux20,tot_exp_pa_est_did_plot_data_aux21,
+                                           tot_exp_pa_est_did_plot_data_aux22,tot_exp_pa_est_did_plot_data_aux23,tot_exp_pa_est_did_plot_data_aux24,
+                                           tot_exp_pa_est_did_plot_data_aux25,tot_exp_pa_est_did_plot_data_aux26,tot_exp_pa_est_did_plot_data_aux27,
+                                           tot_exp_pa_est_did_plot_data_aux28,tot_exp_pa_est_did_plot_data_aux29,tot_exp_pa_est_did_plot_data_aux30,
+                                           tot_exp_pa_est_did_plot_data_aux31,tot_exp_pa_est_did_plot_data_aux32,tot_exp_pa_est_did_plot_data_aux33,
+                                           tot_exp_pa_est_did_plot_data_aux34,tot_exp_pa_est_did_plot_data_aux35)
+rm(tot_exp_pa_est_did_plot_data_aux1,tot_exp_pa_est_did_plot_data_aux2,tot_exp_pa_est_did_plot_data_aux3,
+   tot_exp_pa_est_did_plot_data_aux4,tot_exp_pa_est_did_plot_data_aux5,tot_exp_pa_est_did_plot_data_aux6,
+   tot_exp_pa_est_did_plot_data_aux7,tot_exp_pa_est_did_plot_data_aux8,tot_exp_pa_est_did_plot_data_aux9,
+   tot_exp_pa_est_did_plot_data_aux10,tot_exp_pa_est_did_plot_data_aux11,tot_exp_pa_est_did_plot_data_aux12,
+   tot_exp_pa_est_did_plot_data_aux13,tot_exp_pa_est_did_plot_data_aux14,tot_exp_pa_est_did_plot_data_aux15,
+   tot_exp_pa_est_did_plot_data_aux16,tot_exp_pa_est_did_plot_data_aux17,tot_exp_pa_est_did_plot_data_aux18,
+   tot_exp_pa_est_did_plot_data_aux19,tot_exp_pa_est_did_plot_data_aux20,tot_exp_pa_est_did_plot_data_aux21,
+   tot_exp_pa_est_did_plot_data_aux22,tot_exp_pa_est_did_plot_data_aux23,tot_exp_pa_est_did_plot_data_aux24,
+   tot_exp_pa_est_did_plot_data_aux25,tot_exp_pa_est_did_plot_data_aux26,tot_exp_pa_est_did_plot_data_aux27,
+   tot_exp_pa_est_did_plot_data_aux28,tot_exp_pa_est_did_plot_data_aux29,tot_exp_pa_est_did_plot_data_aux30,
+   tot_exp_pa_est_did_plot_data_aux31,tot_exp_pa_est_did_plot_data_aux32,tot_exp_pa_est_did_plot_data_aux33,
+   tot_exp_pa_est_did_plot_data_aux34,tot_exp_pa_est_did_plot_data_aux35)
+rm(tot_exp_pa_est_did_plot1,tot_exp_pa_est_did_plot2,tot_exp_pa_est_did_plot3,
+   tot_exp_pa_est_did_plot4,tot_exp_pa_est_did_plot5,tot_exp_pa_est_did_plot6,
+   tot_exp_pa_est_did_plot7,tot_exp_pa_est_did_plot8,tot_exp_pa_est_did_plot9,
+   tot_exp_pa_est_did_plot10,tot_exp_pa_est_did_plot11,tot_exp_pa_est_did_plot12,
+   tot_exp_pa_est_did_plot13,tot_exp_pa_est_did_plot14,tot_exp_pa_est_did_plot15,
+   tot_exp_pa_est_did_plot16,tot_exp_pa_est_did_plot17,tot_exp_pa_est_did_plot18,
+   tot_exp_pa_est_did_plot19,tot_exp_pa_est_did_plot20,tot_exp_pa_est_did_plot21,
+   tot_exp_pa_est_did_plot22,tot_exp_pa_est_did_plot23,tot_exp_pa_est_did_plot24,
+   tot_exp_pa_est_did_plot25,tot_exp_pa_est_did_plot26,tot_exp_pa_est_did_plot27,
+   tot_exp_pa_est_did_plot28,tot_exp_pa_est_did_plot29,tot_exp_pa_est_did_plot30,
+   tot_exp_pa_est_did_plot31,tot_exp_pa_est_did_plot32,tot_exp_pa_est_did_plot33,
+   tot_exp_pa_est_did_plot34,tot_exp_pa_est_did_plot35)
+for(i in 1:35) {
+  assign(paste0("tot_exp_pa_est_did_plot_data_long", i), data.frame(tot_exp_pa_est_did_plot_data_aux_list[[i]]$data[[1]]$x, tot_exp_pa_est_did_plot_data_aux_list[[i]]$data[[1]]$y, tot_exp_pa_est_did_plot_data_aux_list[[i]]$data[[1]]$group))
+}
+tot_exp_pa_est_did_plot_data_long_list <- list(tot_exp_pa_est_did_plot_data_long1,tot_exp_pa_est_did_plot_data_long2,tot_exp_pa_est_did_plot_data_long3,
+                                            tot_exp_pa_est_did_plot_data_long4,tot_exp_pa_est_did_plot_data_long5,tot_exp_pa_est_did_plot_data_long6,
+                                            tot_exp_pa_est_did_plot_data_long7,tot_exp_pa_est_did_plot_data_long8,tot_exp_pa_est_did_plot_data_long9,
+                                            tot_exp_pa_est_did_plot_data_long10,tot_exp_pa_est_did_plot_data_long11,tot_exp_pa_est_did_plot_data_long12,
+                                            tot_exp_pa_est_did_plot_data_long13,tot_exp_pa_est_did_plot_data_long14,tot_exp_pa_est_did_plot_data_long15,
+                                            tot_exp_pa_est_did_plot_data_long16,tot_exp_pa_est_did_plot_data_long17,tot_exp_pa_est_did_plot_data_long18,
+                                            tot_exp_pa_est_did_plot_data_long19,tot_exp_pa_est_did_plot_data_long20,tot_exp_pa_est_did_plot_data_long21,
+                                            tot_exp_pa_est_did_plot_data_long22,tot_exp_pa_est_did_plot_data_long23,tot_exp_pa_est_did_plot_data_long24,
+                                            tot_exp_pa_est_did_plot_data_long25,tot_exp_pa_est_did_plot_data_long26,tot_exp_pa_est_did_plot_data_long27,
+                                            tot_exp_pa_est_did_plot_data_long28,tot_exp_pa_est_did_plot_data_long29,tot_exp_pa_est_did_plot_data_long30,
+                                            tot_exp_pa_est_did_plot_data_long31,tot_exp_pa_est_did_plot_data_long32,tot_exp_pa_est_did_plot_data_long33,
+                                            tot_exp_pa_est_did_plot_data_long34,tot_exp_pa_est_did_plot_data_long35)
+rm(tot_exp_pa_est_did_plot_data_long1,tot_exp_pa_est_did_plot_data_long2,tot_exp_pa_est_did_plot_data_long3,
+   tot_exp_pa_est_did_plot_data_long4,tot_exp_pa_est_did_plot_data_long5,tot_exp_pa_est_did_plot_data_long6,
+   tot_exp_pa_est_did_plot_data_long7,tot_exp_pa_est_did_plot_data_long8,tot_exp_pa_est_did_plot_data_long9,
+   tot_exp_pa_est_did_plot_data_long10,tot_exp_pa_est_did_plot_data_long11,tot_exp_pa_est_did_plot_data_long12,
+   tot_exp_pa_est_did_plot_data_long13,tot_exp_pa_est_did_plot_data_long14,tot_exp_pa_est_did_plot_data_long15,
+   tot_exp_pa_est_did_plot_data_long16,tot_exp_pa_est_did_plot_data_long17,tot_exp_pa_est_did_plot_data_long18,
+   tot_exp_pa_est_did_plot_data_long19,tot_exp_pa_est_did_plot_data_long20,tot_exp_pa_est_did_plot_data_long21,
+   tot_exp_pa_est_did_plot_data_long22,tot_exp_pa_est_did_plot_data_long23,tot_exp_pa_est_did_plot_data_long24,
+   tot_exp_pa_est_did_plot_data_long25,tot_exp_pa_est_did_plot_data_long26,tot_exp_pa_est_did_plot_data_long27,
+   tot_exp_pa_est_did_plot_data_long28,tot_exp_pa_est_did_plot_data_long29,tot_exp_pa_est_did_plot_data_long30,
+   tot_exp_pa_est_did_plot_data_long31,tot_exp_pa_est_did_plot_data_long32,tot_exp_pa_est_did_plot_data_long33,
+   tot_exp_pa_est_did_plot_data_long34,tot_exp_pa_est_did_plot_data_long35)
+tot_exp_pa_est_did_plot_data_long_list <- lapply(tot_exp_pa_est_did_plot_data_long_list, function(x) {
+  colnames(x) <- c('year', 'outcome', 'treated')  
+  x$treated <- x$treated - 1
+  return(x)
+}
+)
+for(i in 1:35) {
+  assign(paste0("tot_exp_pa_est_did_plot_data_wide", i), reshape(data=tot_exp_pa_est_did_plot_data_long_list[[i]],
+                                                              idvar = "year",
+                                                              v.names = "outcome",
+                                                              timevar = "treated",
+                                                              direction = "wide"))
+}
+tot_exp_pa_est_did_plot_data_wide_list <- list(tot_exp_pa_est_did_plot_data_wide1,tot_exp_pa_est_did_plot_data_wide2,tot_exp_pa_est_did_plot_data_wide3,
+                                            tot_exp_pa_est_did_plot_data_wide4,tot_exp_pa_est_did_plot_data_wide5,tot_exp_pa_est_did_plot_data_wide6,
+                                            tot_exp_pa_est_did_plot_data_wide7,tot_exp_pa_est_did_plot_data_wide8,tot_exp_pa_est_did_plot_data_wide9,
+                                            tot_exp_pa_est_did_plot_data_wide10,tot_exp_pa_est_did_plot_data_wide11,tot_exp_pa_est_did_plot_data_wide12,
+                                            tot_exp_pa_est_did_plot_data_wide13,tot_exp_pa_est_did_plot_data_wide14,tot_exp_pa_est_did_plot_data_wide15,
+                                            tot_exp_pa_est_did_plot_data_wide16,tot_exp_pa_est_did_plot_data_wide17,tot_exp_pa_est_did_plot_data_wide18,
+                                            tot_exp_pa_est_did_plot_data_wide19,tot_exp_pa_est_did_plot_data_wide20,tot_exp_pa_est_did_plot_data_wide21,
+                                            tot_exp_pa_est_did_plot_data_wide22,tot_exp_pa_est_did_plot_data_wide23,tot_exp_pa_est_did_plot_data_wide24,
+                                            tot_exp_pa_est_did_plot_data_wide25,tot_exp_pa_est_did_plot_data_wide26,tot_exp_pa_est_did_plot_data_wide27,
+                                            tot_exp_pa_est_did_plot_data_wide28,tot_exp_pa_est_did_plot_data_wide29,tot_exp_pa_est_did_plot_data_wide30,
+                                            tot_exp_pa_est_did_plot_data_wide31,tot_exp_pa_est_did_plot_data_wide32,tot_exp_pa_est_did_plot_data_wide33,
+                                            tot_exp_pa_est_did_plot_data_wide34,tot_exp_pa_est_did_plot_data_wide35)
+rm(tot_exp_pa_est_did_plot_data_wide1,tot_exp_pa_est_did_plot_data_wide2,tot_exp_pa_est_did_plot_data_wide3,
+   tot_exp_pa_est_did_plot_data_wide4,tot_exp_pa_est_did_plot_data_wide5,tot_exp_pa_est_did_plot_data_wide6,
+   tot_exp_pa_est_did_plot_data_wide7,tot_exp_pa_est_did_plot_data_wide8,tot_exp_pa_est_did_plot_data_wide9,
+   tot_exp_pa_est_did_plot_data_wide10,tot_exp_pa_est_did_plot_data_wide11,tot_exp_pa_est_did_plot_data_wide12,
+   tot_exp_pa_est_did_plot_data_wide13,tot_exp_pa_est_did_plot_data_wide14,tot_exp_pa_est_did_plot_data_wide15,
+   tot_exp_pa_est_did_plot_data_wide16,tot_exp_pa_est_did_plot_data_wide17,tot_exp_pa_est_did_plot_data_wide18,
+   tot_exp_pa_est_did_plot_data_wide19,tot_exp_pa_est_did_plot_data_wide20,tot_exp_pa_est_did_plot_data_wide21,
+   tot_exp_pa_est_did_plot_data_wide22,tot_exp_pa_est_did_plot_data_wide23,tot_exp_pa_est_did_plot_data_wide24,
+   tot_exp_pa_est_did_plot_data_wide25,tot_exp_pa_est_did_plot_data_wide26,tot_exp_pa_est_did_plot_data_wide27,
+   tot_exp_pa_est_did_plot_data_wide28,tot_exp_pa_est_did_plot_data_wide29,tot_exp_pa_est_did_plot_data_wide30,
+   tot_exp_pa_est_did_plot_data_wide31,tot_exp_pa_est_did_plot_data_wide32,tot_exp_pa_est_did_plot_data_wide33,
+   tot_exp_pa_est_did_plot_data_wide34,tot_exp_pa_est_did_plot_data_wide35)
+tot_exp_pa_est_did_plot_data_wide_list <- lapply(tot_exp_pa_est_did_plot_data_wide_list, function(x) {
+  x$diff <- x$outcome.1 - x$outcome.0
+  return(x)
+}
+)
+# SC #
+tot_exp_pa_est_sc1 <- sc_estimate(setup_tot_exp_pa_list[[1]]$Y, setup_tot_exp_pa_list[[1]]$N0, setup_tot_exp_pa_list[[1]]$T0, X = covariates_exp_array_1)
+tot_exp_pa_est_sc2 <- sc_estimate(setup_tot_exp_pa_list[[2]]$Y, setup_tot_exp_pa_list[[2]]$N0, setup_tot_exp_pa_list[[2]]$T0, X = covariates_exp_array_2)
+tot_exp_pa_est_sc5 <- sc_estimate(setup_tot_exp_pa_list[[3]]$Y, setup_tot_exp_pa_list[[3]]$N0, setup_tot_exp_pa_list[[3]]$T0, X = covariates_exp_array_5)
+tot_exp_pa_est_sc10 <- sc_estimate(setup_tot_exp_pa_list[[4]]$Y, setup_tot_exp_pa_list[[4]]$N0, setup_tot_exp_pa_list[[4]]$T0, X = covariates_exp_array_10)
+tot_exp_pa_est_sc11 <- sc_estimate(setup_tot_exp_pa_list[[5]]$Y, setup_tot_exp_pa_list[[5]]$N0, setup_tot_exp_pa_list[[5]]$T0, X = covariates_exp_array_11)
+tot_exp_pa_est_sc12 <- sc_estimate(setup_tot_exp_pa_list[[6]]$Y, setup_tot_exp_pa_list[[6]]$N0, setup_tot_exp_pa_list[[6]]$T0, X = covariates_exp_array_12)
+tot_exp_pa_est_sc13 <- sc_estimate(setup_tot_exp_pa_list[[7]]$Y, setup_tot_exp_pa_list[[7]]$N0, setup_tot_exp_pa_list[[7]]$T0, X = covariates_exp_array_13)
+tot_exp_pa_est_sc15 <- sc_estimate(setup_tot_exp_pa_list[[8]]$Y, setup_tot_exp_pa_list[[8]]$N0, setup_tot_exp_pa_list[[8]]$T0, X = covariates_exp_array_15)
+tot_exp_pa_est_sc17 <- sc_estimate(setup_tot_exp_pa_list[[9]]$Y, setup_tot_exp_pa_list[[9]]$N0, setup_tot_exp_pa_list[[9]]$T0, X = covariates_exp_array_17)
+tot_exp_pa_est_sc19 <- sc_estimate(setup_tot_exp_pa_list[[10]]$Y, setup_tot_exp_pa_list[[10]]$N0, setup_tot_exp_pa_list[[10]]$T0, X = covariates_exp_array_19)
+tot_exp_pa_est_sc21 <- sc_estimate(setup_tot_exp_pa_list[[11]]$Y, setup_tot_exp_pa_list[[11]]$N0, setup_tot_exp_pa_list[[11]]$T0, X = covariates_exp_array_21)
+tot_exp_pa_est_sc23 <- sc_estimate(setup_tot_exp_pa_list[[12]]$Y, setup_tot_exp_pa_list[[12]]$N0, setup_tot_exp_pa_list[[12]]$T0, X = covariates_exp_array_23)
+tot_exp_pa_est_sc24 <- sc_estimate(setup_tot_exp_pa_list[[13]]$Y, setup_tot_exp_pa_list[[13]]$N0, setup_tot_exp_pa_list[[13]]$T0, X = covariates_exp_array_24)
+tot_exp_pa_est_sc25 <- sc_estimate(setup_tot_exp_pa_list[[14]]$Y, setup_tot_exp_pa_list[[14]]$N0, setup_tot_exp_pa_list[[14]]$T0, X = covariates_exp_array_25)
+tot_exp_pa_est_sc26 <- sc_estimate(setup_tot_exp_pa_list[[15]]$Y, setup_tot_exp_pa_list[[15]]$N0, setup_tot_exp_pa_list[[15]]$T0, X = covariates_exp_array_26)
+tot_exp_pa_est_sc28 <- sc_estimate(setup_tot_exp_pa_list[[16]]$Y, setup_tot_exp_pa_list[[16]]$N0, setup_tot_exp_pa_list[[16]]$T0, X = covariates_exp_array_28)
+tot_exp_pa_est_sc29 <- sc_estimate(setup_tot_exp_pa_list[[17]]$Y, setup_tot_exp_pa_list[[17]]$N0, setup_tot_exp_pa_list[[17]]$T0, X = covariates_exp_array_29)
+tot_exp_pa_est_sc30 <- sc_estimate(setup_tot_exp_pa_list[[18]]$Y, setup_tot_exp_pa_list[[18]]$N0, setup_tot_exp_pa_list[[18]]$T0, X = covariates_exp_array_30)
+tot_exp_pa_est_sc31 <- sc_estimate(setup_tot_exp_pa_list[[19]]$Y, setup_tot_exp_pa_list[[19]]$N0, setup_tot_exp_pa_list[[19]]$T0, X = covariates_exp_array_31)
+tot_exp_pa_est_sc32 <- sc_estimate(setup_tot_exp_pa_list[[20]]$Y, setup_tot_exp_pa_list[[20]]$N0, setup_tot_exp_pa_list[[20]]$T0, X = covariates_exp_array_32)
+tot_exp_pa_est_sc33 <- sc_estimate(setup_tot_exp_pa_list[[21]]$Y, setup_tot_exp_pa_list[[21]]$N0, setup_tot_exp_pa_list[[21]]$T0, X = covariates_exp_array_33)
+tot_exp_pa_est_sc34 <- sc_estimate(setup_tot_exp_pa_list[[22]]$Y, setup_tot_exp_pa_list[[22]]$N0, setup_tot_exp_pa_list[[22]]$T0, X = covariates_exp_array_34)
+tot_exp_pa_est_sc36 <- sc_estimate(setup_tot_exp_pa_list[[23]]$Y, setup_tot_exp_pa_list[[23]]$N0, setup_tot_exp_pa_list[[23]]$T0, X = covariates_exp_array_36)
+tot_exp_pa_est_sc37 <- sc_estimate(setup_tot_exp_pa_list[[24]]$Y, setup_tot_exp_pa_list[[24]]$N0, setup_tot_exp_pa_list[[24]]$T0, X = covariates_exp_array_37)
+tot_exp_pa_est_sc39 <- sc_estimate(setup_tot_exp_pa_list[[25]]$Y, setup_tot_exp_pa_list[[25]]$N0, setup_tot_exp_pa_list[[25]]$T0, X = covariates_exp_array_39)
+tot_exp_pa_est_sc40 <- sc_estimate(setup_tot_exp_pa_list[[26]]$Y, setup_tot_exp_pa_list[[26]]$N0, setup_tot_exp_pa_list[[26]]$T0, X = covariates_exp_array_40)
+tot_exp_pa_est_sc41 <- sc_estimate(setup_tot_exp_pa_list[[27]]$Y, setup_tot_exp_pa_list[[27]]$N0, setup_tot_exp_pa_list[[27]]$T0, X = covariates_exp_array_41)
+tot_exp_pa_est_sc44 <- sc_estimate(setup_tot_exp_pa_list[[28]]$Y, setup_tot_exp_pa_list[[28]]$N0, setup_tot_exp_pa_list[[28]]$T0, X = covariates_exp_array_44)
+tot_exp_pa_est_sc45 <- sc_estimate(setup_tot_exp_pa_list[[29]]$Y, setup_tot_exp_pa_list[[29]]$N0, setup_tot_exp_pa_list[[29]]$T0, X = covariates_exp_array_45)
+tot_exp_pa_est_sc47 <- sc_estimate(setup_tot_exp_pa_list[[30]]$Y, setup_tot_exp_pa_list[[30]]$N0, setup_tot_exp_pa_list[[30]]$T0, X = covariates_exp_array_47)
+tot_exp_pa_est_sc50 <- sc_estimate(setup_tot_exp_pa_list[[31]]$Y, setup_tot_exp_pa_list[[31]]$N0, setup_tot_exp_pa_list[[31]]$T0, X = covariates_exp_array_50)
+tot_exp_pa_est_sc51 <- sc_estimate(setup_tot_exp_pa_list[[32]]$Y, setup_tot_exp_pa_list[[32]]$N0, setup_tot_exp_pa_list[[32]]$T0, X = covariates_exp_array_51)
+tot_exp_pa_est_sc53 <- sc_estimate(setup_tot_exp_pa_list[[33]]$Y, setup_tot_exp_pa_list[[33]]$N0, setup_tot_exp_pa_list[[33]]$T0, X = covariates_exp_array_53)
+tot_exp_pa_est_sc54 <- sc_estimate(setup_tot_exp_pa_list[[34]]$Y, setup_tot_exp_pa_list[[34]]$N0, setup_tot_exp_pa_list[[34]]$T0, X = covariates_exp_array_54)
+tot_exp_pa_est_sc55 <- sc_estimate(setup_tot_exp_pa_list[[35]]$Y, setup_tot_exp_pa_list[[35]]$N0, setup_tot_exp_pa_list[[35]]$T0, X = covariates_exp_array_55)
+tot_exp_pa_est_sc_list <- list(tot_exp_pa_est_sc1,tot_exp_pa_est_sc2,tot_exp_pa_est_sc5,
+                            tot_exp_pa_est_sc10,tot_exp_pa_est_sc11,tot_exp_pa_est_sc12,
+                            tot_exp_pa_est_sc13,tot_exp_pa_est_sc15,tot_exp_pa_est_sc17,
+                            tot_exp_pa_est_sc19,tot_exp_pa_est_sc21,tot_exp_pa_est_sc23,
+                            tot_exp_pa_est_sc24,tot_exp_pa_est_sc25,tot_exp_pa_est_sc26,
+                            tot_exp_pa_est_sc28,tot_exp_pa_est_sc29,tot_exp_pa_est_sc30,
+                            tot_exp_pa_est_sc31,tot_exp_pa_est_sc32,tot_exp_pa_est_sc33,
+                            tot_exp_pa_est_sc34,tot_exp_pa_est_sc36,tot_exp_pa_est_sc37,
+                            tot_exp_pa_est_sc39,tot_exp_pa_est_sc40,tot_exp_pa_est_sc41,
+                            tot_exp_pa_est_sc44,tot_exp_pa_est_sc45,tot_exp_pa_est_sc47,
+                            tot_exp_pa_est_sc50,tot_exp_pa_est_sc51,tot_exp_pa_est_sc53,
+                            tot_exp_pa_est_sc54,tot_exp_pa_est_sc55)
+rm(tot_exp_pa_est_sc1,tot_exp_pa_est_sc2,tot_exp_pa_est_sc5,
+   tot_exp_pa_est_sc10,tot_exp_pa_est_sc11,tot_exp_pa_est_sc12,
+   tot_exp_pa_est_sc13,tot_exp_pa_est_sc15,tot_exp_pa_est_sc17,
+   tot_exp_pa_est_sc19,tot_exp_pa_est_sc21,tot_exp_pa_est_sc23,
+   tot_exp_pa_est_sc24,tot_exp_pa_est_sc25,tot_exp_pa_est_sc26,
+   tot_exp_pa_est_sc28,tot_exp_pa_est_sc29,tot_exp_pa_est_sc30,
+   tot_exp_pa_est_sc31,tot_exp_pa_est_sc32,tot_exp_pa_est_sc33,
+   tot_exp_pa_est_sc34,tot_exp_pa_est_sc36,tot_exp_pa_est_sc37,
+   tot_exp_pa_est_sc39,tot_exp_pa_est_sc40,tot_exp_pa_est_sc41,
+   tot_exp_pa_est_sc44,tot_exp_pa_est_sc45,tot_exp_pa_est_sc47,
+   tot_exp_pa_est_sc50,tot_exp_pa_est_sc51,tot_exp_pa_est_sc53,
+   tot_exp_pa_est_sc54,tot_exp_pa_est_sc55)
+for(i in 1:35) {
+  assign(paste0("tot_exp_pa_est_sc_plot", i), synthdid_plot(tot_exp_pa_est_sc_list[i]))
+}
+tot_exp_pa_est_sc_plot_data_aux1 <- ggplot_build(tot_exp_pa_est_sc_plot1)
+tot_exp_pa_est_sc_plot_data_aux2 <- ggplot_build(tot_exp_pa_est_sc_plot2)
+tot_exp_pa_est_sc_plot_data_aux3 <- ggplot_build(tot_exp_pa_est_sc_plot3)
+tot_exp_pa_est_sc_plot_data_aux4 <- ggplot_build(tot_exp_pa_est_sc_plot4)
+tot_exp_pa_est_sc_plot_data_aux5 <- ggplot_build(tot_exp_pa_est_sc_plot5)
+tot_exp_pa_est_sc_plot_data_aux6 <- ggplot_build(tot_exp_pa_est_sc_plot6)
+tot_exp_pa_est_sc_plot_data_aux7 <- ggplot_build(tot_exp_pa_est_sc_plot7)
+tot_exp_pa_est_sc_plot_data_aux8 <- ggplot_build(tot_exp_pa_est_sc_plot8)
+tot_exp_pa_est_sc_plot_data_aux9 <- ggplot_build(tot_exp_pa_est_sc_plot9)
+tot_exp_pa_est_sc_plot_data_aux10 <- ggplot_build(tot_exp_pa_est_sc_plot10)
+tot_exp_pa_est_sc_plot_data_aux11 <- ggplot_build(tot_exp_pa_est_sc_plot11)
+tot_exp_pa_est_sc_plot_data_aux12 <- ggplot_build(tot_exp_pa_est_sc_plot12)
+tot_exp_pa_est_sc_plot_data_aux13 <- ggplot_build(tot_exp_pa_est_sc_plot13)
+tot_exp_pa_est_sc_plot_data_aux14 <- ggplot_build(tot_exp_pa_est_sc_plot14)
+tot_exp_pa_est_sc_plot_data_aux15 <- ggplot_build(tot_exp_pa_est_sc_plot15)
+tot_exp_pa_est_sc_plot_data_aux16 <- ggplot_build(tot_exp_pa_est_sc_plot16)
+tot_exp_pa_est_sc_plot_data_aux17 <- ggplot_build(tot_exp_pa_est_sc_plot17)
+tot_exp_pa_est_sc_plot_data_aux18 <- ggplot_build(tot_exp_pa_est_sc_plot18)
+tot_exp_pa_est_sc_plot_data_aux19 <- ggplot_build(tot_exp_pa_est_sc_plot19)
+tot_exp_pa_est_sc_plot_data_aux20 <- ggplot_build(tot_exp_pa_est_sc_plot20)
+tot_exp_pa_est_sc_plot_data_aux21 <- ggplot_build(tot_exp_pa_est_sc_plot21)
+tot_exp_pa_est_sc_plot_data_aux22 <- ggplot_build(tot_exp_pa_est_sc_plot22)
+tot_exp_pa_est_sc_plot_data_aux23 <- ggplot_build(tot_exp_pa_est_sc_plot23)
+tot_exp_pa_est_sc_plot_data_aux24 <- ggplot_build(tot_exp_pa_est_sc_plot24)
+tot_exp_pa_est_sc_plot_data_aux25 <- ggplot_build(tot_exp_pa_est_sc_plot25)
+tot_exp_pa_est_sc_plot_data_aux26 <- ggplot_build(tot_exp_pa_est_sc_plot26)
+tot_exp_pa_est_sc_plot_data_aux27 <- ggplot_build(tot_exp_pa_est_sc_plot27)
+tot_exp_pa_est_sc_plot_data_aux28 <- ggplot_build(tot_exp_pa_est_sc_plot28)
+tot_exp_pa_est_sc_plot_data_aux29 <- ggplot_build(tot_exp_pa_est_sc_plot29)
+tot_exp_pa_est_sc_plot_data_aux30 <- ggplot_build(tot_exp_pa_est_sc_plot30)
+tot_exp_pa_est_sc_plot_data_aux31 <- ggplot_build(tot_exp_pa_est_sc_plot31)
+tot_exp_pa_est_sc_plot_data_aux32 <- ggplot_build(tot_exp_pa_est_sc_plot32)
+tot_exp_pa_est_sc_plot_data_aux33 <- ggplot_build(tot_exp_pa_est_sc_plot33)
+tot_exp_pa_est_sc_plot_data_aux34 <- ggplot_build(tot_exp_pa_est_sc_plot34)
+tot_exp_pa_est_sc_plot_data_aux35 <- ggplot_build(tot_exp_pa_est_sc_plot35)
+tot_exp_pa_est_sc_plot_data_aux_list <- list(tot_exp_pa_est_sc_plot_data_aux1,tot_exp_pa_est_sc_plot_data_aux2,tot_exp_pa_est_sc_plot_data_aux3,
+                                          tot_exp_pa_est_sc_plot_data_aux4,tot_exp_pa_est_sc_plot_data_aux5,tot_exp_pa_est_sc_plot_data_aux6,
+                                          tot_exp_pa_est_sc_plot_data_aux7,tot_exp_pa_est_sc_plot_data_aux8,tot_exp_pa_est_sc_plot_data_aux9,
+                                          tot_exp_pa_est_sc_plot_data_aux10,tot_exp_pa_est_sc_plot_data_aux11,tot_exp_pa_est_sc_plot_data_aux12,
+                                          tot_exp_pa_est_sc_plot_data_aux13,tot_exp_pa_est_sc_plot_data_aux14,tot_exp_pa_est_sc_plot_data_aux15,
+                                          tot_exp_pa_est_sc_plot_data_aux16,tot_exp_pa_est_sc_plot_data_aux17,tot_exp_pa_est_sc_plot_data_aux18,
+                                          tot_exp_pa_est_sc_plot_data_aux19,tot_exp_pa_est_sc_plot_data_aux20,tot_exp_pa_est_sc_plot_data_aux21,
+                                          tot_exp_pa_est_sc_plot_data_aux22,tot_exp_pa_est_sc_plot_data_aux23,tot_exp_pa_est_sc_plot_data_aux24,
+                                          tot_exp_pa_est_sc_plot_data_aux25,tot_exp_pa_est_sc_plot_data_aux26,tot_exp_pa_est_sc_plot_data_aux27,
+                                          tot_exp_pa_est_sc_plot_data_aux28,tot_exp_pa_est_sc_plot_data_aux29,tot_exp_pa_est_sc_plot_data_aux30,
+                                          tot_exp_pa_est_sc_plot_data_aux31,tot_exp_pa_est_sc_plot_data_aux32,tot_exp_pa_est_sc_plot_data_aux33,
+                                          tot_exp_pa_est_sc_plot_data_aux34,tot_exp_pa_est_sc_plot_data_aux35)
+rm(tot_exp_pa_est_sc_plot_data_aux1,tot_exp_pa_est_sc_plot_data_aux2,tot_exp_pa_est_sc_plot_data_aux3,
+   tot_exp_pa_est_sc_plot_data_aux4,tot_exp_pa_est_sc_plot_data_aux5,tot_exp_pa_est_sc_plot_data_aux6,
+   tot_exp_pa_est_sc_plot_data_aux7,tot_exp_pa_est_sc_plot_data_aux8,tot_exp_pa_est_sc_plot_data_aux9,
+   tot_exp_pa_est_sc_plot_data_aux10,tot_exp_pa_est_sc_plot_data_aux11,tot_exp_pa_est_sc_plot_data_aux12,
+   tot_exp_pa_est_sc_plot_data_aux13,tot_exp_pa_est_sc_plot_data_aux14,tot_exp_pa_est_sc_plot_data_aux15,
+   tot_exp_pa_est_sc_plot_data_aux16,tot_exp_pa_est_sc_plot_data_aux17,tot_exp_pa_est_sc_plot_data_aux18,
+   tot_exp_pa_est_sc_plot_data_aux19,tot_exp_pa_est_sc_plot_data_aux20,tot_exp_pa_est_sc_plot_data_aux21,
+   tot_exp_pa_est_sc_plot_data_aux22,tot_exp_pa_est_sc_plot_data_aux23,tot_exp_pa_est_sc_plot_data_aux24,
+   tot_exp_pa_est_sc_plot_data_aux25,tot_exp_pa_est_sc_plot_data_aux26,tot_exp_pa_est_sc_plot_data_aux27,
+   tot_exp_pa_est_sc_plot_data_aux28,tot_exp_pa_est_sc_plot_data_aux29,tot_exp_pa_est_sc_plot_data_aux30,
+   tot_exp_pa_est_sc_plot_data_aux31,tot_exp_pa_est_sc_plot_data_aux32,tot_exp_pa_est_sc_plot_data_aux33,
+   tot_exp_pa_est_sc_plot_data_aux34,tot_exp_pa_est_sc_plot_data_aux35)
+rm(tot_exp_pa_est_sc_plot1,tot_exp_pa_est_sc_plot2,tot_exp_pa_est_sc_plot3,
+   tot_exp_pa_est_sc_plot4,tot_exp_pa_est_sc_plot5,tot_exp_pa_est_sc_plot6,
+   tot_exp_pa_est_sc_plot7,tot_exp_pa_est_sc_plot8,tot_exp_pa_est_sc_plot9,
+   tot_exp_pa_est_sc_plot10,tot_exp_pa_est_sc_plot11,tot_exp_pa_est_sc_plot12,
+   tot_exp_pa_est_sc_plot13,tot_exp_pa_est_sc_plot14,tot_exp_pa_est_sc_plot15,
+   tot_exp_pa_est_sc_plot16,tot_exp_pa_est_sc_plot17,tot_exp_pa_est_sc_plot18,
+   tot_exp_pa_est_sc_plot19,tot_exp_pa_est_sc_plot20,tot_exp_pa_est_sc_plot21,
+   tot_exp_pa_est_sc_plot22,tot_exp_pa_est_sc_plot23,tot_exp_pa_est_sc_plot24,
+   tot_exp_pa_est_sc_plot25,tot_exp_pa_est_sc_plot26,tot_exp_pa_est_sc_plot27,
+   tot_exp_pa_est_sc_plot28,tot_exp_pa_est_sc_plot29,tot_exp_pa_est_sc_plot30,
+   tot_exp_pa_est_sc_plot31,tot_exp_pa_est_sc_plot32,tot_exp_pa_est_sc_plot33,
+   tot_exp_pa_est_sc_plot34,tot_exp_pa_est_sc_plot35)
+for(i in 1:35) {
+  assign(paste0("tot_exp_pa_est_sc_plot_data_long", i), data.frame(tot_exp_pa_est_sc_plot_data_aux_list[[i]]$data[[1]]$x, tot_exp_pa_est_sc_plot_data_aux_list[[i]]$data[[1]]$y, tot_exp_pa_est_sc_plot_data_aux_list[[i]]$data[[1]]$group))
+}
+tot_exp_pa_est_sc_plot_data_long_list <- list(tot_exp_pa_est_sc_plot_data_long1,tot_exp_pa_est_sc_plot_data_long2,tot_exp_pa_est_sc_plot_data_long3,
+                                           tot_exp_pa_est_sc_plot_data_long4,tot_exp_pa_est_sc_plot_data_long5,tot_exp_pa_est_sc_plot_data_long6,
+                                           tot_exp_pa_est_sc_plot_data_long7,tot_exp_pa_est_sc_plot_data_long8,tot_exp_pa_est_sc_plot_data_long9,
+                                           tot_exp_pa_est_sc_plot_data_long10,tot_exp_pa_est_sc_plot_data_long11,tot_exp_pa_est_sc_plot_data_long12,
+                                           tot_exp_pa_est_sc_plot_data_long13,tot_exp_pa_est_sc_plot_data_long14,tot_exp_pa_est_sc_plot_data_long15,
+                                           tot_exp_pa_est_sc_plot_data_long16,tot_exp_pa_est_sc_plot_data_long17,tot_exp_pa_est_sc_plot_data_long18,
+                                           tot_exp_pa_est_sc_plot_data_long19,tot_exp_pa_est_sc_plot_data_long20,tot_exp_pa_est_sc_plot_data_long21,
+                                           tot_exp_pa_est_sc_plot_data_long22,tot_exp_pa_est_sc_plot_data_long23,tot_exp_pa_est_sc_plot_data_long24,
+                                           tot_exp_pa_est_sc_plot_data_long25,tot_exp_pa_est_sc_plot_data_long26,tot_exp_pa_est_sc_plot_data_long27,
+                                           tot_exp_pa_est_sc_plot_data_long28,tot_exp_pa_est_sc_plot_data_long29,tot_exp_pa_est_sc_plot_data_long30,
+                                           tot_exp_pa_est_sc_plot_data_long31,tot_exp_pa_est_sc_plot_data_long32,tot_exp_pa_est_sc_plot_data_long33,
+                                           tot_exp_pa_est_sc_plot_data_long34,tot_exp_pa_est_sc_plot_data_long35)
+rm(tot_exp_pa_est_sc_plot_data_long1,tot_exp_pa_est_sc_plot_data_long2,tot_exp_pa_est_sc_plot_data_long3,
+   tot_exp_pa_est_sc_plot_data_long4,tot_exp_pa_est_sc_plot_data_long5,tot_exp_pa_est_sc_plot_data_long6,
+   tot_exp_pa_est_sc_plot_data_long7,tot_exp_pa_est_sc_plot_data_long8,tot_exp_pa_est_sc_plot_data_long9,
+   tot_exp_pa_est_sc_plot_data_long10,tot_exp_pa_est_sc_plot_data_long11,tot_exp_pa_est_sc_plot_data_long12,
+   tot_exp_pa_est_sc_plot_data_long13,tot_exp_pa_est_sc_plot_data_long14,tot_exp_pa_est_sc_plot_data_long15,
+   tot_exp_pa_est_sc_plot_data_long16,tot_exp_pa_est_sc_plot_data_long17,tot_exp_pa_est_sc_plot_data_long18,
+   tot_exp_pa_est_sc_plot_data_long19,tot_exp_pa_est_sc_plot_data_long20,tot_exp_pa_est_sc_plot_data_long21,
+   tot_exp_pa_est_sc_plot_data_long22,tot_exp_pa_est_sc_plot_data_long23,tot_exp_pa_est_sc_plot_data_long24,
+   tot_exp_pa_est_sc_plot_data_long25,tot_exp_pa_est_sc_plot_data_long26,tot_exp_pa_est_sc_plot_data_long27,
+   tot_exp_pa_est_sc_plot_data_long28,tot_exp_pa_est_sc_plot_data_long29,tot_exp_pa_est_sc_plot_data_long30,
+   tot_exp_pa_est_sc_plot_data_long31,tot_exp_pa_est_sc_plot_data_long32,tot_exp_pa_est_sc_plot_data_long33,
+   tot_exp_pa_est_sc_plot_data_long34,tot_exp_pa_est_sc_plot_data_long35)
+tot_exp_pa_est_sc_plot_data_long_list <- lapply(tot_exp_pa_est_sc_plot_data_long_list, function(x) {
+  colnames(x) <- c('year', 'outcome', 'treated')  
+  x$treated <- x$treated - 1
+  return(x)
+}
+)
+for(i in 1:35) {
+  assign(paste0("tot_exp_pa_est_sc_plot_data_wide", i), reshape(data=tot_exp_pa_est_sc_plot_data_long_list[[i]],
+                                                             idvar = "year",
+                                                             v.names = "outcome",
+                                                             timevar = "treated",
+                                                             direction = "wide"))
+}
+tot_exp_pa_est_sc_plot_data_wide_list <- list(tot_exp_pa_est_sc_plot_data_wide1,tot_exp_pa_est_sc_plot_data_wide2,tot_exp_pa_est_sc_plot_data_wide3,
+                                           tot_exp_pa_est_sc_plot_data_wide4,tot_exp_pa_est_sc_plot_data_wide5,tot_exp_pa_est_sc_plot_data_wide6,
+                                           tot_exp_pa_est_sc_plot_data_wide7,tot_exp_pa_est_sc_plot_data_wide8,tot_exp_pa_est_sc_plot_data_wide9,
+                                           tot_exp_pa_est_sc_plot_data_wide10,tot_exp_pa_est_sc_plot_data_wide11,tot_exp_pa_est_sc_plot_data_wide12,
+                                           tot_exp_pa_est_sc_plot_data_wide13,tot_exp_pa_est_sc_plot_data_wide14,tot_exp_pa_est_sc_plot_data_wide15,
+                                           tot_exp_pa_est_sc_plot_data_wide16,tot_exp_pa_est_sc_plot_data_wide17,tot_exp_pa_est_sc_plot_data_wide18,
+                                           tot_exp_pa_est_sc_plot_data_wide19,tot_exp_pa_est_sc_plot_data_wide20,tot_exp_pa_est_sc_plot_data_wide21,
+                                           tot_exp_pa_est_sc_plot_data_wide22,tot_exp_pa_est_sc_plot_data_wide23,tot_exp_pa_est_sc_plot_data_wide24,
+                                           tot_exp_pa_est_sc_plot_data_wide25,tot_exp_pa_est_sc_plot_data_wide26,tot_exp_pa_est_sc_plot_data_wide27,
+                                           tot_exp_pa_est_sc_plot_data_wide28,tot_exp_pa_est_sc_plot_data_wide29,tot_exp_pa_est_sc_plot_data_wide30,
+                                           tot_exp_pa_est_sc_plot_data_wide31,tot_exp_pa_est_sc_plot_data_wide32,tot_exp_pa_est_sc_plot_data_wide33,
+                                           tot_exp_pa_est_sc_plot_data_wide34,tot_exp_pa_est_sc_plot_data_wide35)
+rm(tot_exp_pa_est_sc_plot_data_wide1,tot_exp_pa_est_sc_plot_data_wide2,tot_exp_pa_est_sc_plot_data_wide3,
+   tot_exp_pa_est_sc_plot_data_wide4,tot_exp_pa_est_sc_plot_data_wide5,tot_exp_pa_est_sc_plot_data_wide6,
+   tot_exp_pa_est_sc_plot_data_wide7,tot_exp_pa_est_sc_plot_data_wide8,tot_exp_pa_est_sc_plot_data_wide9,
+   tot_exp_pa_est_sc_plot_data_wide10,tot_exp_pa_est_sc_plot_data_wide11,tot_exp_pa_est_sc_plot_data_wide12,
+   tot_exp_pa_est_sc_plot_data_wide13,tot_exp_pa_est_sc_plot_data_wide14,tot_exp_pa_est_sc_plot_data_wide15,
+   tot_exp_pa_est_sc_plot_data_wide16,tot_exp_pa_est_sc_plot_data_wide17,tot_exp_pa_est_sc_plot_data_wide18,
+   tot_exp_pa_est_sc_plot_data_wide19,tot_exp_pa_est_sc_plot_data_wide20,tot_exp_pa_est_sc_plot_data_wide21,
+   tot_exp_pa_est_sc_plot_data_wide22,tot_exp_pa_est_sc_plot_data_wide23,tot_exp_pa_est_sc_plot_data_wide24,
+   tot_exp_pa_est_sc_plot_data_wide25,tot_exp_pa_est_sc_plot_data_wide26,tot_exp_pa_est_sc_plot_data_wide27,
+   tot_exp_pa_est_sc_plot_data_wide28,tot_exp_pa_est_sc_plot_data_wide29,tot_exp_pa_est_sc_plot_data_wide30,
+   tot_exp_pa_est_sc_plot_data_wide31,tot_exp_pa_est_sc_plot_data_wide32,tot_exp_pa_est_sc_plot_data_wide33,
+   tot_exp_pa_est_sc_plot_data_wide34,tot_exp_pa_est_sc_plot_data_wide35)
+tot_exp_pa_est_sc_plot_data_wide_list <- lapply(tot_exp_pa_est_sc_plot_data_wide_list, function(x) {
+  x$diff <- x$outcome.1 - x$outcome.0
+  return(x)
+}
+)
+# SDID #
+tot_exp_pa_est_sdid1 <- synthdid_estimate(setup_tot_exp_pa_list[[1]]$Y, setup_tot_exp_pa_list[[1]]$N0, setup_tot_exp_pa_list[[1]]$T0, X = covariates_exp_array_1)
+tot_exp_pa_est_sdid2 <- synthdid_estimate(setup_tot_exp_pa_list[[2]]$Y, setup_tot_exp_pa_list[[2]]$N0, setup_tot_exp_pa_list[[2]]$T0, X = covariates_exp_array_2)
+tot_exp_pa_est_sdid5 <- synthdid_estimate(setup_tot_exp_pa_list[[3]]$Y, setup_tot_exp_pa_list[[3]]$N0, setup_tot_exp_pa_list[[3]]$T0, X = covariates_exp_array_5)
+tot_exp_pa_est_sdid10 <- synthdid_estimate(setup_tot_exp_pa_list[[4]]$Y, setup_tot_exp_pa_list[[4]]$N0, setup_tot_exp_pa_list[[4]]$T0, X = covariates_exp_array_10)
+tot_exp_pa_est_sdid11 <- synthdid_estimate(setup_tot_exp_pa_list[[5]]$Y, setup_tot_exp_pa_list[[5]]$N0, setup_tot_exp_pa_list[[5]]$T0, X = covariates_exp_array_11)
+tot_exp_pa_est_sdid12 <- synthdid_estimate(setup_tot_exp_pa_list[[6]]$Y, setup_tot_exp_pa_list[[6]]$N0, setup_tot_exp_pa_list[[6]]$T0, X = covariates_exp_array_12)
+tot_exp_pa_est_sdid13 <- synthdid_estimate(setup_tot_exp_pa_list[[7]]$Y, setup_tot_exp_pa_list[[7]]$N0, setup_tot_exp_pa_list[[7]]$T0, X = covariates_exp_array_13)
+tot_exp_pa_est_sdid15 <- synthdid_estimate(setup_tot_exp_pa_list[[8]]$Y, setup_tot_exp_pa_list[[8]]$N0, setup_tot_exp_pa_list[[8]]$T0, X = covariates_exp_array_15)
+tot_exp_pa_est_sdid17 <- synthdid_estimate(setup_tot_exp_pa_list[[9]]$Y, setup_tot_exp_pa_list[[9]]$N0, setup_tot_exp_pa_list[[9]]$T0, X = covariates_exp_array_17)
+tot_exp_pa_est_sdid19 <- synthdid_estimate(setup_tot_exp_pa_list[[10]]$Y, setup_tot_exp_pa_list[[10]]$N0, setup_tot_exp_pa_list[[10]]$T0, X = covariates_exp_array_19)
+tot_exp_pa_est_sdid21 <- synthdid_estimate(setup_tot_exp_pa_list[[11]]$Y, setup_tot_exp_pa_list[[11]]$N0, setup_tot_exp_pa_list[[11]]$T0, X = covariates_exp_array_21)
+tot_exp_pa_est_sdid23 <- synthdid_estimate(setup_tot_exp_pa_list[[12]]$Y, setup_tot_exp_pa_list[[12]]$N0, setup_tot_exp_pa_list[[12]]$T0, X = covariates_exp_array_23)
+tot_exp_pa_est_sdid24 <- synthdid_estimate(setup_tot_exp_pa_list[[13]]$Y, setup_tot_exp_pa_list[[13]]$N0, setup_tot_exp_pa_list[[13]]$T0, X = covariates_exp_array_24)
+tot_exp_pa_est_sdid25 <- synthdid_estimate(setup_tot_exp_pa_list[[14]]$Y, setup_tot_exp_pa_list[[14]]$N0, setup_tot_exp_pa_list[[14]]$T0, X = covariates_exp_array_25)
+tot_exp_pa_est_sdid26 <- synthdid_estimate(setup_tot_exp_pa_list[[15]]$Y, setup_tot_exp_pa_list[[15]]$N0, setup_tot_exp_pa_list[[15]]$T0, X = covariates_exp_array_26)
+tot_exp_pa_est_sdid28 <- synthdid_estimate(setup_tot_exp_pa_list[[16]]$Y, setup_tot_exp_pa_list[[16]]$N0, setup_tot_exp_pa_list[[16]]$T0, X = covariates_exp_array_28)
+tot_exp_pa_est_sdid29 <- synthdid_estimate(setup_tot_exp_pa_list[[17]]$Y, setup_tot_exp_pa_list[[17]]$N0, setup_tot_exp_pa_list[[17]]$T0, X = covariates_exp_array_29)
+tot_exp_pa_est_sdid30 <- synthdid_estimate(setup_tot_exp_pa_list[[18]]$Y, setup_tot_exp_pa_list[[18]]$N0, setup_tot_exp_pa_list[[18]]$T0, X = covariates_exp_array_30)
+tot_exp_pa_est_sdid31 <- synthdid_estimate(setup_tot_exp_pa_list[[19]]$Y, setup_tot_exp_pa_list[[19]]$N0, setup_tot_exp_pa_list[[19]]$T0, X = covariates_exp_array_31)
+tot_exp_pa_est_sdid32 <- synthdid_estimate(setup_tot_exp_pa_list[[20]]$Y, setup_tot_exp_pa_list[[20]]$N0, setup_tot_exp_pa_list[[20]]$T0, X = covariates_exp_array_32)
+tot_exp_pa_est_sdid33 <- synthdid_estimate(setup_tot_exp_pa_list[[21]]$Y, setup_tot_exp_pa_list[[21]]$N0, setup_tot_exp_pa_list[[21]]$T0, X = covariates_exp_array_33)
+tot_exp_pa_est_sdid34 <- synthdid_estimate(setup_tot_exp_pa_list[[22]]$Y, setup_tot_exp_pa_list[[22]]$N0, setup_tot_exp_pa_list[[22]]$T0, X = covariates_exp_array_34)
+tot_exp_pa_est_sdid36 <- synthdid_estimate(setup_tot_exp_pa_list[[23]]$Y, setup_tot_exp_pa_list[[23]]$N0, setup_tot_exp_pa_list[[23]]$T0, X = covariates_exp_array_36)
+tot_exp_pa_est_sdid37 <- synthdid_estimate(setup_tot_exp_pa_list[[24]]$Y, setup_tot_exp_pa_list[[24]]$N0, setup_tot_exp_pa_list[[24]]$T0, X = covariates_exp_array_37)
+tot_exp_pa_est_sdid39 <- synthdid_estimate(setup_tot_exp_pa_list[[25]]$Y, setup_tot_exp_pa_list[[25]]$N0, setup_tot_exp_pa_list[[25]]$T0, X = covariates_exp_array_39)
+tot_exp_pa_est_sdid40 <- synthdid_estimate(setup_tot_exp_pa_list[[26]]$Y, setup_tot_exp_pa_list[[26]]$N0, setup_tot_exp_pa_list[[26]]$T0, X = covariates_exp_array_40)
+tot_exp_pa_est_sdid41 <- synthdid_estimate(setup_tot_exp_pa_list[[27]]$Y, setup_tot_exp_pa_list[[27]]$N0, setup_tot_exp_pa_list[[27]]$T0, X = covariates_exp_array_41)
+tot_exp_pa_est_sdid44 <- synthdid_estimate(setup_tot_exp_pa_list[[28]]$Y, setup_tot_exp_pa_list[[28]]$N0, setup_tot_exp_pa_list[[28]]$T0, X = covariates_exp_array_44)
+tot_exp_pa_est_sdid45 <- synthdid_estimate(setup_tot_exp_pa_list[[29]]$Y, setup_tot_exp_pa_list[[29]]$N0, setup_tot_exp_pa_list[[29]]$T0, X = covariates_exp_array_45)
+tot_exp_pa_est_sdid47 <- synthdid_estimate(setup_tot_exp_pa_list[[30]]$Y, setup_tot_exp_pa_list[[30]]$N0, setup_tot_exp_pa_list[[30]]$T0, X = covariates_exp_array_47)
+tot_exp_pa_est_sdid50 <- synthdid_estimate(setup_tot_exp_pa_list[[31]]$Y, setup_tot_exp_pa_list[[31]]$N0, setup_tot_exp_pa_list[[31]]$T0, X = covariates_exp_array_50)
+tot_exp_pa_est_sdid51 <- synthdid_estimate(setup_tot_exp_pa_list[[32]]$Y, setup_tot_exp_pa_list[[32]]$N0, setup_tot_exp_pa_list[[32]]$T0, X = covariates_exp_array_51)
+tot_exp_pa_est_sdid53 <- synthdid_estimate(setup_tot_exp_pa_list[[33]]$Y, setup_tot_exp_pa_list[[33]]$N0, setup_tot_exp_pa_list[[33]]$T0, X = covariates_exp_array_53)
+tot_exp_pa_est_sdid54 <- synthdid_estimate(setup_tot_exp_pa_list[[34]]$Y, setup_tot_exp_pa_list[[34]]$N0, setup_tot_exp_pa_list[[34]]$T0, X = covariates_exp_array_54)
+tot_exp_pa_est_sdid55 <- synthdid_estimate(setup_tot_exp_pa_list[[35]]$Y, setup_tot_exp_pa_list[[35]]$N0, setup_tot_exp_pa_list[[35]]$T0, X = covariates_exp_array_55)
+tot_exp_pa_est_sdid_list <- list(tot_exp_pa_est_sdid1,tot_exp_pa_est_sdid2,tot_exp_pa_est_sdid5,
+                              tot_exp_pa_est_sdid10,tot_exp_pa_est_sdid11,tot_exp_pa_est_sdid12,
+                              tot_exp_pa_est_sdid13,tot_exp_pa_est_sdid15,tot_exp_pa_est_sdid17,
+                              tot_exp_pa_est_sdid19,tot_exp_pa_est_sdid21,tot_exp_pa_est_sdid23,
+                              tot_exp_pa_est_sdid24,tot_exp_pa_est_sdid25,tot_exp_pa_est_sdid26,
+                              tot_exp_pa_est_sdid28,tot_exp_pa_est_sdid29,tot_exp_pa_est_sdid30,
+                              tot_exp_pa_est_sdid31,tot_exp_pa_est_sdid32,tot_exp_pa_est_sdid33,
+                              tot_exp_pa_est_sdid34,tot_exp_pa_est_sdid36,tot_exp_pa_est_sdid37,
+                              tot_exp_pa_est_sdid39,tot_exp_pa_est_sdid40,tot_exp_pa_est_sdid41,
+                              tot_exp_pa_est_sdid44,tot_exp_pa_est_sdid45,tot_exp_pa_est_sdid47,
+                              tot_exp_pa_est_sdid50,tot_exp_pa_est_sdid51,tot_exp_pa_est_sdid53,
+                              tot_exp_pa_est_sdid54,tot_exp_pa_est_sdid55)
+rm(tot_exp_pa_est_sdid1,tot_exp_pa_est_sdid2,tot_exp_pa_est_sdid5,
+   tot_exp_pa_est_sdid10,tot_exp_pa_est_sdid11,tot_exp_pa_est_sdid12,
+   tot_exp_pa_est_sdid13,tot_exp_pa_est_sdid15,tot_exp_pa_est_sdid17,
+   tot_exp_pa_est_sdid19,tot_exp_pa_est_sdid21,tot_exp_pa_est_sdid23,
+   tot_exp_pa_est_sdid24,tot_exp_pa_est_sdid25,tot_exp_pa_est_sdid26,
+   tot_exp_pa_est_sdid28,tot_exp_pa_est_sdid29,tot_exp_pa_est_sdid30,
+   tot_exp_pa_est_sdid31,tot_exp_pa_est_sdid32,tot_exp_pa_est_sdid33,
+   tot_exp_pa_est_sdid34,tot_exp_pa_est_sdid36,tot_exp_pa_est_sdid37,
+   tot_exp_pa_est_sdid39,tot_exp_pa_est_sdid40,tot_exp_pa_est_sdid41,
+   tot_exp_pa_est_sdid44,tot_exp_pa_est_sdid45,tot_exp_pa_est_sdid47,
+   tot_exp_pa_est_sdid50,tot_exp_pa_est_sdid51,tot_exp_pa_est_sdid53,
+   tot_exp_pa_est_sdid54,tot_exp_pa_est_sdid55)
+for(i in 1:35) {
+  assign(paste0("tot_exp_pa_est_sdid_plot", i), synthdid_plot(tot_exp_pa_est_sdid_list[i]))
+}
+tot_exp_pa_est_sdid_plot_data_aux1 <- ggplot_build(tot_exp_pa_est_sdid_plot1)
+tot_exp_pa_est_sdid_plot_data_aux2 <- ggplot_build(tot_exp_pa_est_sdid_plot2)
+tot_exp_pa_est_sdid_plot_data_aux3 <- ggplot_build(tot_exp_pa_est_sdid_plot3)
+tot_exp_pa_est_sdid_plot_data_aux4 <- ggplot_build(tot_exp_pa_est_sdid_plot4)
+tot_exp_pa_est_sdid_plot_data_aux5 <- ggplot_build(tot_exp_pa_est_sdid_plot5)
+tot_exp_pa_est_sdid_plot_data_aux6 <- ggplot_build(tot_exp_pa_est_sdid_plot6)
+tot_exp_pa_est_sdid_plot_data_aux7 <- ggplot_build(tot_exp_pa_est_sdid_plot7)
+tot_exp_pa_est_sdid_plot_data_aux8 <- ggplot_build(tot_exp_pa_est_sdid_plot8)
+tot_exp_pa_est_sdid_plot_data_aux9 <- ggplot_build(tot_exp_pa_est_sdid_plot9)
+tot_exp_pa_est_sdid_plot_data_aux10 <- ggplot_build(tot_exp_pa_est_sdid_plot10)
+tot_exp_pa_est_sdid_plot_data_aux11 <- ggplot_build(tot_exp_pa_est_sdid_plot11)
+tot_exp_pa_est_sdid_plot_data_aux12 <- ggplot_build(tot_exp_pa_est_sdid_plot12)
+tot_exp_pa_est_sdid_plot_data_aux13 <- ggplot_build(tot_exp_pa_est_sdid_plot13)
+tot_exp_pa_est_sdid_plot_data_aux14 <- ggplot_build(tot_exp_pa_est_sdid_plot14)
+tot_exp_pa_est_sdid_plot_data_aux15 <- ggplot_build(tot_exp_pa_est_sdid_plot15)
+tot_exp_pa_est_sdid_plot_data_aux16 <- ggplot_build(tot_exp_pa_est_sdid_plot16)
+tot_exp_pa_est_sdid_plot_data_aux17 <- ggplot_build(tot_exp_pa_est_sdid_plot17)
+tot_exp_pa_est_sdid_plot_data_aux18 <- ggplot_build(tot_exp_pa_est_sdid_plot18)
+tot_exp_pa_est_sdid_plot_data_aux19 <- ggplot_build(tot_exp_pa_est_sdid_plot19)
+tot_exp_pa_est_sdid_plot_data_aux20 <- ggplot_build(tot_exp_pa_est_sdid_plot20)
+tot_exp_pa_est_sdid_plot_data_aux21 <- ggplot_build(tot_exp_pa_est_sdid_plot21)
+tot_exp_pa_est_sdid_plot_data_aux22 <- ggplot_build(tot_exp_pa_est_sdid_plot22)
+tot_exp_pa_est_sdid_plot_data_aux23 <- ggplot_build(tot_exp_pa_est_sdid_plot23)
+tot_exp_pa_est_sdid_plot_data_aux24 <- ggplot_build(tot_exp_pa_est_sdid_plot24)
+tot_exp_pa_est_sdid_plot_data_aux25 <- ggplot_build(tot_exp_pa_est_sdid_plot25)
+tot_exp_pa_est_sdid_plot_data_aux26 <- ggplot_build(tot_exp_pa_est_sdid_plot26)
+tot_exp_pa_est_sdid_plot_data_aux27 <- ggplot_build(tot_exp_pa_est_sdid_plot27)
+tot_exp_pa_est_sdid_plot_data_aux28 <- ggplot_build(tot_exp_pa_est_sdid_plot28)
+tot_exp_pa_est_sdid_plot_data_aux29 <- ggplot_build(tot_exp_pa_est_sdid_plot29)
+tot_exp_pa_est_sdid_plot_data_aux30 <- ggplot_build(tot_exp_pa_est_sdid_plot30)
+tot_exp_pa_est_sdid_plot_data_aux31 <- ggplot_build(tot_exp_pa_est_sdid_plot31)
+tot_exp_pa_est_sdid_plot_data_aux32 <- ggplot_build(tot_exp_pa_est_sdid_plot32)
+tot_exp_pa_est_sdid_plot_data_aux33 <- ggplot_build(tot_exp_pa_est_sdid_plot33)
+tot_exp_pa_est_sdid_plot_data_aux34 <- ggplot_build(tot_exp_pa_est_sdid_plot34)
+tot_exp_pa_est_sdid_plot_data_aux35 <- ggplot_build(tot_exp_pa_est_sdid_plot35)
+tot_exp_pa_est_sdid_plot_data_aux_list <- list(tot_exp_pa_est_sdid_plot_data_aux1,tot_exp_pa_est_sdid_plot_data_aux2,tot_exp_pa_est_sdid_plot_data_aux3,
+                                            tot_exp_pa_est_sdid_plot_data_aux4,tot_exp_pa_est_sdid_plot_data_aux5,tot_exp_pa_est_sdid_plot_data_aux6,
+                                            tot_exp_pa_est_sdid_plot_data_aux7,tot_exp_pa_est_sdid_plot_data_aux8,tot_exp_pa_est_sdid_plot_data_aux9,
+                                            tot_exp_pa_est_sdid_plot_data_aux10,tot_exp_pa_est_sdid_plot_data_aux11,tot_exp_pa_est_sdid_plot_data_aux12,
+                                            tot_exp_pa_est_sdid_plot_data_aux13,tot_exp_pa_est_sdid_plot_data_aux14,tot_exp_pa_est_sdid_plot_data_aux15,
+                                            tot_exp_pa_est_sdid_plot_data_aux16,tot_exp_pa_est_sdid_plot_data_aux17,tot_exp_pa_est_sdid_plot_data_aux18,
+                                            tot_exp_pa_est_sdid_plot_data_aux19,tot_exp_pa_est_sdid_plot_data_aux20,tot_exp_pa_est_sdid_plot_data_aux21,
+                                            tot_exp_pa_est_sdid_plot_data_aux22,tot_exp_pa_est_sdid_plot_data_aux23,tot_exp_pa_est_sdid_plot_data_aux24,
+                                            tot_exp_pa_est_sdid_plot_data_aux25,tot_exp_pa_est_sdid_plot_data_aux26,tot_exp_pa_est_sdid_plot_data_aux27,
+                                            tot_exp_pa_est_sdid_plot_data_aux28,tot_exp_pa_est_sdid_plot_data_aux29,tot_exp_pa_est_sdid_plot_data_aux30,
+                                            tot_exp_pa_est_sdid_plot_data_aux31,tot_exp_pa_est_sdid_plot_data_aux32,tot_exp_pa_est_sdid_plot_data_aux33,
+                                            tot_exp_pa_est_sdid_plot_data_aux34,tot_exp_pa_est_sdid_plot_data_aux35)
+rm(tot_exp_pa_est_sdid_plot_data_aux1,tot_exp_pa_est_sdid_plot_data_aux2,tot_exp_pa_est_sdid_plot_data_aux3,
+   tot_exp_pa_est_sdid_plot_data_aux4,tot_exp_pa_est_sdid_plot_data_aux5,tot_exp_pa_est_sdid_plot_data_aux6,
+   tot_exp_pa_est_sdid_plot_data_aux7,tot_exp_pa_est_sdid_plot_data_aux8,tot_exp_pa_est_sdid_plot_data_aux9,
+   tot_exp_pa_est_sdid_plot_data_aux10,tot_exp_pa_est_sdid_plot_data_aux11,tot_exp_pa_est_sdid_plot_data_aux12,
+   tot_exp_pa_est_sdid_plot_data_aux13,tot_exp_pa_est_sdid_plot_data_aux14,tot_exp_pa_est_sdid_plot_data_aux15,
+   tot_exp_pa_est_sdid_plot_data_aux16,tot_exp_pa_est_sdid_plot_data_aux17,tot_exp_pa_est_sdid_plot_data_aux18,
+   tot_exp_pa_est_sdid_plot_data_aux19,tot_exp_pa_est_sdid_plot_data_aux20,tot_exp_pa_est_sdid_plot_data_aux21,
+   tot_exp_pa_est_sdid_plot_data_aux22,tot_exp_pa_est_sdid_plot_data_aux23,tot_exp_pa_est_sdid_plot_data_aux24,
+   tot_exp_pa_est_sdid_plot_data_aux25,tot_exp_pa_est_sdid_plot_data_aux26,tot_exp_pa_est_sdid_plot_data_aux27,
+   tot_exp_pa_est_sdid_plot_data_aux28,tot_exp_pa_est_sdid_plot_data_aux29,tot_exp_pa_est_sdid_plot_data_aux30,
+   tot_exp_pa_est_sdid_plot_data_aux31,tot_exp_pa_est_sdid_plot_data_aux32,tot_exp_pa_est_sdid_plot_data_aux33,
+   tot_exp_pa_est_sdid_plot_data_aux34,tot_exp_pa_est_sdid_plot_data_aux35)
+rm(tot_exp_pa_est_sdid_plot1,tot_exp_pa_est_sdid_plot2,tot_exp_pa_est_sdid_plot3,
+   tot_exp_pa_est_sdid_plot4,tot_exp_pa_est_sdid_plot5,tot_exp_pa_est_sdid_plot6,
+   tot_exp_pa_est_sdid_plot7,tot_exp_pa_est_sdid_plot8,tot_exp_pa_est_sdid_plot9,
+   tot_exp_pa_est_sdid_plot10,tot_exp_pa_est_sdid_plot11,tot_exp_pa_est_sdid_plot12,
+   tot_exp_pa_est_sdid_plot13,tot_exp_pa_est_sdid_plot14,tot_exp_pa_est_sdid_plot15,
+   tot_exp_pa_est_sdid_plot16,tot_exp_pa_est_sdid_plot17,tot_exp_pa_est_sdid_plot18,
+   tot_exp_pa_est_sdid_plot19,tot_exp_pa_est_sdid_plot20,tot_exp_pa_est_sdid_plot21,
+   tot_exp_pa_est_sdid_plot22,tot_exp_pa_est_sdid_plot23,tot_exp_pa_est_sdid_plot24,
+   tot_exp_pa_est_sdid_plot25,tot_exp_pa_est_sdid_plot26,tot_exp_pa_est_sdid_plot27,
+   tot_exp_pa_est_sdid_plot28,tot_exp_pa_est_sdid_plot29,tot_exp_pa_est_sdid_plot30,
+   tot_exp_pa_est_sdid_plot31,tot_exp_pa_est_sdid_plot32,tot_exp_pa_est_sdid_plot33,
+   tot_exp_pa_est_sdid_plot34,tot_exp_pa_est_sdid_plot35)
+for(i in 1:35) {
+  assign(paste0("tot_exp_pa_est_sdid_plot_data_long", i), data.frame(tot_exp_pa_est_sdid_plot_data_aux_list[[i]]$data[[1]]$x, tot_exp_pa_est_sdid_plot_data_aux_list[[i]]$data[[1]]$y, tot_exp_pa_est_sdid_plot_data_aux_list[[i]]$data[[1]]$group))
+}
+tot_exp_pa_est_sdid_plot_data_long_list <- list(tot_exp_pa_est_sdid_plot_data_long1,tot_exp_pa_est_sdid_plot_data_long2,tot_exp_pa_est_sdid_plot_data_long3,
+                                             tot_exp_pa_est_sdid_plot_data_long4,tot_exp_pa_est_sdid_plot_data_long5,tot_exp_pa_est_sdid_plot_data_long6,
+                                             tot_exp_pa_est_sdid_plot_data_long7,tot_exp_pa_est_sdid_plot_data_long8,tot_exp_pa_est_sdid_plot_data_long9,
+                                             tot_exp_pa_est_sdid_plot_data_long10,tot_exp_pa_est_sdid_plot_data_long11,tot_exp_pa_est_sdid_plot_data_long12,
+                                             tot_exp_pa_est_sdid_plot_data_long13,tot_exp_pa_est_sdid_plot_data_long14,tot_exp_pa_est_sdid_plot_data_long15,
+                                             tot_exp_pa_est_sdid_plot_data_long16,tot_exp_pa_est_sdid_plot_data_long17,tot_exp_pa_est_sdid_plot_data_long18,
+                                             tot_exp_pa_est_sdid_plot_data_long19,tot_exp_pa_est_sdid_plot_data_long20,tot_exp_pa_est_sdid_plot_data_long21,
+                                             tot_exp_pa_est_sdid_plot_data_long22,tot_exp_pa_est_sdid_plot_data_long23,tot_exp_pa_est_sdid_plot_data_long24,
+                                             tot_exp_pa_est_sdid_plot_data_long25,tot_exp_pa_est_sdid_plot_data_long26,tot_exp_pa_est_sdid_plot_data_long27,
+                                             tot_exp_pa_est_sdid_plot_data_long28,tot_exp_pa_est_sdid_plot_data_long29,tot_exp_pa_est_sdid_plot_data_long30,
+                                             tot_exp_pa_est_sdid_plot_data_long31,tot_exp_pa_est_sdid_plot_data_long32,tot_exp_pa_est_sdid_plot_data_long33,
+                                             tot_exp_pa_est_sdid_plot_data_long34,tot_exp_pa_est_sdid_plot_data_long35)
+rm(tot_exp_pa_est_sdid_plot_data_long1,tot_exp_pa_est_sdid_plot_data_long2,tot_exp_pa_est_sdid_plot_data_long3,
+   tot_exp_pa_est_sdid_plot_data_long4,tot_exp_pa_est_sdid_plot_data_long5,tot_exp_pa_est_sdid_plot_data_long6,
+   tot_exp_pa_est_sdid_plot_data_long7,tot_exp_pa_est_sdid_plot_data_long8,tot_exp_pa_est_sdid_plot_data_long9,
+   tot_exp_pa_est_sdid_plot_data_long10,tot_exp_pa_est_sdid_plot_data_long11,tot_exp_pa_est_sdid_plot_data_long12,
+   tot_exp_pa_est_sdid_plot_data_long13,tot_exp_pa_est_sdid_plot_data_long14,tot_exp_pa_est_sdid_plot_data_long15,
+   tot_exp_pa_est_sdid_plot_data_long16,tot_exp_pa_est_sdid_plot_data_long17,tot_exp_pa_est_sdid_plot_data_long18,
+   tot_exp_pa_est_sdid_plot_data_long19,tot_exp_pa_est_sdid_plot_data_long20,tot_exp_pa_est_sdid_plot_data_long21,
+   tot_exp_pa_est_sdid_plot_data_long22,tot_exp_pa_est_sdid_plot_data_long23,tot_exp_pa_est_sdid_plot_data_long24,
+   tot_exp_pa_est_sdid_plot_data_long25,tot_exp_pa_est_sdid_plot_data_long26,tot_exp_pa_est_sdid_plot_data_long27,
+   tot_exp_pa_est_sdid_plot_data_long28,tot_exp_pa_est_sdid_plot_data_long29,tot_exp_pa_est_sdid_plot_data_long30,
+   tot_exp_pa_est_sdid_plot_data_long31,tot_exp_pa_est_sdid_plot_data_long32,tot_exp_pa_est_sdid_plot_data_long33,
+   tot_exp_pa_est_sdid_plot_data_long34,tot_exp_pa_est_sdid_plot_data_long35)
+tot_exp_pa_est_sdid_plot_data_long_list <- lapply(tot_exp_pa_est_sdid_plot_data_long_list, function(x) {
+  colnames(x) <- c('year', 'outcome', 'treated')  
+  x$treated <- x$treated - 1
+  return(x)
+}
+)
+for(i in 1:35) {
+  assign(paste0("tot_exp_pa_est_sdid_plot_data_wide", i), reshape(data=tot_exp_pa_est_sdid_plot_data_long_list[[i]],
+                                                               idvar = "year",
+                                                               v.names = "outcome",
+                                                               timevar = "treated",
+                                                               direction = "wide"))
+}
+tot_exp_pa_est_sdid_plot_data_wide_list <- list(tot_exp_pa_est_sdid_plot_data_wide1,tot_exp_pa_est_sdid_plot_data_wide2,tot_exp_pa_est_sdid_plot_data_wide3,
+                                             tot_exp_pa_est_sdid_plot_data_wide4,tot_exp_pa_est_sdid_plot_data_wide5,tot_exp_pa_est_sdid_plot_data_wide6,
+                                             tot_exp_pa_est_sdid_plot_data_wide7,tot_exp_pa_est_sdid_plot_data_wide8,tot_exp_pa_est_sdid_plot_data_wide9,
+                                             tot_exp_pa_est_sdid_plot_data_wide10,tot_exp_pa_est_sdid_plot_data_wide11,tot_exp_pa_est_sdid_plot_data_wide12,
+                                             tot_exp_pa_est_sdid_plot_data_wide13,tot_exp_pa_est_sdid_plot_data_wide14,tot_exp_pa_est_sdid_plot_data_wide15,
+                                             tot_exp_pa_est_sdid_plot_data_wide16,tot_exp_pa_est_sdid_plot_data_wide17,tot_exp_pa_est_sdid_plot_data_wide18,
+                                             tot_exp_pa_est_sdid_plot_data_wide19,tot_exp_pa_est_sdid_plot_data_wide20,tot_exp_pa_est_sdid_plot_data_wide21,
+                                             tot_exp_pa_est_sdid_plot_data_wide22,tot_exp_pa_est_sdid_plot_data_wide23,tot_exp_pa_est_sdid_plot_data_wide24,
+                                             tot_exp_pa_est_sdid_plot_data_wide25,tot_exp_pa_est_sdid_plot_data_wide26,tot_exp_pa_est_sdid_plot_data_wide27,
+                                             tot_exp_pa_est_sdid_plot_data_wide28,tot_exp_pa_est_sdid_plot_data_wide29,tot_exp_pa_est_sdid_plot_data_wide30,
+                                             tot_exp_pa_est_sdid_plot_data_wide31,tot_exp_pa_est_sdid_plot_data_wide32,tot_exp_pa_est_sdid_plot_data_wide33,
+                                             tot_exp_pa_est_sdid_plot_data_wide34,tot_exp_pa_est_sdid_plot_data_wide35)
+rm(tot_exp_pa_est_sdid_plot_data_wide1,tot_exp_pa_est_sdid_plot_data_wide2,tot_exp_pa_est_sdid_plot_data_wide3,
+   tot_exp_pa_est_sdid_plot_data_wide4,tot_exp_pa_est_sdid_plot_data_wide5,tot_exp_pa_est_sdid_plot_data_wide6,
+   tot_exp_pa_est_sdid_plot_data_wide7,tot_exp_pa_est_sdid_plot_data_wide8,tot_exp_pa_est_sdid_plot_data_wide9,
+   tot_exp_pa_est_sdid_plot_data_wide10,tot_exp_pa_est_sdid_plot_data_wide11,tot_exp_pa_est_sdid_plot_data_wide12,
+   tot_exp_pa_est_sdid_plot_data_wide13,tot_exp_pa_est_sdid_plot_data_wide14,tot_exp_pa_est_sdid_plot_data_wide15,
+   tot_exp_pa_est_sdid_plot_data_wide16,tot_exp_pa_est_sdid_plot_data_wide17,tot_exp_pa_est_sdid_plot_data_wide18,
+   tot_exp_pa_est_sdid_plot_data_wide19,tot_exp_pa_est_sdid_plot_data_wide20,tot_exp_pa_est_sdid_plot_data_wide21,
+   tot_exp_pa_est_sdid_plot_data_wide22,tot_exp_pa_est_sdid_plot_data_wide23,tot_exp_pa_est_sdid_plot_data_wide24,
+   tot_exp_pa_est_sdid_plot_data_wide25,tot_exp_pa_est_sdid_plot_data_wide26,tot_exp_pa_est_sdid_plot_data_wide27,
+   tot_exp_pa_est_sdid_plot_data_wide28,tot_exp_pa_est_sdid_plot_data_wide29,tot_exp_pa_est_sdid_plot_data_wide30,
+   tot_exp_pa_est_sdid_plot_data_wide31,tot_exp_pa_est_sdid_plot_data_wide32,tot_exp_pa_est_sdid_plot_data_wide33,
+   tot_exp_pa_est_sdid_plot_data_wide34,tot_exp_pa_est_sdid_plot_data_wide35)
+tot_exp_pa_est_sdid_plot_data_wide_list <- lapply(tot_exp_pa_est_sdid_plot_data_wide_list, function(x) {
+  x$diff <- x$outcome.1 - x$outcome.0
+  return(x)
+}
+)
+
+##### Spaghetti and Placebo Distribution Plots #####
+# Spaghetti plots #
+tot_exp_est_did_plot_data_wide_pa$did_facet_title <- "Diff-in-Diff"
+tot_exp_est_sc_plot_data_wide_pa$sc_facet_title <- "Synthetic Control"
+tot_exp_est_sdid_plot_data_wide_pa$sdid_facet_title <- "Synthetic Diff-in-Diff"
+tot_exp_est_did_plot_data_wide_pa$diff_relative <- tot_exp_est_did_plot_data_wide_pa$diff - tot_exp_est_did_plot_data_wide_pa$diff[16]
+for(i in 1:35) {
+  tot_exp_pa_est_did_plot_data_wide_list[[i]]$diff_relative <- tot_exp_pa_est_did_plot_data_wide_list[[i]]$diff - tot_exp_pa_est_did_plot_data_wide_list[[i]]$diff[16]
+}
+tot_exp_pa_spag_did_plot <- ggplot(tot_exp_est_did_plot_data_wide_pa, aes(year,diff_relative)) +
+  geom_vline(xintercept = 1995, size = .75, color = "grey70", alpha = 0.75) +
+  geom_hline(yintercept = 0, size = .75, color = "grey70", alpha = 0.75) +
+  geom_line(data = tot_exp_pa_est_did_plot_data_wide_list[[1]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = tot_exp_pa_est_did_plot_data_wide_list[[2]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = tot_exp_pa_est_did_plot_data_wide_list[[3]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = tot_exp_pa_est_did_plot_data_wide_list[[4]], color = "#F8766D", alpha = 0.4) +
+  #geom_line(data = tot_exp_pa_est_did_plot_data_wide_list[[5]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = tot_exp_pa_est_did_plot_data_wide_list[[6]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = tot_exp_pa_est_did_plot_data_wide_list[[7]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = tot_exp_pa_est_did_plot_data_wide_list[[8]], color = "#F8766D", alpha = 0.4) +    
+  geom_line(data = tot_exp_pa_est_did_plot_data_wide_list[[9]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = tot_exp_pa_est_did_plot_data_wide_list[[10]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = tot_exp_pa_est_did_plot_data_wide_list[[11]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = tot_exp_pa_est_did_plot_data_wide_list[[12]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = tot_exp_pa_est_did_plot_data_wide_list[[13]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = tot_exp_pa_est_did_plot_data_wide_list[[14]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = tot_exp_pa_est_did_plot_data_wide_list[[15]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = tot_exp_pa_est_did_plot_data_wide_list[[16]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = tot_exp_pa_est_did_plot_data_wide_list[[17]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = tot_exp_pa_est_did_plot_data_wide_list[[18]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = tot_exp_pa_est_did_plot_data_wide_list[[19]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = tot_exp_pa_est_did_plot_data_wide_list[[20]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = tot_exp_pa_est_did_plot_data_wide_list[[21]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = tot_exp_pa_est_did_plot_data_wide_list[[22]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = tot_exp_pa_est_did_plot_data_wide_list[[23]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = tot_exp_pa_est_did_plot_data_wide_list[[24]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = tot_exp_pa_est_did_plot_data_wide_list[[25]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = tot_exp_pa_est_did_plot_data_wide_list[[26]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = tot_exp_pa_est_did_plot_data_wide_list[[27]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = tot_exp_pa_est_did_plot_data_wide_list[[28]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = tot_exp_pa_est_did_plot_data_wide_list[[29]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = tot_exp_pa_est_did_plot_data_wide_list[[30]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = tot_exp_pa_est_did_plot_data_wide_list[[31]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = tot_exp_pa_est_did_plot_data_wide_list[[32]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = tot_exp_pa_est_did_plot_data_wide_list[[33]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = tot_exp_pa_est_did_plot_data_wide_list[[34]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = tot_exp_pa_est_did_plot_data_wide_list[[35]], color = "#F8766D", alpha = 0.4) +
+  geom_line(size = 1.25, color = "#00BFC4") +
+  labs(y= "Gap in Total Expenditure \n (Per Capita)") +
+  facet_grid(. ~ did_facet_title) +
+  theme(aspect.ratio=1,
+        panel.spacing.x=unit(1, "lines"),
+        panel.background = element_blank(),
+        panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank(), 
+        panel.grid.major.y = element_line(size=.25, color='grey90'),
+        panel.grid.minor.y = element_blank(),
+        axis.text.x = element_text(angle = 45, hjust=1, size = 8),
+        axis.text.y = element_text(size = 8),
+        axis.title.y = element_text(size=8),
+        axis.title.x = element_blank(),
+        strip.background = element_rect(fill="grey70", size=1),
+        strip.text = element_text(size=8, face="bold", color = "white"),
+        axis.ticks = element_line(color = "grey70"),
+        panel.border = element_rect(color = "grey70", fill = NA, size = 0.5)
+  )
+tot_exp_pa_spag_sc_plot <- ggplot(tot_exp_est_sc_plot_data_wide_pa, aes(year,diff)) +
+  geom_vline(xintercept = 1995, size = .75, color = "grey70", alpha = 0.75) +
+  geom_hline(yintercept = 0, size = .75, color = "grey70", alpha = 0.75) +
+  geom_line(data = tot_exp_pa_est_sc_plot_data_wide_list[[1]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = tot_exp_pa_est_sc_plot_data_wide_list[[2]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = tot_exp_pa_est_sc_plot_data_wide_list[[3]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = tot_exp_pa_est_sc_plot_data_wide_list[[4]], color = "#F8766D", alpha = 0.4) +
+  #geom_line(data = tot_exp_pa_est_sc_plot_data_wide_list[[5]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = tot_exp_pa_est_sc_plot_data_wide_list[[6]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = tot_exp_pa_est_sc_plot_data_wide_list[[7]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = tot_exp_pa_est_sc_plot_data_wide_list[[8]], color = "#F8766D", alpha = 0.4) +    
+  geom_line(data = tot_exp_pa_est_sc_plot_data_wide_list[[9]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = tot_exp_pa_est_sc_plot_data_wide_list[[10]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = tot_exp_pa_est_sc_plot_data_wide_list[[11]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = tot_exp_pa_est_sc_plot_data_wide_list[[12]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = tot_exp_pa_est_sc_plot_data_wide_list[[13]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = tot_exp_pa_est_sc_plot_data_wide_list[[14]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = tot_exp_pa_est_sc_plot_data_wide_list[[15]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = tot_exp_pa_est_sc_plot_data_wide_list[[16]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = tot_exp_pa_est_sc_plot_data_wide_list[[17]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = tot_exp_pa_est_sc_plot_data_wide_list[[18]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = tot_exp_pa_est_sc_plot_data_wide_list[[19]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = tot_exp_pa_est_sc_plot_data_wide_list[[20]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = tot_exp_pa_est_sc_plot_data_wide_list[[21]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = tot_exp_pa_est_sc_plot_data_wide_list[[22]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = tot_exp_pa_est_sc_plot_data_wide_list[[23]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = tot_exp_pa_est_sc_plot_data_wide_list[[24]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = tot_exp_pa_est_sc_plot_data_wide_list[[25]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = tot_exp_pa_est_sc_plot_data_wide_list[[26]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = tot_exp_pa_est_sc_plot_data_wide_list[[27]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = tot_exp_pa_est_sc_plot_data_wide_list[[28]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = tot_exp_pa_est_sc_plot_data_wide_list[[29]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = tot_exp_pa_est_sc_plot_data_wide_list[[30]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = tot_exp_pa_est_sc_plot_data_wide_list[[31]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = tot_exp_pa_est_sc_plot_data_wide_list[[32]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = tot_exp_pa_est_sc_plot_data_wide_list[[33]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = tot_exp_pa_est_sc_plot_data_wide_list[[34]], color = "#F8766D", alpha = 0.4) +
+  geom_line(aes(y = diff, color = "Placebos"),data = tot_exp_pa_est_sc_plot_data_wide_list[[35]], alpha = 0.4) +
+  geom_line(aes(y = diff, color = "Pennsylvania"),data = tot_exp_est_sc_plot_data_wide_pa, size = 1.25) +
+  scale_color_manual(values = c("Placebos" = "#F8766D", "Pennsylvania" = "#00BFC4")) +
+  labs(x= "Year") +
+  facet_grid(. ~ sc_facet_title) +
+  theme(aspect.ratio=1,
+        panel.spacing.x=unit(1, "lines"),
+        panel.background = element_blank(),
+        panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank(), 
+        panel.grid.major.y = element_line(size=.25, color='grey90'),
+        panel.grid.minor.y = element_blank(),
+        axis.text.x = element_text(angle = 45, hjust=1, size = 8),
+        axis.text.y = element_text(size = 8),
+        axis.title.y = element_blank(),
+        axis.title.x = element_text(size=8),
+        strip.background = element_rect(fill="grey70", size=1),
+        strip.text = element_text(size=8, face="bold", color = "white"),
+        legend.position='top', 
+        legend.text = element_text(size=8.5),
+        legend.direction='horizontal',
+        legend.key = element_blank(),
+        legend.title = element_blank(),
+        axis.ticks = element_line(color = "grey70"),
+        panel.border = element_rect(color = "grey70", fill = NA, size = 0.5)
+  )
+tot_exp_est_sdid_plot_data_wide_pa$diff_relative <- tot_exp_est_sdid_plot_data_wide_pa$diff - tot_exp_est_sdid_plot_data_wide_pa$diff[16]
+for(i in 1:35) {
+  tot_exp_pa_est_sdid_plot_data_wide_list[[i]]$diff_relative <- tot_exp_pa_est_sdid_plot_data_wide_list[[i]]$diff - tot_exp_pa_est_sdid_plot_data_wide_list[[i]]$diff[16]
+}
+tot_exp_pa_spag_sdid_plot <- ggplot(tot_exp_est_sdid_plot_data_wide_pa, aes(year,diff_relative)) +
+  geom_vline(xintercept = 1995, size = .75, color = "grey70", alpha = 0.75) +
+  geom_hline(yintercept = 0, size = .75, color = "grey70", alpha = 0.75) +
+  geom_line(data = tot_exp_pa_est_sdid_plot_data_wide_list[[1]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = tot_exp_pa_est_sdid_plot_data_wide_list[[2]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = tot_exp_pa_est_sdid_plot_data_wide_list[[3]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = tot_exp_pa_est_sdid_plot_data_wide_list[[4]], color = "#F8766D", alpha = 0.4) +
+  #geom_line(data = tot_exp_pa_est_sdid_plot_data_wide_list[[5]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = tot_exp_pa_est_sdid_plot_data_wide_list[[6]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = tot_exp_pa_est_sdid_plot_data_wide_list[[7]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = tot_exp_pa_est_sdid_plot_data_wide_list[[8]], color = "#F8766D", alpha = 0.4) +    
+  geom_line(data = tot_exp_pa_est_sdid_plot_data_wide_list[[9]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = tot_exp_pa_est_sdid_plot_data_wide_list[[10]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = tot_exp_pa_est_sdid_plot_data_wide_list[[11]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = tot_exp_pa_est_sdid_plot_data_wide_list[[12]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = tot_exp_pa_est_sdid_plot_data_wide_list[[13]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = tot_exp_pa_est_sdid_plot_data_wide_list[[14]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = tot_exp_pa_est_sdid_plot_data_wide_list[[15]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = tot_exp_pa_est_sdid_plot_data_wide_list[[16]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = tot_exp_pa_est_sdid_plot_data_wide_list[[17]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = tot_exp_pa_est_sdid_plot_data_wide_list[[18]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = tot_exp_pa_est_sdid_plot_data_wide_list[[19]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = tot_exp_pa_est_sdid_plot_data_wide_list[[20]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = tot_exp_pa_est_sdid_plot_data_wide_list[[21]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = tot_exp_pa_est_sdid_plot_data_wide_list[[22]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = tot_exp_pa_est_sdid_plot_data_wide_list[[23]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = tot_exp_pa_est_sdid_plot_data_wide_list[[24]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = tot_exp_pa_est_sdid_plot_data_wide_list[[25]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = tot_exp_pa_est_sdid_plot_data_wide_list[[26]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = tot_exp_pa_est_sdid_plot_data_wide_list[[27]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = tot_exp_pa_est_sdid_plot_data_wide_list[[28]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = tot_exp_pa_est_sdid_plot_data_wide_list[[29]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = tot_exp_pa_est_sdid_plot_data_wide_list[[30]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = tot_exp_pa_est_sdid_plot_data_wide_list[[31]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = tot_exp_pa_est_sdid_plot_data_wide_list[[32]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = tot_exp_pa_est_sdid_plot_data_wide_list[[33]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = tot_exp_pa_est_sdid_plot_data_wide_list[[34]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = tot_exp_pa_est_sdid_plot_data_wide_list[[35]], color = "#F8766D", alpha = 0.4) +
+  geom_line(size = 1.25, color = "#00BFC4") +
+  facet_grid(. ~ sdid_facet_title) +
+  theme(aspect.ratio=1,
+        panel.spacing.x=unit(1, "lines"),
+        panel.background = element_blank(),
+        panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank(), 
+        panel.grid.major.y = element_line(size=.25, color='grey90'),
+        panel.grid.minor.y = element_blank(),
+        axis.text.x = element_text(angle = 45, hjust=1, size = 8),
+        axis.text.y = element_text(size = 8),
+        axis.title.y = element_blank(),
+        axis.title.x = element_blank(),
+        strip.background = element_rect(fill="grey70", size=1),
+        strip.text = element_text(size=8, face="bold", color = "white"),
+        axis.ticks = element_line(color = "grey70"),
+        panel.border = element_rect(color = "grey70", fill = NA, size = 0.5)
+  )
+# Placebo Distribution Plots #
+tot_exp_pa_est_did_vec <- c(tot_exp_est_did_pa)
+for (i in c(1:4,6:35)) {
+  tot_exp_pa_est_did_vec_aux <- tot_exp_pa_est_did_list[[i]][1]
+  tot_exp_pa_est_did_vec <- c(tot_exp_pa_est_did_vec,tot_exp_pa_est_did_vec_aux)
+}
+tot_exp_pa_est_did_df <- data.frame(tot_exp_pa_est_did_vec)
+tot_exp_pa_hist_did_plot_aux <- ggplot(data = NULL, aes(x = tot_exp_pa_est_did_vec)) +
+  geom_histogram(data = tot_exp_pa_est_did_df, aes(x = tot_exp_pa_est_did_vec, y = ..count..) ,alpha = .5, color = "#F8766D", fill = "#F8766D", bins = 25) +
+  labs(y= "Frequency") +  
+  theme(aspect.ratio=1,
+        panel.spacing.x=unit(1, "lines"),
+        panel.background = element_blank(),
+        panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank(), 
+        panel.grid.major.y = element_line(size=.25, color='grey90'),
+        panel.grid.minor.y = element_blank(),
+        axis.text.x = element_text(angle = 45, hjust=1, size = 8),
+        axis.text.y = element_text(size = 8),
+        axis.title.y = element_text(size = 8),
+        axis.title.x = element_blank(),
+        strip.background = element_rect(fill="grey70", size=1),
+        strip.text = element_text(size=8, face="bold", color = "white"),
+        axis.ticks = element_line(color = "grey70"),
+        panel.border = element_rect(color = "grey70", fill = NA, size = 0.5)
+  )
+tot_exp_pa_hist_did_plot1_ylim <- ggplot_build(tot_exp_pa_hist_did_plot_aux)$layout$panel_scales_y[[1]]$range$range[2]
+tot_exp_pa_hist_did_plot <- tot_exp_pa_hist_did_plot_aux +
+  expand_limits(y=tot_exp_pa_hist_did_plot1_ylim*1.025) +
+  geom_segment(aes(x = c(tot_exp_pa_est_did_vec[1], mean(tot_exp_pa_est_did_vec[2:35])), xend = c(tot_exp_pa_est_did_vec[1],mean(tot_exp_pa_est_did_vec[2:35])), y = c(0,0), yend = c(tot_exp_pa_hist_did_plot1_ylim,tot_exp_pa_hist_did_plot1_ylim)),
+               color = c("#00BFC4","grey50"), alpha = c(.75,.75), size = c(.75,.75)) +
+  geom_text(aes(x = c(tot_exp_pa_est_did_vec[1], mean(tot_exp_pa_est_did_vec[2:35])), y = c(tot_exp_pa_hist_did_plot1_ylim,tot_exp_pa_hist_did_plot1_ylim), label = c(paste0("hat(tau)[tr]==",round(tot_exp_pa_est_did_vec[1], 2)),paste0("bar(tau)[controls]==",round(mean(tot_exp_pa_est_did_vec[2:35]),2)))),
+            parse = TRUE, vjust = c(-.3,-.5), hjust = c(.7,.5), color = c("#00BFC4","grey40"), size = c(2,2))
+
+tot_exp_pa_est_sc_vec <- c(tot_exp_est_sc_pa)
+for (i in c(1:4,6:35)) {
+  tot_exp_pa_est_sc_vec_aux <- tot_exp_pa_est_sc_list[[i]][1]
+  tot_exp_pa_est_sc_vec <- c(tot_exp_pa_est_sc_vec,tot_exp_pa_est_sc_vec_aux)
+}
+tot_exp_pa_est_sc_df <- data.frame(tot_exp_pa_est_sc_vec)
+tot_exp_pa_hist_sc_plot_aux <- ggplot(data = NULL, aes(x = tot_exp_pa_est_sc_vec)) +
+  geom_histogram(data = tot_exp_pa_est_sc_df, aes(x = tot_exp_pa_est_sc_vec, y = ..count..) ,alpha = .5, color = "#F8766D", fill = "#F8766D", bins = 25) +
+  labs(x= expression("Average Treatment Effect"~(hat(tau)))) +  
+  theme(aspect.ratio=1,
+        panel.spacing.x=unit(1, "lines"),
+        panel.background = element_blank(),
+        panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank(), 
+        panel.grid.major.y = element_line(size=.25, color='grey90'),
+        panel.grid.minor.y = element_blank(),
+        axis.text.x = element_text(angle = 45, hjust=1, size = 8),
+        axis.text.y = element_text(size = 8),
+        axis.title.x = element_text(size=8),
+        axis.title.y = element_blank(),
+        strip.background = element_rect(fill="grey70", size=1),
+        strip.text = element_text(size=8, face="bold", color = "white"),
+        axis.ticks = element_line(color = "grey70"),
+        panel.border = element_rect(color = "grey70", fill = NA, size = 0.5)
+  )
+tot_exp_pa_hist_sc_plot1_ylim <- ggplot_build(tot_exp_pa_hist_sc_plot_aux)$layout$panel_scales_y[[1]]$range$range[2]
+tot_exp_pa_hist_sc_plot <- tot_exp_pa_hist_sc_plot_aux +
+  expand_limits(y=tot_exp_pa_hist_sc_plot1_ylim*1.025) +
+  geom_segment(aes(x = c(tot_exp_pa_est_sc_vec[1], mean(tot_exp_pa_est_sc_vec[2:35])), xend = c(tot_exp_pa_est_sc_vec[1],mean(tot_exp_pa_est_sc_vec[2:35])), y = c(0,0), yend = c(tot_exp_pa_hist_sc_plot1_ylim,tot_exp_pa_hist_sc_plot1_ylim)),
+               color = c("#00BFC4","grey50"), alpha = c(.75,.75), size = c(.75,.75)) +
+  geom_text(aes(x = c(tot_exp_pa_est_sc_vec[1], mean(tot_exp_pa_est_sc_vec[2:35])), y = c(tot_exp_pa_hist_sc_plot1_ylim,tot_exp_pa_hist_sc_plot1_ylim), label = c(paste0("hat(tau)[tr]==",round(tot_exp_pa_est_sc_vec[1], 2)),paste0("bar(tau)[controls]==",round(mean(tot_exp_pa_est_sc_vec[2:35]),2)))),
+            parse = TRUE, vjust = c(-.3,-.5), color = c("#00BFC4","grey40"), size = c(2,2))
+
+tot_exp_pa_est_sdid_vec <- c(tot_exp_est_sdid_pa)
+for (i in c(1:4,6:35)) {
+  tot_exp_pa_est_sdid_vec_aux <- tot_exp_pa_est_sdid_list[[i]][1]
+  tot_exp_pa_est_sdid_vec <- c(tot_exp_pa_est_sdid_vec,tot_exp_pa_est_sdid_vec_aux)
+}
+tot_exp_pa_est_sdid_df <- data.frame(tot_exp_pa_est_sdid_vec)
+tot_exp_pa_hist_sdid_plot_aux <- ggplot(data = NULL, aes(x = tot_exp_pa_est_sdid_vec)) +
+  geom_histogram(data = tot_exp_pa_est_sdid_df, aes(x = tot_exp_pa_est_sdid_vec, y = ..count..) ,alpha = .5, color = "#F8766D", fill = "#F8766D", bins = 25) +
+  theme(aspect.ratio=1,
+        panel.spacing.x=unit(1, "lines"),
+        panel.background = element_blank(),
+        panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank(), 
+        panel.grid.major.y = element_line(size=.25, color='grey90'),
+        panel.grid.minor.y = element_blank(),
+        axis.text.x = element_text(angle = 45, hjust=1, size = 8),
+        axis.text.y = element_text(size = 8),
+        axis.title.x = element_blank(),
+        axis.title.y = element_blank(),
+        strip.background = element_rect(fill="grey70", size=1),
+        strip.text = element_text(size=8, face="bold", color = "white"),
+        axis.ticks = element_line(color = "grey70"),
+        panel.border = element_rect(color = "grey70", fill = NA, size = 0.5)
+  )
+tot_exp_pa_hist_sdid_plot1_ylim <- ggplot_build(tot_exp_pa_hist_sdid_plot_aux)$layout$panel_scales_y[[1]]$range$range[2]
+tot_exp_pa_hist_sdid_plot <- tot_exp_pa_hist_sdid_plot_aux +
+  expand_limits(y=tot_exp_pa_hist_sdid_plot1_ylim*1.025) +
+  geom_segment(aes(x = c(tot_exp_pa_est_sdid_vec[1], mean(tot_exp_pa_est_sdid_vec[2:35])), xend = c(tot_exp_pa_est_sdid_vec[1],mean(tot_exp_pa_est_sdid_vec[2:35])), y = c(0,0), yend = c(tot_exp_pa_hist_sdid_plot1_ylim,tot_exp_pa_hist_sdid_plot1_ylim)),
+               color = c("#00BFC4","grey50"), alpha = c(.75,.75), size = c(.75,.75)) +
+  geom_text(aes(x = c(tot_exp_pa_est_sdid_vec[1], mean(tot_exp_pa_est_sdid_vec[2:35])), y = c(tot_exp_pa_hist_sdid_plot1_ylim,tot_exp_pa_hist_sdid_plot1_ylim), label = c(paste0("hat(tau)[tr]==",round(tot_exp_pa_est_sdid_vec[1], 2)),paste0("bar(tau)[controls]==",round(mean(tot_exp_pa_est_sdid_vec[2:35]),2)))),
+            parse = TRUE, vjust = c(-.3,-.5), hjust = c(.7,.5), color = c("#00BFC4","grey40"), size = c(2,2))
+pdf(file='SynthDID_Figs_and_Tables/tot_exp_spag_dist_plots_PA.pdf', paper = "USr", width = 10.9, height = 8.4)
+(tot_exp_pa_spag_dist_plots_PA <- tot_exp_pa_spag_did_plot + tot_exp_pa_spag_sc_plot + tot_exp_pa_spag_sdid_plot + tot_exp_pa_hist_did_plot + tot_exp_pa_hist_sc_plot + tot_exp_pa_hist_sdid_plot + plot_layout(ncol = 3))
+dev.off()
+
+
+##### Medicaid Expenditure #####
+### PA - Get DID, SC, and SDID estimates, as well as a data set with difference in outcomes for spaghetti graphs ###
+# Restrict data to actual treated state and control states by expenditure type (code = 10 for nursing home care), and get in panel form for synthdid #
+med_exp_pa_df <- as.data.frame(subset(CON_Expenditure, code == 10))
+med_exp_pa_df$treated <- as.integer(ifelse(med_exp_pa_df$name == "Pennsylvania" & med_exp_pa_df$year >= 1996, 1, 0))
+med_exp_pa_df <- med_exp_pa_df[order(med_exp_pa_df$year, med_exp_pa_df$treated_pa_aux, med_exp_pa_df$name),]
+med_exp_pa_df <- subset(med_exp_pa_df, alwaysconpa == 1 | name == "Pennsylvania", select=c(name, year, medicaid_exp, treated))
+setup_med_exp_pa <- panel.matrices(med_exp_pa_df, unit = 1, time = 2, outcome = 3, treatment = 4)
+# DID #
+med_exp_est_did_pa <- did_estimate(setup_med_exp_pa$Y, setup_med_exp_pa$N0, setup_med_exp_pa$T0, X = covariates_exp_pa_array)
+med_exp_est_did_plot_pa <- synthdid_plot(med_exp_est_did_pa)
+med_exp_est_did_plot_data_aux_pa <- ggplot_build(med_exp_est_did_plot_pa)
+med_exp_est_did_plot_data_long_pa <- data.frame(med_exp_est_did_plot_data_aux_pa$data[[1]]$x, med_exp_est_did_plot_data_aux_pa$data[[1]]$y, med_exp_est_did_plot_data_aux_pa$data[[1]]$group)
+colnames(med_exp_est_did_plot_data_long_pa) <- c('year', 'outcome', 'treated')
+med_exp_est_did_plot_data_long_pa$treated <- med_exp_est_did_plot_data_long_pa$treated - 1
+med_exp_est_did_plot_data_wide_pa <- reshape(data=med_exp_est_did_plot_data_long_pa,
+                                             idvar = "year",
+                                             v.names = "outcome",
+                                             timevar = "treated",
+                                             direction = "wide")
+med_exp_est_did_plot_data_wide_pa$diff <- med_exp_est_did_plot_data_wide_pa$outcome.1 - med_exp_est_did_plot_data_wide_pa$outcome.0
+# SC #
+med_exp_est_sc_pa <- sc_estimate(setup_med_exp_pa$Y, setup_med_exp_pa$N0, setup_med_exp_pa$T0, X = covariates_exp_pa_array)
+med_exp_est_sc_plot_pa <- synthdid_plot(med_exp_est_sc_pa)
+med_exp_est_sc_plot_data_aux_pa <- ggplot_build(med_exp_est_sc_plot_pa)
+med_exp_est_sc_plot_data_long_pa <- data.frame(med_exp_est_sc_plot_data_aux_pa$data[[1]]$x, med_exp_est_sc_plot_data_aux_pa$data[[1]]$y, med_exp_est_sc_plot_data_aux_pa$data[[1]]$group)
+colnames(med_exp_est_sc_plot_data_long_pa) <- c('year', 'outcome', 'treated')
+med_exp_est_sc_plot_data_long_pa$treated <- med_exp_est_sc_plot_data_long_pa$treated - 1
+med_exp_est_sc_plot_data_wide_pa <- reshape(data=med_exp_est_sc_plot_data_long_pa,
+                                            idvar = "year",
+                                            v.names = "outcome",
+                                            timevar = "treated",
+                                            direction = "wide")
+med_exp_est_sc_plot_data_wide_pa$diff <- med_exp_est_sc_plot_data_wide_pa$outcome.1 - med_exp_est_sc_plot_data_wide_pa$outcome.0
+# SDID #
+med_exp_est_sdid_pa <- synthdid_estimate(setup_med_exp_pa$Y, setup_med_exp_pa$N0, setup_med_exp_pa$T0, X = covariates_exp_pa_array)
+med_exp_est_sdid_plot_pa <- synthdid_plot(med_exp_est_sdid_pa)
+med_exp_est_sdid_plot_data_aux_pa <- ggplot_build(med_exp_est_sdid_plot_pa)
+med_exp_est_sdid_plot_data_long_pa <- data.frame(med_exp_est_sdid_plot_data_aux_pa$data[[1]]$x, med_exp_est_sdid_plot_data_aux_pa$data[[1]]$y, med_exp_est_sdid_plot_data_aux_pa$data[[1]]$group)
+colnames(med_exp_est_sdid_plot_data_long_pa) <- c('year', 'outcome', 'treated')
+med_exp_est_sdid_plot_data_long_pa$treated <- med_exp_est_sdid_plot_data_long_pa$treated - 1
+med_exp_est_sdid_plot_data_wide_pa <- reshape(data=med_exp_est_sdid_plot_data_long_pa,
+                                              idvar = "year",
+                                              v.names = "outcome",
+                                              timevar = "treated",
+                                              direction = "wide")
+med_exp_est_sdid_plot_data_wide_pa$diff <- med_exp_est_sdid_plot_data_wide_pa$outcome.1 - med_exp_est_sdid_plot_data_wide_pa$outcome.0
+### Control States - Get DID, SC, and SDID estimates, as well as a data set with difference in outcomes for spaghetti graphs ###
+# Restrict data to "placebo treated" state and other control states by expenditure type (code = 10 for nursing home care), and get in panel form for synthdid #
+for(i in unique(controls.df$id)) {
+  assign(paste0("med_exp_pa_df", i), subset(CON_Expenditure, alwaysconpa == 1 & code == 10))
+}
+med_exp_pa_df1$treated_aux <- ifelse(med_exp_pa_df1$id == 1, 1, 0)
+med_exp_pa_df2$treated_aux <- ifelse(med_exp_pa_df2$id == 2, 1, 0)
+med_exp_pa_df5$treated_aux <- ifelse(med_exp_pa_df5$id == 5, 1, 0)
+med_exp_pa_df10$treated_aux <- ifelse(med_exp_pa_df10$id == 10, 1, 0)
+med_exp_pa_df11$treated_aux <- ifelse(med_exp_pa_df11$id == 11, 1, 0)
+med_exp_pa_df12$treated_aux <- ifelse(med_exp_pa_df12$id == 12, 1, 0)
+med_exp_pa_df13$treated_aux <- ifelse(med_exp_pa_df13$id == 13, 1, 0)
+med_exp_pa_df15$treated_aux <- ifelse(med_exp_pa_df15$id == 15, 1, 0)
+med_exp_pa_df17$treated_aux <- ifelse(med_exp_pa_df17$id == 17, 1, 0)
+med_exp_pa_df19$treated_aux <- ifelse(med_exp_pa_df19$id == 19, 1, 0)
+med_exp_pa_df21$treated_aux <- ifelse(med_exp_pa_df21$id == 21, 1, 0)
+med_exp_pa_df23$treated_aux <- ifelse(med_exp_pa_df23$id == 23, 1, 0)
+med_exp_pa_df24$treated_aux <- ifelse(med_exp_pa_df24$id == 24, 1, 0)
+med_exp_pa_df25$treated_aux <- ifelse(med_exp_pa_df25$id == 25, 1, 0)
+med_exp_pa_df26$treated_aux <- ifelse(med_exp_pa_df26$id == 26, 1, 0)
+med_exp_pa_df28$treated_aux <- ifelse(med_exp_pa_df28$id == 28, 1, 0)
+med_exp_pa_df29$treated_aux <- ifelse(med_exp_pa_df29$id == 29, 1, 0)
+med_exp_pa_df30$treated_aux <- ifelse(med_exp_pa_df30$id == 30, 1, 0)
+med_exp_pa_df31$treated_aux <- ifelse(med_exp_pa_df31$id == 31, 1, 0)
+med_exp_pa_df32$treated_aux <- ifelse(med_exp_pa_df32$id == 32, 1, 0)
+med_exp_pa_df33$treated_aux <- ifelse(med_exp_pa_df33$id == 33, 1, 0)
+med_exp_pa_df34$treated_aux <- ifelse(med_exp_pa_df34$id == 34, 1, 0)
+med_exp_pa_df36$treated_aux <- ifelse(med_exp_pa_df36$id == 36, 1, 0)
+med_exp_pa_df37$treated_aux <- ifelse(med_exp_pa_df37$id == 37, 1, 0)
+med_exp_pa_df39$treated_aux <- ifelse(med_exp_pa_df39$id == 39, 1, 0)
+med_exp_pa_df40$treated_aux <- ifelse(med_exp_pa_df40$id == 40, 1, 0)
+med_exp_pa_df41$treated_aux <- ifelse(med_exp_pa_df41$id == 41, 1, 0)
+med_exp_pa_df44$treated_aux <- ifelse(med_exp_pa_df44$id == 44, 1, 0)
+med_exp_pa_df45$treated_aux <- ifelse(med_exp_pa_df45$id == 45, 1, 0)
+med_exp_pa_df47$treated_aux <- ifelse(med_exp_pa_df47$id == 47, 1, 0)
+med_exp_pa_df50$treated_aux <- ifelse(med_exp_pa_df50$id == 50, 1, 0)
+med_exp_pa_df51$treated_aux <- ifelse(med_exp_pa_df51$id == 51, 1, 0)
+med_exp_pa_df53$treated_aux <- ifelse(med_exp_pa_df53$id == 53, 1, 0)
+med_exp_pa_df54$treated_aux <- ifelse(med_exp_pa_df54$id == 54, 1, 0)
+med_exp_pa_df55$treated_aux <- ifelse(med_exp_pa_df55$id == 55, 1, 0)
+med_exp_pa_df1$treated <- as.integer(ifelse(med_exp_pa_df1$id == 1 & med_exp_pa_df1$year >= 1996, 1, 0))
+med_exp_pa_df2$treated <- as.integer(ifelse(med_exp_pa_df2$id == 2 & med_exp_pa_df2$year >= 1996, 1, 0))
+med_exp_pa_df5$treated <- as.integer(ifelse(med_exp_pa_df5$id == 5 & med_exp_pa_df5$year >= 1996, 1, 0))
+med_exp_pa_df10$treated <- as.integer(ifelse(med_exp_pa_df10$id == 10 & med_exp_pa_df10$year >= 1996, 1, 0))
+med_exp_pa_df11$treated <- as.integer(ifelse(med_exp_pa_df11$id == 11 & med_exp_pa_df11$year >= 1996, 1, 0))
+med_exp_pa_df12$treated <- as.integer(ifelse(med_exp_pa_df12$id == 12 & med_exp_pa_df12$year >= 1996, 1, 0))
+med_exp_pa_df13$treated <- as.integer(ifelse(med_exp_pa_df13$id == 13 & med_exp_pa_df13$year >= 1996, 1, 0))
+med_exp_pa_df15$treated <- as.integer(ifelse(med_exp_pa_df15$id == 15 & med_exp_pa_df15$year >= 1996, 1, 0))
+med_exp_pa_df17$treated <- as.integer(ifelse(med_exp_pa_df17$id == 17 & med_exp_pa_df17$year >= 1996, 1, 0))
+med_exp_pa_df19$treated <- as.integer(ifelse(med_exp_pa_df19$id == 19 & med_exp_pa_df19$year >= 1996, 1, 0))
+med_exp_pa_df21$treated <- as.integer(ifelse(med_exp_pa_df21$id == 21 & med_exp_pa_df21$year >= 1996, 1, 0))
+med_exp_pa_df23$treated <- as.integer(ifelse(med_exp_pa_df23$id == 23 & med_exp_pa_df23$year >= 1996, 1, 0))
+med_exp_pa_df24$treated <- as.integer(ifelse(med_exp_pa_df24$id == 24 & med_exp_pa_df24$year >= 1996, 1, 0))
+med_exp_pa_df25$treated <- as.integer(ifelse(med_exp_pa_df25$id == 25 & med_exp_pa_df25$year >= 1996, 1, 0))
+med_exp_pa_df26$treated <- as.integer(ifelse(med_exp_pa_df26$id == 26 & med_exp_pa_df26$year >= 1996, 1, 0))
+med_exp_pa_df28$treated <- as.integer(ifelse(med_exp_pa_df28$id == 28 & med_exp_pa_df28$year >= 1996, 1, 0))
+med_exp_pa_df29$treated <- as.integer(ifelse(med_exp_pa_df29$id == 29 & med_exp_pa_df29$year >= 1996, 1, 0))
+med_exp_pa_df30$treated <- as.integer(ifelse(med_exp_pa_df30$id == 30 & med_exp_pa_df30$year >= 1996, 1, 0))
+med_exp_pa_df31$treated <- as.integer(ifelse(med_exp_pa_df31$id == 31 & med_exp_pa_df31$year >= 1996, 1, 0))
+med_exp_pa_df32$treated <- as.integer(ifelse(med_exp_pa_df32$id == 32 & med_exp_pa_df32$year >= 1996, 1, 0))
+med_exp_pa_df33$treated <- as.integer(ifelse(med_exp_pa_df33$id == 33 & med_exp_pa_df33$year >= 1996, 1, 0))
+med_exp_pa_df34$treated <- as.integer(ifelse(med_exp_pa_df34$id == 34 & med_exp_pa_df34$year >= 1996, 1, 0))
+med_exp_pa_df36$treated <- as.integer(ifelse(med_exp_pa_df36$id == 36 & med_exp_pa_df36$year >= 1996, 1, 0))
+med_exp_pa_df37$treated <- as.integer(ifelse(med_exp_pa_df37$id == 37 & med_exp_pa_df37$year >= 1996, 1, 0))
+med_exp_pa_df39$treated <- as.integer(ifelse(med_exp_pa_df39$id == 39 & med_exp_pa_df39$year >= 1996, 1, 0))
+med_exp_pa_df40$treated <- as.integer(ifelse(med_exp_pa_df40$id == 40 & med_exp_pa_df40$year >= 1996, 1, 0))
+med_exp_pa_df41$treated <- as.integer(ifelse(med_exp_pa_df41$id == 41 & med_exp_pa_df41$year >= 1996, 1, 0))
+med_exp_pa_df44$treated <- as.integer(ifelse(med_exp_pa_df44$id == 44 & med_exp_pa_df44$year >= 1996, 1, 0))
+med_exp_pa_df45$treated <- as.integer(ifelse(med_exp_pa_df45$id == 45 & med_exp_pa_df45$year >= 1996, 1, 0))
+med_exp_pa_df47$treated <- as.integer(ifelse(med_exp_pa_df47$id == 47 & med_exp_pa_df47$year >= 1996, 1, 0))
+med_exp_pa_df50$treated <- as.integer(ifelse(med_exp_pa_df50$id == 50 & med_exp_pa_df50$year >= 1996, 1, 0))
+med_exp_pa_df51$treated <- as.integer(ifelse(med_exp_pa_df51$id == 51 & med_exp_pa_df51$year >= 1996, 1, 0))
+med_exp_pa_df53$treated <- as.integer(ifelse(med_exp_pa_df53$id == 53 & med_exp_pa_df53$year >= 1996, 1, 0))
+med_exp_pa_df54$treated <- as.integer(ifelse(med_exp_pa_df54$id == 54 & med_exp_pa_df54$year >= 1996, 1, 0))
+med_exp_pa_df55$treated <- as.integer(ifelse(med_exp_pa_df55$id == 55 & med_exp_pa_df55$year >= 1996, 1, 0))
+med_exp_pa_df_list <- list(med_exp_pa_df1,med_exp_pa_df2,med_exp_pa_df5,
+                           med_exp_pa_df10,med_exp_pa_df11,med_exp_pa_df12,
+                           med_exp_pa_df13,med_exp_pa_df15,med_exp_pa_df17,
+                           med_exp_pa_df19,med_exp_pa_df21,med_exp_pa_df23,
+                           med_exp_pa_df24,med_exp_pa_df25,med_exp_pa_df26,
+                           med_exp_pa_df28,med_exp_pa_df29,med_exp_pa_df30,
+                           med_exp_pa_df31,med_exp_pa_df32,med_exp_pa_df33,
+                           med_exp_pa_df34,med_exp_pa_df36,med_exp_pa_df37,
+                           med_exp_pa_df39,med_exp_pa_df40,med_exp_pa_df41,
+                           med_exp_pa_df44,med_exp_pa_df45,med_exp_pa_df47,
+                           med_exp_pa_df50,med_exp_pa_df51,med_exp_pa_df53,
+                           med_exp_pa_df54,med_exp_pa_df55)
+rm(med_exp_pa_df1,med_exp_pa_df2,med_exp_pa_df5,
+   med_exp_pa_df10,med_exp_pa_df11,med_exp_pa_df12,
+   med_exp_pa_df13,med_exp_pa_df15,med_exp_pa_df17,
+   med_exp_pa_df19,med_exp_pa_df21,med_exp_pa_df23,
+   med_exp_pa_df24,med_exp_pa_df25,med_exp_pa_df26,
+   med_exp_pa_df28,med_exp_pa_df29,med_exp_pa_df30,
+   med_exp_pa_df31,med_exp_pa_df32,med_exp_pa_df33,
+   med_exp_pa_df34,med_exp_pa_df36,med_exp_pa_df37,
+   med_exp_pa_df39,med_exp_pa_df40,med_exp_pa_df41,
+   med_exp_pa_df44,med_exp_pa_df45,med_exp_pa_df47,
+   med_exp_pa_df50,med_exp_pa_df51,med_exp_pa_df53,
+   med_exp_pa_df54,med_exp_pa_df55)
+med_exp_pa_df_list <- lapply(med_exp_pa_df_list, function(x) {
+  x <- x[order(x$year, x$treated_aux, x$name),]
+  return(x)
+}
+)
+med_exp_pa_df_list <- lapply(med_exp_pa_df_list, function(x) {
+  data.frame(subset(x, alwaysconpa == 1, select=c(name, year, medicaid_exp, treated)))
+}
+)
+setup_med_exp_pa1 <- panel.matrices(med_exp_pa_df_list[[1]], unit = 1, time = 2, outcome = 3, treatment = 4)
+setup_med_exp_pa2 <- panel.matrices(med_exp_pa_df_list[[2]], unit = 1, time = 2, outcome = 3, treatment = 4)
+setup_med_exp_pa5 <- panel.matrices(med_exp_pa_df_list[[3]], unit = 1, time = 2, outcome = 3, treatment = 4)
+setup_med_exp_pa10 <- panel.matrices(med_exp_pa_df_list[[4]], unit = 1, time = 2, outcome = 3, treatment = 4)
+setup_med_exp_pa11 <- panel.matrices(med_exp_pa_df_list[[5]], unit = 1, time = 2, outcome = 3, treatment = 4)
+setup_med_exp_pa12 <- panel.matrices(med_exp_pa_df_list[[6]], unit = 1, time = 2, outcome = 3, treatment = 4)
+setup_med_exp_pa13 <- panel.matrices(med_exp_pa_df_list[[7]], unit = 1, time = 2, outcome = 3, treatment = 4)
+setup_med_exp_pa15 <- panel.matrices(med_exp_pa_df_list[[8]], unit = 1, time = 2, outcome = 3, treatment = 4)
+setup_med_exp_pa17 <- panel.matrices(med_exp_pa_df_list[[9]], unit = 1, time = 2, outcome = 3, treatment = 4)
+setup_med_exp_pa19 <- panel.matrices(med_exp_pa_df_list[[10]], unit = 1, time = 2, outcome = 3, treatment = 4)
+setup_med_exp_pa21 <- panel.matrices(med_exp_pa_df_list[[11]], unit = 1, time = 2, outcome = 3, treatment = 4)
+setup_med_exp_pa23 <- panel.matrices(med_exp_pa_df_list[[12]], unit = 1, time = 2, outcome = 3, treatment = 4)
+setup_med_exp_pa24 <- panel.matrices(med_exp_pa_df_list[[13]], unit = 1, time = 2, outcome = 3, treatment = 4)
+setup_med_exp_pa25 <- panel.matrices(med_exp_pa_df_list[[14]], unit = 1, time = 2, outcome = 3, treatment = 4)
+setup_med_exp_pa26 <- panel.matrices(med_exp_pa_df_list[[15]], unit = 1, time = 2, outcome = 3, treatment = 4)
+setup_med_exp_pa28 <- panel.matrices(med_exp_pa_df_list[[16]], unit = 1, time = 2, outcome = 3, treatment = 4)
+setup_med_exp_pa29 <- panel.matrices(med_exp_pa_df_list[[17]], unit = 1, time = 2, outcome = 3, treatment = 4)
+setup_med_exp_pa30 <- panel.matrices(med_exp_pa_df_list[[18]], unit = 1, time = 2, outcome = 3, treatment = 4)
+setup_med_exp_pa31 <- panel.matrices(med_exp_pa_df_list[[19]], unit = 1, time = 2, outcome = 3, treatment = 4)
+setup_med_exp_pa32 <- panel.matrices(med_exp_pa_df_list[[20]], unit = 1, time = 2, outcome = 3, treatment = 4)
+setup_med_exp_pa33 <- panel.matrices(med_exp_pa_df_list[[21]], unit = 1, time = 2, outcome = 3, treatment = 4)
+setup_med_exp_pa34 <- panel.matrices(med_exp_pa_df_list[[22]], unit = 1, time = 2, outcome = 3, treatment = 4)
+setup_med_exp_pa36 <- panel.matrices(med_exp_pa_df_list[[23]], unit = 1, time = 2, outcome = 3, treatment = 4)
+setup_med_exp_pa37 <- panel.matrices(med_exp_pa_df_list[[24]], unit = 1, time = 2, outcome = 3, treatment = 4)
+setup_med_exp_pa39 <- panel.matrices(med_exp_pa_df_list[[25]], unit = 1, time = 2, outcome = 3, treatment = 4)
+setup_med_exp_pa40 <- panel.matrices(med_exp_pa_df_list[[26]], unit = 1, time = 2, outcome = 3, treatment = 4)
+setup_med_exp_pa41 <- panel.matrices(med_exp_pa_df_list[[27]], unit = 1, time = 2, outcome = 3, treatment = 4)
+setup_med_exp_pa44 <- panel.matrices(med_exp_pa_df_list[[28]], unit = 1, time = 2, outcome = 3, treatment = 4)
+setup_med_exp_pa45 <- panel.matrices(med_exp_pa_df_list[[29]], unit = 1, time = 2, outcome = 3, treatment = 4)
+setup_med_exp_pa47 <- panel.matrices(med_exp_pa_df_list[[30]], unit = 1, time = 2, outcome = 3, treatment = 4)
+setup_med_exp_pa50 <- panel.matrices(med_exp_pa_df_list[[31]], unit = 1, time = 2, outcome = 3, treatment = 4)
+setup_med_exp_pa51 <- panel.matrices(med_exp_pa_df_list[[32]], unit = 1, time = 2, outcome = 3, treatment = 4)
+setup_med_exp_pa53 <- panel.matrices(med_exp_pa_df_list[[33]], unit = 1, time = 2, outcome = 3, treatment = 4)
+setup_med_exp_pa54 <- panel.matrices(med_exp_pa_df_list[[34]], unit = 1, time = 2, outcome = 3, treatment = 4)
+setup_med_exp_pa55 <- panel.matrices(med_exp_pa_df_list[[35]], unit = 1, time = 2, outcome = 3, treatment = 4)
+setup_med_exp_pa_list <- list(setup_med_exp_pa1,setup_med_exp_pa2,setup_med_exp_pa5,
+                              setup_med_exp_pa10,setup_med_exp_pa11,setup_med_exp_pa12,
+                              setup_med_exp_pa13,setup_med_exp_pa15,setup_med_exp_pa17,
+                              setup_med_exp_pa19,setup_med_exp_pa21,setup_med_exp_pa23,
+                              setup_med_exp_pa24,setup_med_exp_pa25,setup_med_exp_pa26,
+                              setup_med_exp_pa28,setup_med_exp_pa29,setup_med_exp_pa30,
+                              setup_med_exp_pa31,setup_med_exp_pa32,setup_med_exp_pa33,
+                              setup_med_exp_pa34,setup_med_exp_pa36,setup_med_exp_pa37,
+                              setup_med_exp_pa39,setup_med_exp_pa40,setup_med_exp_pa41,
+                              setup_med_exp_pa44,setup_med_exp_pa45,setup_med_exp_pa47,
+                              setup_med_exp_pa50,setup_med_exp_pa51,setup_med_exp_pa53,
+                              setup_med_exp_pa54,setup_med_exp_pa55)
+rm(setup_med_exp_pa1,setup_med_exp_pa2,setup_med_exp_pa5,
+   setup_med_exp_pa10,setup_med_exp_pa11,setup_med_exp_pa12,
+   setup_med_exp_pa13,setup_med_exp_pa15,setup_med_exp_pa17,
+   setup_med_exp_pa19,setup_med_exp_pa21,setup_med_exp_pa23,
+   setup_med_exp_pa24,setup_med_exp_pa25,setup_med_exp_pa26,
+   setup_med_exp_pa28,setup_med_exp_pa29,setup_med_exp_pa30,
+   setup_med_exp_pa31,setup_med_exp_pa32,setup_med_exp_pa33,
+   setup_med_exp_pa34,setup_med_exp_pa36,setup_med_exp_pa37,
+   setup_med_exp_pa39,setup_med_exp_pa40,setup_med_exp_pa41,
+   setup_med_exp_pa44,setup_med_exp_pa45,setup_med_exp_pa47,
+   setup_med_exp_pa50,setup_med_exp_pa51,setup_med_exp_pa53,
+   setup_med_exp_pa54,setup_med_exp_pa55)
+# DID #
+med_exp_pa_est_did1 <- did_estimate(setup_med_exp_pa_list[[1]]$Y, setup_med_exp_pa_list[[1]]$N0, setup_med_exp_pa_list[[1]]$T0, X = covariates_exp_array_1)
+med_exp_pa_est_did2 <- did_estimate(setup_med_exp_pa_list[[2]]$Y, setup_med_exp_pa_list[[2]]$N0, setup_med_exp_pa_list[[2]]$T0, X = covariates_exp_array_2)
+med_exp_pa_est_did5 <- did_estimate(setup_med_exp_pa_list[[3]]$Y, setup_med_exp_pa_list[[3]]$N0, setup_med_exp_pa_list[[3]]$T0, X = covariates_exp_array_5)
+med_exp_pa_est_did10 <- did_estimate(setup_med_exp_pa_list[[4]]$Y, setup_med_exp_pa_list[[4]]$N0, setup_med_exp_pa_list[[4]]$T0, X = covariates_exp_array_10)
+med_exp_pa_est_did11 <- did_estimate(setup_med_exp_pa_list[[5]]$Y, setup_med_exp_pa_list[[5]]$N0, setup_med_exp_pa_list[[5]]$T0, X = covariates_exp_array_11)
+med_exp_pa_est_did12 <- did_estimate(setup_med_exp_pa_list[[6]]$Y, setup_med_exp_pa_list[[6]]$N0, setup_med_exp_pa_list[[6]]$T0, X = covariates_exp_array_12)
+med_exp_pa_est_did13 <- did_estimate(setup_med_exp_pa_list[[7]]$Y, setup_med_exp_pa_list[[7]]$N0, setup_med_exp_pa_list[[7]]$T0, X = covariates_exp_array_13)
+med_exp_pa_est_did15 <- did_estimate(setup_med_exp_pa_list[[8]]$Y, setup_med_exp_pa_list[[8]]$N0, setup_med_exp_pa_list[[8]]$T0, X = covariates_exp_array_15)
+med_exp_pa_est_did17 <- did_estimate(setup_med_exp_pa_list[[9]]$Y, setup_med_exp_pa_list[[9]]$N0, setup_med_exp_pa_list[[9]]$T0, X = covariates_exp_array_17)
+med_exp_pa_est_did19 <- did_estimate(setup_med_exp_pa_list[[10]]$Y, setup_med_exp_pa_list[[10]]$N0, setup_med_exp_pa_list[[10]]$T0, X = covariates_exp_array_19)
+med_exp_pa_est_did21 <- did_estimate(setup_med_exp_pa_list[[11]]$Y, setup_med_exp_pa_list[[11]]$N0, setup_med_exp_pa_list[[11]]$T0, X = covariates_exp_array_21)
+med_exp_pa_est_did23 <- did_estimate(setup_med_exp_pa_list[[12]]$Y, setup_med_exp_pa_list[[12]]$N0, setup_med_exp_pa_list[[12]]$T0, X = covariates_exp_array_23)
+med_exp_pa_est_did24 <- did_estimate(setup_med_exp_pa_list[[13]]$Y, setup_med_exp_pa_list[[13]]$N0, setup_med_exp_pa_list[[13]]$T0, X = covariates_exp_array_24)
+med_exp_pa_est_did25 <- did_estimate(setup_med_exp_pa_list[[14]]$Y, setup_med_exp_pa_list[[14]]$N0, setup_med_exp_pa_list[[14]]$T0, X = covariates_exp_array_25)
+med_exp_pa_est_did26 <- did_estimate(setup_med_exp_pa_list[[15]]$Y, setup_med_exp_pa_list[[15]]$N0, setup_med_exp_pa_list[[15]]$T0, X = covariates_exp_array_26)
+med_exp_pa_est_did28 <- did_estimate(setup_med_exp_pa_list[[16]]$Y, setup_med_exp_pa_list[[16]]$N0, setup_med_exp_pa_list[[16]]$T0, X = covariates_exp_array_28)
+med_exp_pa_est_did29 <- did_estimate(setup_med_exp_pa_list[[17]]$Y, setup_med_exp_pa_list[[17]]$N0, setup_med_exp_pa_list[[17]]$T0, X = covariates_exp_array_29)
+med_exp_pa_est_did30 <- did_estimate(setup_med_exp_pa_list[[18]]$Y, setup_med_exp_pa_list[[18]]$N0, setup_med_exp_pa_list[[18]]$T0, X = covariates_exp_array_30)
+med_exp_pa_est_did31 <- did_estimate(setup_med_exp_pa_list[[19]]$Y, setup_med_exp_pa_list[[19]]$N0, setup_med_exp_pa_list[[19]]$T0, X = covariates_exp_array_31)
+med_exp_pa_est_did32 <- did_estimate(setup_med_exp_pa_list[[20]]$Y, setup_med_exp_pa_list[[20]]$N0, setup_med_exp_pa_list[[20]]$T0, X = covariates_exp_array_32)
+med_exp_pa_est_did33 <- did_estimate(setup_med_exp_pa_list[[21]]$Y, setup_med_exp_pa_list[[21]]$N0, setup_med_exp_pa_list[[21]]$T0, X = covariates_exp_array_33)
+med_exp_pa_est_did34 <- did_estimate(setup_med_exp_pa_list[[22]]$Y, setup_med_exp_pa_list[[22]]$N0, setup_med_exp_pa_list[[22]]$T0, X = covariates_exp_array_34)
+med_exp_pa_est_did36 <- did_estimate(setup_med_exp_pa_list[[23]]$Y, setup_med_exp_pa_list[[23]]$N0, setup_med_exp_pa_list[[23]]$T0, X = covariates_exp_array_36)
+med_exp_pa_est_did37 <- did_estimate(setup_med_exp_pa_list[[24]]$Y, setup_med_exp_pa_list[[24]]$N0, setup_med_exp_pa_list[[24]]$T0, X = covariates_exp_array_37)
+med_exp_pa_est_did39 <- did_estimate(setup_med_exp_pa_list[[25]]$Y, setup_med_exp_pa_list[[25]]$N0, setup_med_exp_pa_list[[25]]$T0, X = covariates_exp_array_39)
+med_exp_pa_est_did40 <- did_estimate(setup_med_exp_pa_list[[26]]$Y, setup_med_exp_pa_list[[26]]$N0, setup_med_exp_pa_list[[26]]$T0, X = covariates_exp_array_40)
+med_exp_pa_est_did41 <- did_estimate(setup_med_exp_pa_list[[27]]$Y, setup_med_exp_pa_list[[27]]$N0, setup_med_exp_pa_list[[27]]$T0, X = covariates_exp_array_41)
+med_exp_pa_est_did44 <- did_estimate(setup_med_exp_pa_list[[28]]$Y, setup_med_exp_pa_list[[28]]$N0, setup_med_exp_pa_list[[28]]$T0, X = covariates_exp_array_44)
+med_exp_pa_est_did45 <- did_estimate(setup_med_exp_pa_list[[29]]$Y, setup_med_exp_pa_list[[29]]$N0, setup_med_exp_pa_list[[29]]$T0, X = covariates_exp_array_45)
+med_exp_pa_est_did47 <- did_estimate(setup_med_exp_pa_list[[30]]$Y, setup_med_exp_pa_list[[30]]$N0, setup_med_exp_pa_list[[30]]$T0, X = covariates_exp_array_47)
+med_exp_pa_est_did50 <- did_estimate(setup_med_exp_pa_list[[31]]$Y, setup_med_exp_pa_list[[31]]$N0, setup_med_exp_pa_list[[31]]$T0, X = covariates_exp_array_50)
+med_exp_pa_est_did51 <- did_estimate(setup_med_exp_pa_list[[32]]$Y, setup_med_exp_pa_list[[32]]$N0, setup_med_exp_pa_list[[32]]$T0, X = covariates_exp_array_51)
+med_exp_pa_est_did53 <- did_estimate(setup_med_exp_pa_list[[33]]$Y, setup_med_exp_pa_list[[33]]$N0, setup_med_exp_pa_list[[33]]$T0, X = covariates_exp_array_53)
+med_exp_pa_est_did54 <- did_estimate(setup_med_exp_pa_list[[34]]$Y, setup_med_exp_pa_list[[34]]$N0, setup_med_exp_pa_list[[34]]$T0, X = covariates_exp_array_54)
+med_exp_pa_est_did55 <- did_estimate(setup_med_exp_pa_list[[35]]$Y, setup_med_exp_pa_list[[35]]$N0, setup_med_exp_pa_list[[35]]$T0, X = covariates_exp_array_55)
+med_exp_pa_est_did_list <- list(med_exp_pa_est_did1,med_exp_pa_est_did2,med_exp_pa_est_did5,
+                                med_exp_pa_est_did10,med_exp_pa_est_did11,med_exp_pa_est_did12,
+                                med_exp_pa_est_did13,med_exp_pa_est_did15,med_exp_pa_est_did17,
+                                med_exp_pa_est_did19,med_exp_pa_est_did21,med_exp_pa_est_did23,
+                                med_exp_pa_est_did24,med_exp_pa_est_did25,med_exp_pa_est_did26,
+                                med_exp_pa_est_did28,med_exp_pa_est_did29,med_exp_pa_est_did30,
+                                med_exp_pa_est_did31,med_exp_pa_est_did32,med_exp_pa_est_did33,
+                                med_exp_pa_est_did34,med_exp_pa_est_did36,med_exp_pa_est_did37,
+                                med_exp_pa_est_did39,med_exp_pa_est_did40,med_exp_pa_est_did41,
+                                med_exp_pa_est_did44,med_exp_pa_est_did45,med_exp_pa_est_did47,
+                                med_exp_pa_est_did50,med_exp_pa_est_did51,med_exp_pa_est_did53,
+                                med_exp_pa_est_did54,med_exp_pa_est_did55)
+rm(med_exp_pa_est_did1,med_exp_pa_est_did2,med_exp_pa_est_did5,
+   med_exp_pa_est_did10,med_exp_pa_est_did11,med_exp_pa_est_did12,
+   med_exp_pa_est_did13,med_exp_pa_est_did15,med_exp_pa_est_did17,
+   med_exp_pa_est_did19,med_exp_pa_est_did21,med_exp_pa_est_did23,
+   med_exp_pa_est_did24,med_exp_pa_est_did25,med_exp_pa_est_did26,
+   med_exp_pa_est_did28,med_exp_pa_est_did29,med_exp_pa_est_did30,
+   med_exp_pa_est_did31,med_exp_pa_est_did32,med_exp_pa_est_did33,
+   med_exp_pa_est_did34,med_exp_pa_est_did36,med_exp_pa_est_did37,
+   med_exp_pa_est_did39,med_exp_pa_est_did40,med_exp_pa_est_did41,
+   med_exp_pa_est_did44,med_exp_pa_est_did45,med_exp_pa_est_did47,
+   med_exp_pa_est_did50,med_exp_pa_est_did51,med_exp_pa_est_did53,
+   med_exp_pa_est_did54,med_exp_pa_est_did55)
+for(i in 1:35) {
+  assign(paste0("med_exp_pa_est_did_plot", i), synthdid_plot(med_exp_pa_est_did_list[i]))
+}
+med_exp_pa_est_did_plot_data_aux1 <- ggplot_build(med_exp_pa_est_did_plot1)
+med_exp_pa_est_did_plot_data_aux2 <- ggplot_build(med_exp_pa_est_did_plot2)
+med_exp_pa_est_did_plot_data_aux3 <- ggplot_build(med_exp_pa_est_did_plot3)
+med_exp_pa_est_did_plot_data_aux4 <- ggplot_build(med_exp_pa_est_did_plot4)
+med_exp_pa_est_did_plot_data_aux5 <- ggplot_build(med_exp_pa_est_did_plot5)
+med_exp_pa_est_did_plot_data_aux6 <- ggplot_build(med_exp_pa_est_did_plot6)
+med_exp_pa_est_did_plot_data_aux7 <- ggplot_build(med_exp_pa_est_did_plot7)
+med_exp_pa_est_did_plot_data_aux8 <- ggplot_build(med_exp_pa_est_did_plot8)
+med_exp_pa_est_did_plot_data_aux9 <- ggplot_build(med_exp_pa_est_did_plot9)
+med_exp_pa_est_did_plot_data_aux10 <- ggplot_build(med_exp_pa_est_did_plot10)
+med_exp_pa_est_did_plot_data_aux11 <- ggplot_build(med_exp_pa_est_did_plot11)
+med_exp_pa_est_did_plot_data_aux12 <- ggplot_build(med_exp_pa_est_did_plot12)
+med_exp_pa_est_did_plot_data_aux13 <- ggplot_build(med_exp_pa_est_did_plot13)
+med_exp_pa_est_did_plot_data_aux14 <- ggplot_build(med_exp_pa_est_did_plot14)
+med_exp_pa_est_did_plot_data_aux15 <- ggplot_build(med_exp_pa_est_did_plot15)
+med_exp_pa_est_did_plot_data_aux16 <- ggplot_build(med_exp_pa_est_did_plot16)
+med_exp_pa_est_did_plot_data_aux17 <- ggplot_build(med_exp_pa_est_did_plot17)
+med_exp_pa_est_did_plot_data_aux18 <- ggplot_build(med_exp_pa_est_did_plot18)
+med_exp_pa_est_did_plot_data_aux19 <- ggplot_build(med_exp_pa_est_did_plot19)
+med_exp_pa_est_did_plot_data_aux20 <- ggplot_build(med_exp_pa_est_did_plot20)
+med_exp_pa_est_did_plot_data_aux21 <- ggplot_build(med_exp_pa_est_did_plot21)
+med_exp_pa_est_did_plot_data_aux22 <- ggplot_build(med_exp_pa_est_did_plot22)
+med_exp_pa_est_did_plot_data_aux23 <- ggplot_build(med_exp_pa_est_did_plot23)
+med_exp_pa_est_did_plot_data_aux24 <- ggplot_build(med_exp_pa_est_did_plot24)
+med_exp_pa_est_did_plot_data_aux25 <- ggplot_build(med_exp_pa_est_did_plot25)
+med_exp_pa_est_did_plot_data_aux26 <- ggplot_build(med_exp_pa_est_did_plot26)
+med_exp_pa_est_did_plot_data_aux27 <- ggplot_build(med_exp_pa_est_did_plot27)
+med_exp_pa_est_did_plot_data_aux28 <- ggplot_build(med_exp_pa_est_did_plot28)
+med_exp_pa_est_did_plot_data_aux29 <- ggplot_build(med_exp_pa_est_did_plot29)
+med_exp_pa_est_did_plot_data_aux30 <- ggplot_build(med_exp_pa_est_did_plot30)
+med_exp_pa_est_did_plot_data_aux31 <- ggplot_build(med_exp_pa_est_did_plot31)
+med_exp_pa_est_did_plot_data_aux32 <- ggplot_build(med_exp_pa_est_did_plot32)
+med_exp_pa_est_did_plot_data_aux33 <- ggplot_build(med_exp_pa_est_did_plot33)
+med_exp_pa_est_did_plot_data_aux34 <- ggplot_build(med_exp_pa_est_did_plot34)
+med_exp_pa_est_did_plot_data_aux35 <- ggplot_build(med_exp_pa_est_did_plot35)
+med_exp_pa_est_did_plot_data_aux_list <- list(med_exp_pa_est_did_plot_data_aux1,med_exp_pa_est_did_plot_data_aux2,med_exp_pa_est_did_plot_data_aux3,
+                                              med_exp_pa_est_did_plot_data_aux4,med_exp_pa_est_did_plot_data_aux5,med_exp_pa_est_did_plot_data_aux6,
+                                              med_exp_pa_est_did_plot_data_aux7,med_exp_pa_est_did_plot_data_aux8,med_exp_pa_est_did_plot_data_aux9,
+                                              med_exp_pa_est_did_plot_data_aux10,med_exp_pa_est_did_plot_data_aux11,med_exp_pa_est_did_plot_data_aux12,
+                                              med_exp_pa_est_did_plot_data_aux13,med_exp_pa_est_did_plot_data_aux14,med_exp_pa_est_did_plot_data_aux15,
+                                              med_exp_pa_est_did_plot_data_aux16,med_exp_pa_est_did_plot_data_aux17,med_exp_pa_est_did_plot_data_aux18,
+                                              med_exp_pa_est_did_plot_data_aux19,med_exp_pa_est_did_plot_data_aux20,med_exp_pa_est_did_plot_data_aux21,
+                                              med_exp_pa_est_did_plot_data_aux22,med_exp_pa_est_did_plot_data_aux23,med_exp_pa_est_did_plot_data_aux24,
+                                              med_exp_pa_est_did_plot_data_aux25,med_exp_pa_est_did_plot_data_aux26,med_exp_pa_est_did_plot_data_aux27,
+                                              med_exp_pa_est_did_plot_data_aux28,med_exp_pa_est_did_plot_data_aux29,med_exp_pa_est_did_plot_data_aux30,
+                                              med_exp_pa_est_did_plot_data_aux31,med_exp_pa_est_did_plot_data_aux32,med_exp_pa_est_did_plot_data_aux33,
+                                              med_exp_pa_est_did_plot_data_aux34,med_exp_pa_est_did_plot_data_aux35)
+rm(med_exp_pa_est_did_plot_data_aux1,med_exp_pa_est_did_plot_data_aux2,med_exp_pa_est_did_plot_data_aux3,
+   med_exp_pa_est_did_plot_data_aux4,med_exp_pa_est_did_plot_data_aux5,med_exp_pa_est_did_plot_data_aux6,
+   med_exp_pa_est_did_plot_data_aux7,med_exp_pa_est_did_plot_data_aux8,med_exp_pa_est_did_plot_data_aux9,
+   med_exp_pa_est_did_plot_data_aux10,med_exp_pa_est_did_plot_data_aux11,med_exp_pa_est_did_plot_data_aux12,
+   med_exp_pa_est_did_plot_data_aux13,med_exp_pa_est_did_plot_data_aux14,med_exp_pa_est_did_plot_data_aux15,
+   med_exp_pa_est_did_plot_data_aux16,med_exp_pa_est_did_plot_data_aux17,med_exp_pa_est_did_plot_data_aux18,
+   med_exp_pa_est_did_plot_data_aux19,med_exp_pa_est_did_plot_data_aux20,med_exp_pa_est_did_plot_data_aux21,
+   med_exp_pa_est_did_plot_data_aux22,med_exp_pa_est_did_plot_data_aux23,med_exp_pa_est_did_plot_data_aux24,
+   med_exp_pa_est_did_plot_data_aux25,med_exp_pa_est_did_plot_data_aux26,med_exp_pa_est_did_plot_data_aux27,
+   med_exp_pa_est_did_plot_data_aux28,med_exp_pa_est_did_plot_data_aux29,med_exp_pa_est_did_plot_data_aux30,
+   med_exp_pa_est_did_plot_data_aux31,med_exp_pa_est_did_plot_data_aux32,med_exp_pa_est_did_plot_data_aux33,
+   med_exp_pa_est_did_plot_data_aux34,med_exp_pa_est_did_plot_data_aux35)
+rm(med_exp_pa_est_did_plot1,med_exp_pa_est_did_plot2,med_exp_pa_est_did_plot3,
+   med_exp_pa_est_did_plot4,med_exp_pa_est_did_plot5,med_exp_pa_est_did_plot6,
+   med_exp_pa_est_did_plot7,med_exp_pa_est_did_plot8,med_exp_pa_est_did_plot9,
+   med_exp_pa_est_did_plot10,med_exp_pa_est_did_plot11,med_exp_pa_est_did_plot12,
+   med_exp_pa_est_did_plot13,med_exp_pa_est_did_plot14,med_exp_pa_est_did_plot15,
+   med_exp_pa_est_did_plot16,med_exp_pa_est_did_plot17,med_exp_pa_est_did_plot18,
+   med_exp_pa_est_did_plot19,med_exp_pa_est_did_plot20,med_exp_pa_est_did_plot21,
+   med_exp_pa_est_did_plot22,med_exp_pa_est_did_plot23,med_exp_pa_est_did_plot24,
+   med_exp_pa_est_did_plot25,med_exp_pa_est_did_plot26,med_exp_pa_est_did_plot27,
+   med_exp_pa_est_did_plot28,med_exp_pa_est_did_plot29,med_exp_pa_est_did_plot30,
+   med_exp_pa_est_did_plot31,med_exp_pa_est_did_plot32,med_exp_pa_est_did_plot33,
+   med_exp_pa_est_did_plot34,med_exp_pa_est_did_plot35)
+for(i in 1:35) {
+  assign(paste0("med_exp_pa_est_did_plot_data_long", i), data.frame(med_exp_pa_est_did_plot_data_aux_list[[i]]$data[[1]]$x, med_exp_pa_est_did_plot_data_aux_list[[i]]$data[[1]]$y, med_exp_pa_est_did_plot_data_aux_list[[i]]$data[[1]]$group))
+}
+med_exp_pa_est_did_plot_data_long_list <- list(med_exp_pa_est_did_plot_data_long1,med_exp_pa_est_did_plot_data_long2,med_exp_pa_est_did_plot_data_long3,
+                                               med_exp_pa_est_did_plot_data_long4,med_exp_pa_est_did_plot_data_long5,med_exp_pa_est_did_plot_data_long6,
+                                               med_exp_pa_est_did_plot_data_long7,med_exp_pa_est_did_plot_data_long8,med_exp_pa_est_did_plot_data_long9,
+                                               med_exp_pa_est_did_plot_data_long10,med_exp_pa_est_did_plot_data_long11,med_exp_pa_est_did_plot_data_long12,
+                                               med_exp_pa_est_did_plot_data_long13,med_exp_pa_est_did_plot_data_long14,med_exp_pa_est_did_plot_data_long15,
+                                               med_exp_pa_est_did_plot_data_long16,med_exp_pa_est_did_plot_data_long17,med_exp_pa_est_did_plot_data_long18,
+                                               med_exp_pa_est_did_plot_data_long19,med_exp_pa_est_did_plot_data_long20,med_exp_pa_est_did_plot_data_long21,
+                                               med_exp_pa_est_did_plot_data_long22,med_exp_pa_est_did_plot_data_long23,med_exp_pa_est_did_plot_data_long24,
+                                               med_exp_pa_est_did_plot_data_long25,med_exp_pa_est_did_plot_data_long26,med_exp_pa_est_did_plot_data_long27,
+                                               med_exp_pa_est_did_plot_data_long28,med_exp_pa_est_did_plot_data_long29,med_exp_pa_est_did_plot_data_long30,
+                                               med_exp_pa_est_did_plot_data_long31,med_exp_pa_est_did_plot_data_long32,med_exp_pa_est_did_plot_data_long33,
+                                               med_exp_pa_est_did_plot_data_long34,med_exp_pa_est_did_plot_data_long35)
+rm(med_exp_pa_est_did_plot_data_long1,med_exp_pa_est_did_plot_data_long2,med_exp_pa_est_did_plot_data_long3,
+   med_exp_pa_est_did_plot_data_long4,med_exp_pa_est_did_plot_data_long5,med_exp_pa_est_did_plot_data_long6,
+   med_exp_pa_est_did_plot_data_long7,med_exp_pa_est_did_plot_data_long8,med_exp_pa_est_did_plot_data_long9,
+   med_exp_pa_est_did_plot_data_long10,med_exp_pa_est_did_plot_data_long11,med_exp_pa_est_did_plot_data_long12,
+   med_exp_pa_est_did_plot_data_long13,med_exp_pa_est_did_plot_data_long14,med_exp_pa_est_did_plot_data_long15,
+   med_exp_pa_est_did_plot_data_long16,med_exp_pa_est_did_plot_data_long17,med_exp_pa_est_did_plot_data_long18,
+   med_exp_pa_est_did_plot_data_long19,med_exp_pa_est_did_plot_data_long20,med_exp_pa_est_did_plot_data_long21,
+   med_exp_pa_est_did_plot_data_long22,med_exp_pa_est_did_plot_data_long23,med_exp_pa_est_did_plot_data_long24,
+   med_exp_pa_est_did_plot_data_long25,med_exp_pa_est_did_plot_data_long26,med_exp_pa_est_did_plot_data_long27,
+   med_exp_pa_est_did_plot_data_long28,med_exp_pa_est_did_plot_data_long29,med_exp_pa_est_did_plot_data_long30,
+   med_exp_pa_est_did_plot_data_long31,med_exp_pa_est_did_plot_data_long32,med_exp_pa_est_did_plot_data_long33,
+   med_exp_pa_est_did_plot_data_long34,med_exp_pa_est_did_plot_data_long35)
+med_exp_pa_est_did_plot_data_long_list <- lapply(med_exp_pa_est_did_plot_data_long_list, function(x) {
+  colnames(x) <- c('year', 'outcome', 'treated')  
+  x$treated <- x$treated - 1
+  return(x)
+}
+)
+for(i in 1:35) {
+  assign(paste0("med_exp_pa_est_did_plot_data_wide", i), reshape(data=med_exp_pa_est_did_plot_data_long_list[[i]],
+                                                                 idvar = "year",
+                                                                 v.names = "outcome",
+                                                                 timevar = "treated",
+                                                                 direction = "wide"))
+}
+med_exp_pa_est_did_plot_data_wide_list <- list(med_exp_pa_est_did_plot_data_wide1,med_exp_pa_est_did_plot_data_wide2,med_exp_pa_est_did_plot_data_wide3,
+                                               med_exp_pa_est_did_plot_data_wide4,med_exp_pa_est_did_plot_data_wide5,med_exp_pa_est_did_plot_data_wide6,
+                                               med_exp_pa_est_did_plot_data_wide7,med_exp_pa_est_did_plot_data_wide8,med_exp_pa_est_did_plot_data_wide9,
+                                               med_exp_pa_est_did_plot_data_wide10,med_exp_pa_est_did_plot_data_wide11,med_exp_pa_est_did_plot_data_wide12,
+                                               med_exp_pa_est_did_plot_data_wide13,med_exp_pa_est_did_plot_data_wide14,med_exp_pa_est_did_plot_data_wide15,
+                                               med_exp_pa_est_did_plot_data_wide16,med_exp_pa_est_did_plot_data_wide17,med_exp_pa_est_did_plot_data_wide18,
+                                               med_exp_pa_est_did_plot_data_wide19,med_exp_pa_est_did_plot_data_wide20,med_exp_pa_est_did_plot_data_wide21,
+                                               med_exp_pa_est_did_plot_data_wide22,med_exp_pa_est_did_plot_data_wide23,med_exp_pa_est_did_plot_data_wide24,
+                                               med_exp_pa_est_did_plot_data_wide25,med_exp_pa_est_did_plot_data_wide26,med_exp_pa_est_did_plot_data_wide27,
+                                               med_exp_pa_est_did_plot_data_wide28,med_exp_pa_est_did_plot_data_wide29,med_exp_pa_est_did_plot_data_wide30,
+                                               med_exp_pa_est_did_plot_data_wide31,med_exp_pa_est_did_plot_data_wide32,med_exp_pa_est_did_plot_data_wide33,
+                                               med_exp_pa_est_did_plot_data_wide34,med_exp_pa_est_did_plot_data_wide35)
+rm(med_exp_pa_est_did_plot_data_wide1,med_exp_pa_est_did_plot_data_wide2,med_exp_pa_est_did_plot_data_wide3,
+   med_exp_pa_est_did_plot_data_wide4,med_exp_pa_est_did_plot_data_wide5,med_exp_pa_est_did_plot_data_wide6,
+   med_exp_pa_est_did_plot_data_wide7,med_exp_pa_est_did_plot_data_wide8,med_exp_pa_est_did_plot_data_wide9,
+   med_exp_pa_est_did_plot_data_wide10,med_exp_pa_est_did_plot_data_wide11,med_exp_pa_est_did_plot_data_wide12,
+   med_exp_pa_est_did_plot_data_wide13,med_exp_pa_est_did_plot_data_wide14,med_exp_pa_est_did_plot_data_wide15,
+   med_exp_pa_est_did_plot_data_wide16,med_exp_pa_est_did_plot_data_wide17,med_exp_pa_est_did_plot_data_wide18,
+   med_exp_pa_est_did_plot_data_wide19,med_exp_pa_est_did_plot_data_wide20,med_exp_pa_est_did_plot_data_wide21,
+   med_exp_pa_est_did_plot_data_wide22,med_exp_pa_est_did_plot_data_wide23,med_exp_pa_est_did_plot_data_wide24,
+   med_exp_pa_est_did_plot_data_wide25,med_exp_pa_est_did_plot_data_wide26,med_exp_pa_est_did_plot_data_wide27,
+   med_exp_pa_est_did_plot_data_wide28,med_exp_pa_est_did_plot_data_wide29,med_exp_pa_est_did_plot_data_wide30,
+   med_exp_pa_est_did_plot_data_wide31,med_exp_pa_est_did_plot_data_wide32,med_exp_pa_est_did_plot_data_wide33,
+   med_exp_pa_est_did_plot_data_wide34,med_exp_pa_est_did_plot_data_wide35)
+med_exp_pa_est_did_plot_data_wide_list <- lapply(med_exp_pa_est_did_plot_data_wide_list, function(x) {
+  x$diff <- x$outcome.1 - x$outcome.0
+  return(x)
+}
+)
+# SC #
+med_exp_pa_est_sc1 <- sc_estimate(setup_med_exp_pa_list[[1]]$Y, setup_med_exp_pa_list[[1]]$N0, setup_med_exp_pa_list[[1]]$T0, X = covariates_exp_array_1)
+med_exp_pa_est_sc2 <- sc_estimate(setup_med_exp_pa_list[[2]]$Y, setup_med_exp_pa_list[[2]]$N0, setup_med_exp_pa_list[[2]]$T0, X = covariates_exp_array_2)
+med_exp_pa_est_sc5 <- sc_estimate(setup_med_exp_pa_list[[3]]$Y, setup_med_exp_pa_list[[3]]$N0, setup_med_exp_pa_list[[3]]$T0, X = covariates_exp_array_5)
+med_exp_pa_est_sc10 <- sc_estimate(setup_med_exp_pa_list[[4]]$Y, setup_med_exp_pa_list[[4]]$N0, setup_med_exp_pa_list[[4]]$T0, X = covariates_exp_array_10)
+med_exp_pa_est_sc11 <- sc_estimate(setup_med_exp_pa_list[[5]]$Y, setup_med_exp_pa_list[[5]]$N0, setup_med_exp_pa_list[[5]]$T0, X = covariates_exp_array_11)
+med_exp_pa_est_sc12 <- sc_estimate(setup_med_exp_pa_list[[6]]$Y, setup_med_exp_pa_list[[6]]$N0, setup_med_exp_pa_list[[6]]$T0, X = covariates_exp_array_12)
+med_exp_pa_est_sc13 <- sc_estimate(setup_med_exp_pa_list[[7]]$Y, setup_med_exp_pa_list[[7]]$N0, setup_med_exp_pa_list[[7]]$T0, X = covariates_exp_array_13)
+med_exp_pa_est_sc15 <- sc_estimate(setup_med_exp_pa_list[[8]]$Y, setup_med_exp_pa_list[[8]]$N0, setup_med_exp_pa_list[[8]]$T0, X = covariates_exp_array_15)
+med_exp_pa_est_sc17 <- sc_estimate(setup_med_exp_pa_list[[9]]$Y, setup_med_exp_pa_list[[9]]$N0, setup_med_exp_pa_list[[9]]$T0, X = covariates_exp_array_17)
+med_exp_pa_est_sc19 <- sc_estimate(setup_med_exp_pa_list[[10]]$Y, setup_med_exp_pa_list[[10]]$N0, setup_med_exp_pa_list[[10]]$T0, X = covariates_exp_array_19)
+med_exp_pa_est_sc21 <- sc_estimate(setup_med_exp_pa_list[[11]]$Y, setup_med_exp_pa_list[[11]]$N0, setup_med_exp_pa_list[[11]]$T0, X = covariates_exp_array_21)
+med_exp_pa_est_sc23 <- sc_estimate(setup_med_exp_pa_list[[12]]$Y, setup_med_exp_pa_list[[12]]$N0, setup_med_exp_pa_list[[12]]$T0, X = covariates_exp_array_23)
+med_exp_pa_est_sc24 <- sc_estimate(setup_med_exp_pa_list[[13]]$Y, setup_med_exp_pa_list[[13]]$N0, setup_med_exp_pa_list[[13]]$T0, X = covariates_exp_array_24)
+med_exp_pa_est_sc25 <- sc_estimate(setup_med_exp_pa_list[[14]]$Y, setup_med_exp_pa_list[[14]]$N0, setup_med_exp_pa_list[[14]]$T0, X = covariates_exp_array_25)
+med_exp_pa_est_sc26 <- sc_estimate(setup_med_exp_pa_list[[15]]$Y, setup_med_exp_pa_list[[15]]$N0, setup_med_exp_pa_list[[15]]$T0, X = covariates_exp_array_26)
+med_exp_pa_est_sc28 <- sc_estimate(setup_med_exp_pa_list[[16]]$Y, setup_med_exp_pa_list[[16]]$N0, setup_med_exp_pa_list[[16]]$T0, X = covariates_exp_array_28)
+med_exp_pa_est_sc29 <- sc_estimate(setup_med_exp_pa_list[[17]]$Y, setup_med_exp_pa_list[[17]]$N0, setup_med_exp_pa_list[[17]]$T0, X = covariates_exp_array_29)
+med_exp_pa_est_sc30 <- sc_estimate(setup_med_exp_pa_list[[18]]$Y, setup_med_exp_pa_list[[18]]$N0, setup_med_exp_pa_list[[18]]$T0, X = covariates_exp_array_30)
+med_exp_pa_est_sc31 <- sc_estimate(setup_med_exp_pa_list[[19]]$Y, setup_med_exp_pa_list[[19]]$N0, setup_med_exp_pa_list[[19]]$T0, X = covariates_exp_array_31)
+med_exp_pa_est_sc32 <- sc_estimate(setup_med_exp_pa_list[[20]]$Y, setup_med_exp_pa_list[[20]]$N0, setup_med_exp_pa_list[[20]]$T0, X = covariates_exp_array_32)
+med_exp_pa_est_sc33 <- sc_estimate(setup_med_exp_pa_list[[21]]$Y, setup_med_exp_pa_list[[21]]$N0, setup_med_exp_pa_list[[21]]$T0, X = covariates_exp_array_33)
+med_exp_pa_est_sc34 <- sc_estimate(setup_med_exp_pa_list[[22]]$Y, setup_med_exp_pa_list[[22]]$N0, setup_med_exp_pa_list[[22]]$T0, X = covariates_exp_array_34)
+med_exp_pa_est_sc36 <- sc_estimate(setup_med_exp_pa_list[[23]]$Y, setup_med_exp_pa_list[[23]]$N0, setup_med_exp_pa_list[[23]]$T0, X = covariates_exp_array_36)
+med_exp_pa_est_sc37 <- sc_estimate(setup_med_exp_pa_list[[24]]$Y, setup_med_exp_pa_list[[24]]$N0, setup_med_exp_pa_list[[24]]$T0, X = covariates_exp_array_37)
+med_exp_pa_est_sc39 <- sc_estimate(setup_med_exp_pa_list[[25]]$Y, setup_med_exp_pa_list[[25]]$N0, setup_med_exp_pa_list[[25]]$T0, X = covariates_exp_array_39)
+med_exp_pa_est_sc40 <- sc_estimate(setup_med_exp_pa_list[[26]]$Y, setup_med_exp_pa_list[[26]]$N0, setup_med_exp_pa_list[[26]]$T0, X = covariates_exp_array_40)
+med_exp_pa_est_sc41 <- sc_estimate(setup_med_exp_pa_list[[27]]$Y, setup_med_exp_pa_list[[27]]$N0, setup_med_exp_pa_list[[27]]$T0, X = covariates_exp_array_41)
+med_exp_pa_est_sc44 <- sc_estimate(setup_med_exp_pa_list[[28]]$Y, setup_med_exp_pa_list[[28]]$N0, setup_med_exp_pa_list[[28]]$T0, X = covariates_exp_array_44)
+med_exp_pa_est_sc45 <- sc_estimate(setup_med_exp_pa_list[[29]]$Y, setup_med_exp_pa_list[[29]]$N0, setup_med_exp_pa_list[[29]]$T0, X = covariates_exp_array_45)
+med_exp_pa_est_sc47 <- sc_estimate(setup_med_exp_pa_list[[30]]$Y, setup_med_exp_pa_list[[30]]$N0, setup_med_exp_pa_list[[30]]$T0, X = covariates_exp_array_47)
+med_exp_pa_est_sc50 <- sc_estimate(setup_med_exp_pa_list[[31]]$Y, setup_med_exp_pa_list[[31]]$N0, setup_med_exp_pa_list[[31]]$T0, X = covariates_exp_array_50)
+med_exp_pa_est_sc51 <- sc_estimate(setup_med_exp_pa_list[[32]]$Y, setup_med_exp_pa_list[[32]]$N0, setup_med_exp_pa_list[[32]]$T0, X = covariates_exp_array_51)
+med_exp_pa_est_sc53 <- sc_estimate(setup_med_exp_pa_list[[33]]$Y, setup_med_exp_pa_list[[33]]$N0, setup_med_exp_pa_list[[33]]$T0, X = covariates_exp_array_53)
+med_exp_pa_est_sc54 <- sc_estimate(setup_med_exp_pa_list[[34]]$Y, setup_med_exp_pa_list[[34]]$N0, setup_med_exp_pa_list[[34]]$T0, X = covariates_exp_array_54)
+med_exp_pa_est_sc55 <- sc_estimate(setup_med_exp_pa_list[[35]]$Y, setup_med_exp_pa_list[[35]]$N0, setup_med_exp_pa_list[[35]]$T0, X = covariates_exp_array_55)
+med_exp_pa_est_sc_list <- list(med_exp_pa_est_sc1,med_exp_pa_est_sc2,med_exp_pa_est_sc5,
+                               med_exp_pa_est_sc10,med_exp_pa_est_sc11,med_exp_pa_est_sc12,
+                               med_exp_pa_est_sc13,med_exp_pa_est_sc15,med_exp_pa_est_sc17,
+                               med_exp_pa_est_sc19,med_exp_pa_est_sc21,med_exp_pa_est_sc23,
+                               med_exp_pa_est_sc24,med_exp_pa_est_sc25,med_exp_pa_est_sc26,
+                               med_exp_pa_est_sc28,med_exp_pa_est_sc29,med_exp_pa_est_sc30,
+                               med_exp_pa_est_sc31,med_exp_pa_est_sc32,med_exp_pa_est_sc33,
+                               med_exp_pa_est_sc34,med_exp_pa_est_sc36,med_exp_pa_est_sc37,
+                               med_exp_pa_est_sc39,med_exp_pa_est_sc40,med_exp_pa_est_sc41,
+                               med_exp_pa_est_sc44,med_exp_pa_est_sc45,med_exp_pa_est_sc47,
+                               med_exp_pa_est_sc50,med_exp_pa_est_sc51,med_exp_pa_est_sc53,
+                               med_exp_pa_est_sc54,med_exp_pa_est_sc55)
+rm(med_exp_pa_est_sc1,med_exp_pa_est_sc2,med_exp_pa_est_sc5,
+   med_exp_pa_est_sc10,med_exp_pa_est_sc11,med_exp_pa_est_sc12,
+   med_exp_pa_est_sc13,med_exp_pa_est_sc15,med_exp_pa_est_sc17,
+   med_exp_pa_est_sc19,med_exp_pa_est_sc21,med_exp_pa_est_sc23,
+   med_exp_pa_est_sc24,med_exp_pa_est_sc25,med_exp_pa_est_sc26,
+   med_exp_pa_est_sc28,med_exp_pa_est_sc29,med_exp_pa_est_sc30,
+   med_exp_pa_est_sc31,med_exp_pa_est_sc32,med_exp_pa_est_sc33,
+   med_exp_pa_est_sc34,med_exp_pa_est_sc36,med_exp_pa_est_sc37,
+   med_exp_pa_est_sc39,med_exp_pa_est_sc40,med_exp_pa_est_sc41,
+   med_exp_pa_est_sc44,med_exp_pa_est_sc45,med_exp_pa_est_sc47,
+   med_exp_pa_est_sc50,med_exp_pa_est_sc51,med_exp_pa_est_sc53,
+   med_exp_pa_est_sc54,med_exp_pa_est_sc55)
+for(i in 1:35) {
+  assign(paste0("med_exp_pa_est_sc_plot", i), synthdid_plot(med_exp_pa_est_sc_list[i]))
+}
+med_exp_pa_est_sc_plot_data_aux1 <- ggplot_build(med_exp_pa_est_sc_plot1)
+med_exp_pa_est_sc_plot_data_aux2 <- ggplot_build(med_exp_pa_est_sc_plot2)
+med_exp_pa_est_sc_plot_data_aux3 <- ggplot_build(med_exp_pa_est_sc_plot3)
+med_exp_pa_est_sc_plot_data_aux4 <- ggplot_build(med_exp_pa_est_sc_plot4)
+med_exp_pa_est_sc_plot_data_aux5 <- ggplot_build(med_exp_pa_est_sc_plot5)
+med_exp_pa_est_sc_plot_data_aux6 <- ggplot_build(med_exp_pa_est_sc_plot6)
+med_exp_pa_est_sc_plot_data_aux7 <- ggplot_build(med_exp_pa_est_sc_plot7)
+med_exp_pa_est_sc_plot_data_aux8 <- ggplot_build(med_exp_pa_est_sc_plot8)
+med_exp_pa_est_sc_plot_data_aux9 <- ggplot_build(med_exp_pa_est_sc_plot9)
+med_exp_pa_est_sc_plot_data_aux10 <- ggplot_build(med_exp_pa_est_sc_plot10)
+med_exp_pa_est_sc_plot_data_aux11 <- ggplot_build(med_exp_pa_est_sc_plot11)
+med_exp_pa_est_sc_plot_data_aux12 <- ggplot_build(med_exp_pa_est_sc_plot12)
+med_exp_pa_est_sc_plot_data_aux13 <- ggplot_build(med_exp_pa_est_sc_plot13)
+med_exp_pa_est_sc_plot_data_aux14 <- ggplot_build(med_exp_pa_est_sc_plot14)
+med_exp_pa_est_sc_plot_data_aux15 <- ggplot_build(med_exp_pa_est_sc_plot15)
+med_exp_pa_est_sc_plot_data_aux16 <- ggplot_build(med_exp_pa_est_sc_plot16)
+med_exp_pa_est_sc_plot_data_aux17 <- ggplot_build(med_exp_pa_est_sc_plot17)
+med_exp_pa_est_sc_plot_data_aux18 <- ggplot_build(med_exp_pa_est_sc_plot18)
+med_exp_pa_est_sc_plot_data_aux19 <- ggplot_build(med_exp_pa_est_sc_plot19)
+med_exp_pa_est_sc_plot_data_aux20 <- ggplot_build(med_exp_pa_est_sc_plot20)
+med_exp_pa_est_sc_plot_data_aux21 <- ggplot_build(med_exp_pa_est_sc_plot21)
+med_exp_pa_est_sc_plot_data_aux22 <- ggplot_build(med_exp_pa_est_sc_plot22)
+med_exp_pa_est_sc_plot_data_aux23 <- ggplot_build(med_exp_pa_est_sc_plot23)
+med_exp_pa_est_sc_plot_data_aux24 <- ggplot_build(med_exp_pa_est_sc_plot24)
+med_exp_pa_est_sc_plot_data_aux25 <- ggplot_build(med_exp_pa_est_sc_plot25)
+med_exp_pa_est_sc_plot_data_aux26 <- ggplot_build(med_exp_pa_est_sc_plot26)
+med_exp_pa_est_sc_plot_data_aux27 <- ggplot_build(med_exp_pa_est_sc_plot27)
+med_exp_pa_est_sc_plot_data_aux28 <- ggplot_build(med_exp_pa_est_sc_plot28)
+med_exp_pa_est_sc_plot_data_aux29 <- ggplot_build(med_exp_pa_est_sc_plot29)
+med_exp_pa_est_sc_plot_data_aux30 <- ggplot_build(med_exp_pa_est_sc_plot30)
+med_exp_pa_est_sc_plot_data_aux31 <- ggplot_build(med_exp_pa_est_sc_plot31)
+med_exp_pa_est_sc_plot_data_aux32 <- ggplot_build(med_exp_pa_est_sc_plot32)
+med_exp_pa_est_sc_plot_data_aux33 <- ggplot_build(med_exp_pa_est_sc_plot33)
+med_exp_pa_est_sc_plot_data_aux34 <- ggplot_build(med_exp_pa_est_sc_plot34)
+med_exp_pa_est_sc_plot_data_aux35 <- ggplot_build(med_exp_pa_est_sc_plot35)
+med_exp_pa_est_sc_plot_data_aux_list <- list(med_exp_pa_est_sc_plot_data_aux1,med_exp_pa_est_sc_plot_data_aux2,med_exp_pa_est_sc_plot_data_aux3,
+                                             med_exp_pa_est_sc_plot_data_aux4,med_exp_pa_est_sc_plot_data_aux5,med_exp_pa_est_sc_plot_data_aux6,
+                                             med_exp_pa_est_sc_plot_data_aux7,med_exp_pa_est_sc_plot_data_aux8,med_exp_pa_est_sc_plot_data_aux9,
+                                             med_exp_pa_est_sc_plot_data_aux10,med_exp_pa_est_sc_plot_data_aux11,med_exp_pa_est_sc_plot_data_aux12,
+                                             med_exp_pa_est_sc_plot_data_aux13,med_exp_pa_est_sc_plot_data_aux14,med_exp_pa_est_sc_plot_data_aux15,
+                                             med_exp_pa_est_sc_plot_data_aux16,med_exp_pa_est_sc_plot_data_aux17,med_exp_pa_est_sc_plot_data_aux18,
+                                             med_exp_pa_est_sc_plot_data_aux19,med_exp_pa_est_sc_plot_data_aux20,med_exp_pa_est_sc_plot_data_aux21,
+                                             med_exp_pa_est_sc_plot_data_aux22,med_exp_pa_est_sc_plot_data_aux23,med_exp_pa_est_sc_plot_data_aux24,
+                                             med_exp_pa_est_sc_plot_data_aux25,med_exp_pa_est_sc_plot_data_aux26,med_exp_pa_est_sc_plot_data_aux27,
+                                             med_exp_pa_est_sc_plot_data_aux28,med_exp_pa_est_sc_plot_data_aux29,med_exp_pa_est_sc_plot_data_aux30,
+                                             med_exp_pa_est_sc_plot_data_aux31,med_exp_pa_est_sc_plot_data_aux32,med_exp_pa_est_sc_plot_data_aux33,
+                                             med_exp_pa_est_sc_plot_data_aux34,med_exp_pa_est_sc_plot_data_aux35)
+rm(med_exp_pa_est_sc_plot_data_aux1,med_exp_pa_est_sc_plot_data_aux2,med_exp_pa_est_sc_plot_data_aux3,
+   med_exp_pa_est_sc_plot_data_aux4,med_exp_pa_est_sc_plot_data_aux5,med_exp_pa_est_sc_plot_data_aux6,
+   med_exp_pa_est_sc_plot_data_aux7,med_exp_pa_est_sc_plot_data_aux8,med_exp_pa_est_sc_plot_data_aux9,
+   med_exp_pa_est_sc_plot_data_aux10,med_exp_pa_est_sc_plot_data_aux11,med_exp_pa_est_sc_plot_data_aux12,
+   med_exp_pa_est_sc_plot_data_aux13,med_exp_pa_est_sc_plot_data_aux14,med_exp_pa_est_sc_plot_data_aux15,
+   med_exp_pa_est_sc_plot_data_aux16,med_exp_pa_est_sc_plot_data_aux17,med_exp_pa_est_sc_plot_data_aux18,
+   med_exp_pa_est_sc_plot_data_aux19,med_exp_pa_est_sc_plot_data_aux20,med_exp_pa_est_sc_plot_data_aux21,
+   med_exp_pa_est_sc_plot_data_aux22,med_exp_pa_est_sc_plot_data_aux23,med_exp_pa_est_sc_plot_data_aux24,
+   med_exp_pa_est_sc_plot_data_aux25,med_exp_pa_est_sc_plot_data_aux26,med_exp_pa_est_sc_plot_data_aux27,
+   med_exp_pa_est_sc_plot_data_aux28,med_exp_pa_est_sc_plot_data_aux29,med_exp_pa_est_sc_plot_data_aux30,
+   med_exp_pa_est_sc_plot_data_aux31,med_exp_pa_est_sc_plot_data_aux32,med_exp_pa_est_sc_plot_data_aux33,
+   med_exp_pa_est_sc_plot_data_aux34,med_exp_pa_est_sc_plot_data_aux35)
+rm(med_exp_pa_est_sc_plot1,med_exp_pa_est_sc_plot2,med_exp_pa_est_sc_plot3,
+   med_exp_pa_est_sc_plot4,med_exp_pa_est_sc_plot5,med_exp_pa_est_sc_plot6,
+   med_exp_pa_est_sc_plot7,med_exp_pa_est_sc_plot8,med_exp_pa_est_sc_plot9,
+   med_exp_pa_est_sc_plot10,med_exp_pa_est_sc_plot11,med_exp_pa_est_sc_plot12,
+   med_exp_pa_est_sc_plot13,med_exp_pa_est_sc_plot14,med_exp_pa_est_sc_plot15,
+   med_exp_pa_est_sc_plot16,med_exp_pa_est_sc_plot17,med_exp_pa_est_sc_plot18,
+   med_exp_pa_est_sc_plot19,med_exp_pa_est_sc_plot20,med_exp_pa_est_sc_plot21,
+   med_exp_pa_est_sc_plot22,med_exp_pa_est_sc_plot23,med_exp_pa_est_sc_plot24,
+   med_exp_pa_est_sc_plot25,med_exp_pa_est_sc_plot26,med_exp_pa_est_sc_plot27,
+   med_exp_pa_est_sc_plot28,med_exp_pa_est_sc_plot29,med_exp_pa_est_sc_plot30,
+   med_exp_pa_est_sc_plot31,med_exp_pa_est_sc_plot32,med_exp_pa_est_sc_plot33,
+   med_exp_pa_est_sc_plot34,med_exp_pa_est_sc_plot35)
+for(i in 1:35) {
+  assign(paste0("med_exp_pa_est_sc_plot_data_long", i), data.frame(med_exp_pa_est_sc_plot_data_aux_list[[i]]$data[[1]]$x, med_exp_pa_est_sc_plot_data_aux_list[[i]]$data[[1]]$y, med_exp_pa_est_sc_plot_data_aux_list[[i]]$data[[1]]$group))
+}
+med_exp_pa_est_sc_plot_data_long_list <- list(med_exp_pa_est_sc_plot_data_long1,med_exp_pa_est_sc_plot_data_long2,med_exp_pa_est_sc_plot_data_long3,
+                                              med_exp_pa_est_sc_plot_data_long4,med_exp_pa_est_sc_plot_data_long5,med_exp_pa_est_sc_plot_data_long6,
+                                              med_exp_pa_est_sc_plot_data_long7,med_exp_pa_est_sc_plot_data_long8,med_exp_pa_est_sc_plot_data_long9,
+                                              med_exp_pa_est_sc_plot_data_long10,med_exp_pa_est_sc_plot_data_long11,med_exp_pa_est_sc_plot_data_long12,
+                                              med_exp_pa_est_sc_plot_data_long13,med_exp_pa_est_sc_plot_data_long14,med_exp_pa_est_sc_plot_data_long15,
+                                              med_exp_pa_est_sc_plot_data_long16,med_exp_pa_est_sc_plot_data_long17,med_exp_pa_est_sc_plot_data_long18,
+                                              med_exp_pa_est_sc_plot_data_long19,med_exp_pa_est_sc_plot_data_long20,med_exp_pa_est_sc_plot_data_long21,
+                                              med_exp_pa_est_sc_plot_data_long22,med_exp_pa_est_sc_plot_data_long23,med_exp_pa_est_sc_plot_data_long24,
+                                              med_exp_pa_est_sc_plot_data_long25,med_exp_pa_est_sc_plot_data_long26,med_exp_pa_est_sc_plot_data_long27,
+                                              med_exp_pa_est_sc_plot_data_long28,med_exp_pa_est_sc_plot_data_long29,med_exp_pa_est_sc_plot_data_long30,
+                                              med_exp_pa_est_sc_plot_data_long31,med_exp_pa_est_sc_plot_data_long32,med_exp_pa_est_sc_plot_data_long33,
+                                              med_exp_pa_est_sc_plot_data_long34,med_exp_pa_est_sc_plot_data_long35)
+rm(med_exp_pa_est_sc_plot_data_long1,med_exp_pa_est_sc_plot_data_long2,med_exp_pa_est_sc_plot_data_long3,
+   med_exp_pa_est_sc_plot_data_long4,med_exp_pa_est_sc_plot_data_long5,med_exp_pa_est_sc_plot_data_long6,
+   med_exp_pa_est_sc_plot_data_long7,med_exp_pa_est_sc_plot_data_long8,med_exp_pa_est_sc_plot_data_long9,
+   med_exp_pa_est_sc_plot_data_long10,med_exp_pa_est_sc_plot_data_long11,med_exp_pa_est_sc_plot_data_long12,
+   med_exp_pa_est_sc_plot_data_long13,med_exp_pa_est_sc_plot_data_long14,med_exp_pa_est_sc_plot_data_long15,
+   med_exp_pa_est_sc_plot_data_long16,med_exp_pa_est_sc_plot_data_long17,med_exp_pa_est_sc_plot_data_long18,
+   med_exp_pa_est_sc_plot_data_long19,med_exp_pa_est_sc_plot_data_long20,med_exp_pa_est_sc_plot_data_long21,
+   med_exp_pa_est_sc_plot_data_long22,med_exp_pa_est_sc_plot_data_long23,med_exp_pa_est_sc_plot_data_long24,
+   med_exp_pa_est_sc_plot_data_long25,med_exp_pa_est_sc_plot_data_long26,med_exp_pa_est_sc_plot_data_long27,
+   med_exp_pa_est_sc_plot_data_long28,med_exp_pa_est_sc_plot_data_long29,med_exp_pa_est_sc_plot_data_long30,
+   med_exp_pa_est_sc_plot_data_long31,med_exp_pa_est_sc_plot_data_long32,med_exp_pa_est_sc_plot_data_long33,
+   med_exp_pa_est_sc_plot_data_long34,med_exp_pa_est_sc_plot_data_long35)
+med_exp_pa_est_sc_plot_data_long_list <- lapply(med_exp_pa_est_sc_plot_data_long_list, function(x) {
+  colnames(x) <- c('year', 'outcome', 'treated')  
+  x$treated <- x$treated - 1
+  return(x)
+}
+)
+for(i in 1:35) {
+  assign(paste0("med_exp_pa_est_sc_plot_data_wide", i), reshape(data=med_exp_pa_est_sc_plot_data_long_list[[i]],
+                                                                idvar = "year",
+                                                                v.names = "outcome",
+                                                                timevar = "treated",
+                                                                direction = "wide"))
+}
+med_exp_pa_est_sc_plot_data_wide_list <- list(med_exp_pa_est_sc_plot_data_wide1,med_exp_pa_est_sc_plot_data_wide2,med_exp_pa_est_sc_plot_data_wide3,
+                                              med_exp_pa_est_sc_plot_data_wide4,med_exp_pa_est_sc_plot_data_wide5,med_exp_pa_est_sc_plot_data_wide6,
+                                              med_exp_pa_est_sc_plot_data_wide7,med_exp_pa_est_sc_plot_data_wide8,med_exp_pa_est_sc_plot_data_wide9,
+                                              med_exp_pa_est_sc_plot_data_wide10,med_exp_pa_est_sc_plot_data_wide11,med_exp_pa_est_sc_plot_data_wide12,
+                                              med_exp_pa_est_sc_plot_data_wide13,med_exp_pa_est_sc_plot_data_wide14,med_exp_pa_est_sc_plot_data_wide15,
+                                              med_exp_pa_est_sc_plot_data_wide16,med_exp_pa_est_sc_plot_data_wide17,med_exp_pa_est_sc_plot_data_wide18,
+                                              med_exp_pa_est_sc_plot_data_wide19,med_exp_pa_est_sc_plot_data_wide20,med_exp_pa_est_sc_plot_data_wide21,
+                                              med_exp_pa_est_sc_plot_data_wide22,med_exp_pa_est_sc_plot_data_wide23,med_exp_pa_est_sc_plot_data_wide24,
+                                              med_exp_pa_est_sc_plot_data_wide25,med_exp_pa_est_sc_plot_data_wide26,med_exp_pa_est_sc_plot_data_wide27,
+                                              med_exp_pa_est_sc_plot_data_wide28,med_exp_pa_est_sc_plot_data_wide29,med_exp_pa_est_sc_plot_data_wide30,
+                                              med_exp_pa_est_sc_plot_data_wide31,med_exp_pa_est_sc_plot_data_wide32,med_exp_pa_est_sc_plot_data_wide33,
+                                              med_exp_pa_est_sc_plot_data_wide34,med_exp_pa_est_sc_plot_data_wide35)
+rm(med_exp_pa_est_sc_plot_data_wide1,med_exp_pa_est_sc_plot_data_wide2,med_exp_pa_est_sc_plot_data_wide3,
+   med_exp_pa_est_sc_plot_data_wide4,med_exp_pa_est_sc_plot_data_wide5,med_exp_pa_est_sc_plot_data_wide6,
+   med_exp_pa_est_sc_plot_data_wide7,med_exp_pa_est_sc_plot_data_wide8,med_exp_pa_est_sc_plot_data_wide9,
+   med_exp_pa_est_sc_plot_data_wide10,med_exp_pa_est_sc_plot_data_wide11,med_exp_pa_est_sc_plot_data_wide12,
+   med_exp_pa_est_sc_plot_data_wide13,med_exp_pa_est_sc_plot_data_wide14,med_exp_pa_est_sc_plot_data_wide15,
+   med_exp_pa_est_sc_plot_data_wide16,med_exp_pa_est_sc_plot_data_wide17,med_exp_pa_est_sc_plot_data_wide18,
+   med_exp_pa_est_sc_plot_data_wide19,med_exp_pa_est_sc_plot_data_wide20,med_exp_pa_est_sc_plot_data_wide21,
+   med_exp_pa_est_sc_plot_data_wide22,med_exp_pa_est_sc_plot_data_wide23,med_exp_pa_est_sc_plot_data_wide24,
+   med_exp_pa_est_sc_plot_data_wide25,med_exp_pa_est_sc_plot_data_wide26,med_exp_pa_est_sc_plot_data_wide27,
+   med_exp_pa_est_sc_plot_data_wide28,med_exp_pa_est_sc_plot_data_wide29,med_exp_pa_est_sc_plot_data_wide30,
+   med_exp_pa_est_sc_plot_data_wide31,med_exp_pa_est_sc_plot_data_wide32,med_exp_pa_est_sc_plot_data_wide33,
+   med_exp_pa_est_sc_plot_data_wide34,med_exp_pa_est_sc_plot_data_wide35)
+med_exp_pa_est_sc_plot_data_wide_list <- lapply(med_exp_pa_est_sc_plot_data_wide_list, function(x) {
+  x$diff <- x$outcome.1 - x$outcome.0
+  return(x)
+}
+)
+# SDID #
+med_exp_pa_est_sdid1 <- synthdid_estimate(setup_med_exp_pa_list[[1]]$Y, setup_med_exp_pa_list[[1]]$N0, setup_med_exp_pa_list[[1]]$T0, X = covariates_exp_array_1)
+med_exp_pa_est_sdid2 <- synthdid_estimate(setup_med_exp_pa_list[[2]]$Y, setup_med_exp_pa_list[[2]]$N0, setup_med_exp_pa_list[[2]]$T0, X = covariates_exp_array_2)
+med_exp_pa_est_sdid5 <- synthdid_estimate(setup_med_exp_pa_list[[3]]$Y, setup_med_exp_pa_list[[3]]$N0, setup_med_exp_pa_list[[3]]$T0, X = covariates_exp_array_5)
+med_exp_pa_est_sdid10 <- synthdid_estimate(setup_med_exp_pa_list[[4]]$Y, setup_med_exp_pa_list[[4]]$N0, setup_med_exp_pa_list[[4]]$T0, X = covariates_exp_array_10)
+med_exp_pa_est_sdid11 <- synthdid_estimate(setup_med_exp_pa_list[[5]]$Y, setup_med_exp_pa_list[[5]]$N0, setup_med_exp_pa_list[[5]]$T0, X = covariates_exp_array_11)
+med_exp_pa_est_sdid12 <- synthdid_estimate(setup_med_exp_pa_list[[6]]$Y, setup_med_exp_pa_list[[6]]$N0, setup_med_exp_pa_list[[6]]$T0, X = covariates_exp_array_12)
+med_exp_pa_est_sdid13 <- synthdid_estimate(setup_med_exp_pa_list[[7]]$Y, setup_med_exp_pa_list[[7]]$N0, setup_med_exp_pa_list[[7]]$T0, X = covariates_exp_array_13)
+med_exp_pa_est_sdid15 <- synthdid_estimate(setup_med_exp_pa_list[[8]]$Y, setup_med_exp_pa_list[[8]]$N0, setup_med_exp_pa_list[[8]]$T0, X = covariates_exp_array_15)
+med_exp_pa_est_sdid17 <- synthdid_estimate(setup_med_exp_pa_list[[9]]$Y, setup_med_exp_pa_list[[9]]$N0, setup_med_exp_pa_list[[9]]$T0, X = covariates_exp_array_17)
+med_exp_pa_est_sdid19 <- synthdid_estimate(setup_med_exp_pa_list[[10]]$Y, setup_med_exp_pa_list[[10]]$N0, setup_med_exp_pa_list[[10]]$T0, X = covariates_exp_array_19)
+med_exp_pa_est_sdid21 <- synthdid_estimate(setup_med_exp_pa_list[[11]]$Y, setup_med_exp_pa_list[[11]]$N0, setup_med_exp_pa_list[[11]]$T0, X = covariates_exp_array_21)
+med_exp_pa_est_sdid23 <- synthdid_estimate(setup_med_exp_pa_list[[12]]$Y, setup_med_exp_pa_list[[12]]$N0, setup_med_exp_pa_list[[12]]$T0, X = covariates_exp_array_23)
+med_exp_pa_est_sdid24 <- synthdid_estimate(setup_med_exp_pa_list[[13]]$Y, setup_med_exp_pa_list[[13]]$N0, setup_med_exp_pa_list[[13]]$T0, X = covariates_exp_array_24)
+med_exp_pa_est_sdid25 <- synthdid_estimate(setup_med_exp_pa_list[[14]]$Y, setup_med_exp_pa_list[[14]]$N0, setup_med_exp_pa_list[[14]]$T0, X = covariates_exp_array_25)
+med_exp_pa_est_sdid26 <- synthdid_estimate(setup_med_exp_pa_list[[15]]$Y, setup_med_exp_pa_list[[15]]$N0, setup_med_exp_pa_list[[15]]$T0, X = covariates_exp_array_26)
+med_exp_pa_est_sdid28 <- synthdid_estimate(setup_med_exp_pa_list[[16]]$Y, setup_med_exp_pa_list[[16]]$N0, setup_med_exp_pa_list[[16]]$T0, X = covariates_exp_array_28)
+med_exp_pa_est_sdid29 <- synthdid_estimate(setup_med_exp_pa_list[[17]]$Y, setup_med_exp_pa_list[[17]]$N0, setup_med_exp_pa_list[[17]]$T0, X = covariates_exp_array_29)
+med_exp_pa_est_sdid30 <- synthdid_estimate(setup_med_exp_pa_list[[18]]$Y, setup_med_exp_pa_list[[18]]$N0, setup_med_exp_pa_list[[18]]$T0, X = covariates_exp_array_30)
+med_exp_pa_est_sdid31 <- synthdid_estimate(setup_med_exp_pa_list[[19]]$Y, setup_med_exp_pa_list[[19]]$N0, setup_med_exp_pa_list[[19]]$T0, X = covariates_exp_array_31)
+med_exp_pa_est_sdid32 <- synthdid_estimate(setup_med_exp_pa_list[[20]]$Y, setup_med_exp_pa_list[[20]]$N0, setup_med_exp_pa_list[[20]]$T0, X = covariates_exp_array_32)
+med_exp_pa_est_sdid33 <- synthdid_estimate(setup_med_exp_pa_list[[21]]$Y, setup_med_exp_pa_list[[21]]$N0, setup_med_exp_pa_list[[21]]$T0, X = covariates_exp_array_33)
+med_exp_pa_est_sdid34 <- synthdid_estimate(setup_med_exp_pa_list[[22]]$Y, setup_med_exp_pa_list[[22]]$N0, setup_med_exp_pa_list[[22]]$T0, X = covariates_exp_array_34)
+med_exp_pa_est_sdid36 <- synthdid_estimate(setup_med_exp_pa_list[[23]]$Y, setup_med_exp_pa_list[[23]]$N0, setup_med_exp_pa_list[[23]]$T0, X = covariates_exp_array_36)
+med_exp_pa_est_sdid37 <- synthdid_estimate(setup_med_exp_pa_list[[24]]$Y, setup_med_exp_pa_list[[24]]$N0, setup_med_exp_pa_list[[24]]$T0, X = covariates_exp_array_37)
+med_exp_pa_est_sdid39 <- synthdid_estimate(setup_med_exp_pa_list[[25]]$Y, setup_med_exp_pa_list[[25]]$N0, setup_med_exp_pa_list[[25]]$T0, X = covariates_exp_array_39)
+med_exp_pa_est_sdid40 <- synthdid_estimate(setup_med_exp_pa_list[[26]]$Y, setup_med_exp_pa_list[[26]]$N0, setup_med_exp_pa_list[[26]]$T0, X = covariates_exp_array_40)
+med_exp_pa_est_sdid41 <- synthdid_estimate(setup_med_exp_pa_list[[27]]$Y, setup_med_exp_pa_list[[27]]$N0, setup_med_exp_pa_list[[27]]$T0, X = covariates_exp_array_41)
+med_exp_pa_est_sdid44 <- synthdid_estimate(setup_med_exp_pa_list[[28]]$Y, setup_med_exp_pa_list[[28]]$N0, setup_med_exp_pa_list[[28]]$T0, X = covariates_exp_array_44)
+med_exp_pa_est_sdid45 <- synthdid_estimate(setup_med_exp_pa_list[[29]]$Y, setup_med_exp_pa_list[[29]]$N0, setup_med_exp_pa_list[[29]]$T0, X = covariates_exp_array_45)
+med_exp_pa_est_sdid47 <- synthdid_estimate(setup_med_exp_pa_list[[30]]$Y, setup_med_exp_pa_list[[30]]$N0, setup_med_exp_pa_list[[30]]$T0, X = covariates_exp_array_47)
+med_exp_pa_est_sdid50 <- synthdid_estimate(setup_med_exp_pa_list[[31]]$Y, setup_med_exp_pa_list[[31]]$N0, setup_med_exp_pa_list[[31]]$T0, X = covariates_exp_array_50)
+med_exp_pa_est_sdid51 <- synthdid_estimate(setup_med_exp_pa_list[[32]]$Y, setup_med_exp_pa_list[[32]]$N0, setup_med_exp_pa_list[[32]]$T0, X = covariates_exp_array_51)
+med_exp_pa_est_sdid53 <- synthdid_estimate(setup_med_exp_pa_list[[33]]$Y, setup_med_exp_pa_list[[33]]$N0, setup_med_exp_pa_list[[33]]$T0, X = covariates_exp_array_53)
+med_exp_pa_est_sdid54 <- synthdid_estimate(setup_med_exp_pa_list[[34]]$Y, setup_med_exp_pa_list[[34]]$N0, setup_med_exp_pa_list[[34]]$T0, X = covariates_exp_array_54)
+med_exp_pa_est_sdid55 <- synthdid_estimate(setup_med_exp_pa_list[[35]]$Y, setup_med_exp_pa_list[[35]]$N0, setup_med_exp_pa_list[[35]]$T0, X = covariates_exp_array_55)
+med_exp_pa_est_sdid_list <- list(med_exp_pa_est_sdid1,med_exp_pa_est_sdid2,med_exp_pa_est_sdid5,
+                                 med_exp_pa_est_sdid10,med_exp_pa_est_sdid11,med_exp_pa_est_sdid12,
+                                 med_exp_pa_est_sdid13,med_exp_pa_est_sdid15,med_exp_pa_est_sdid17,
+                                 med_exp_pa_est_sdid19,med_exp_pa_est_sdid21,med_exp_pa_est_sdid23,
+                                 med_exp_pa_est_sdid24,med_exp_pa_est_sdid25,med_exp_pa_est_sdid26,
+                                 med_exp_pa_est_sdid28,med_exp_pa_est_sdid29,med_exp_pa_est_sdid30,
+                                 med_exp_pa_est_sdid31,med_exp_pa_est_sdid32,med_exp_pa_est_sdid33,
+                                 med_exp_pa_est_sdid34,med_exp_pa_est_sdid36,med_exp_pa_est_sdid37,
+                                 med_exp_pa_est_sdid39,med_exp_pa_est_sdid40,med_exp_pa_est_sdid41,
+                                 med_exp_pa_est_sdid44,med_exp_pa_est_sdid45,med_exp_pa_est_sdid47,
+                                 med_exp_pa_est_sdid50,med_exp_pa_est_sdid51,med_exp_pa_est_sdid53,
+                                 med_exp_pa_est_sdid54,med_exp_pa_est_sdid55)
+rm(med_exp_pa_est_sdid1,med_exp_pa_est_sdid2,med_exp_pa_est_sdid5,
+   med_exp_pa_est_sdid10,med_exp_pa_est_sdid11,med_exp_pa_est_sdid12,
+   med_exp_pa_est_sdid13,med_exp_pa_est_sdid15,med_exp_pa_est_sdid17,
+   med_exp_pa_est_sdid19,med_exp_pa_est_sdid21,med_exp_pa_est_sdid23,
+   med_exp_pa_est_sdid24,med_exp_pa_est_sdid25,med_exp_pa_est_sdid26,
+   med_exp_pa_est_sdid28,med_exp_pa_est_sdid29,med_exp_pa_est_sdid30,
+   med_exp_pa_est_sdid31,med_exp_pa_est_sdid32,med_exp_pa_est_sdid33,
+   med_exp_pa_est_sdid34,med_exp_pa_est_sdid36,med_exp_pa_est_sdid37,
+   med_exp_pa_est_sdid39,med_exp_pa_est_sdid40,med_exp_pa_est_sdid41,
+   med_exp_pa_est_sdid44,med_exp_pa_est_sdid45,med_exp_pa_est_sdid47,
+   med_exp_pa_est_sdid50,med_exp_pa_est_sdid51,med_exp_pa_est_sdid53,
+   med_exp_pa_est_sdid54,med_exp_pa_est_sdid55)
+for(i in 1:35) {
+  assign(paste0("med_exp_pa_est_sdid_plot", i), synthdid_plot(med_exp_pa_est_sdid_list[i]))
+}
+med_exp_pa_est_sdid_plot_data_aux1 <- ggplot_build(med_exp_pa_est_sdid_plot1)
+med_exp_pa_est_sdid_plot_data_aux2 <- ggplot_build(med_exp_pa_est_sdid_plot2)
+med_exp_pa_est_sdid_plot_data_aux3 <- ggplot_build(med_exp_pa_est_sdid_plot3)
+med_exp_pa_est_sdid_plot_data_aux4 <- ggplot_build(med_exp_pa_est_sdid_plot4)
+med_exp_pa_est_sdid_plot_data_aux5 <- ggplot_build(med_exp_pa_est_sdid_plot5)
+med_exp_pa_est_sdid_plot_data_aux6 <- ggplot_build(med_exp_pa_est_sdid_plot6)
+med_exp_pa_est_sdid_plot_data_aux7 <- ggplot_build(med_exp_pa_est_sdid_plot7)
+med_exp_pa_est_sdid_plot_data_aux8 <- ggplot_build(med_exp_pa_est_sdid_plot8)
+med_exp_pa_est_sdid_plot_data_aux9 <- ggplot_build(med_exp_pa_est_sdid_plot9)
+med_exp_pa_est_sdid_plot_data_aux10 <- ggplot_build(med_exp_pa_est_sdid_plot10)
+med_exp_pa_est_sdid_plot_data_aux11 <- ggplot_build(med_exp_pa_est_sdid_plot11)
+med_exp_pa_est_sdid_plot_data_aux12 <- ggplot_build(med_exp_pa_est_sdid_plot12)
+med_exp_pa_est_sdid_plot_data_aux13 <- ggplot_build(med_exp_pa_est_sdid_plot13)
+med_exp_pa_est_sdid_plot_data_aux14 <- ggplot_build(med_exp_pa_est_sdid_plot14)
+med_exp_pa_est_sdid_plot_data_aux15 <- ggplot_build(med_exp_pa_est_sdid_plot15)
+med_exp_pa_est_sdid_plot_data_aux16 <- ggplot_build(med_exp_pa_est_sdid_plot16)
+med_exp_pa_est_sdid_plot_data_aux17 <- ggplot_build(med_exp_pa_est_sdid_plot17)
+med_exp_pa_est_sdid_plot_data_aux18 <- ggplot_build(med_exp_pa_est_sdid_plot18)
+med_exp_pa_est_sdid_plot_data_aux19 <- ggplot_build(med_exp_pa_est_sdid_plot19)
+med_exp_pa_est_sdid_plot_data_aux20 <- ggplot_build(med_exp_pa_est_sdid_plot20)
+med_exp_pa_est_sdid_plot_data_aux21 <- ggplot_build(med_exp_pa_est_sdid_plot21)
+med_exp_pa_est_sdid_plot_data_aux22 <- ggplot_build(med_exp_pa_est_sdid_plot22)
+med_exp_pa_est_sdid_plot_data_aux23 <- ggplot_build(med_exp_pa_est_sdid_plot23)
+med_exp_pa_est_sdid_plot_data_aux24 <- ggplot_build(med_exp_pa_est_sdid_plot24)
+med_exp_pa_est_sdid_plot_data_aux25 <- ggplot_build(med_exp_pa_est_sdid_plot25)
+med_exp_pa_est_sdid_plot_data_aux26 <- ggplot_build(med_exp_pa_est_sdid_plot26)
+med_exp_pa_est_sdid_plot_data_aux27 <- ggplot_build(med_exp_pa_est_sdid_plot27)
+med_exp_pa_est_sdid_plot_data_aux28 <- ggplot_build(med_exp_pa_est_sdid_plot28)
+med_exp_pa_est_sdid_plot_data_aux29 <- ggplot_build(med_exp_pa_est_sdid_plot29)
+med_exp_pa_est_sdid_plot_data_aux30 <- ggplot_build(med_exp_pa_est_sdid_plot30)
+med_exp_pa_est_sdid_plot_data_aux31 <- ggplot_build(med_exp_pa_est_sdid_plot31)
+med_exp_pa_est_sdid_plot_data_aux32 <- ggplot_build(med_exp_pa_est_sdid_plot32)
+med_exp_pa_est_sdid_plot_data_aux33 <- ggplot_build(med_exp_pa_est_sdid_plot33)
+med_exp_pa_est_sdid_plot_data_aux34 <- ggplot_build(med_exp_pa_est_sdid_plot34)
+med_exp_pa_est_sdid_plot_data_aux35 <- ggplot_build(med_exp_pa_est_sdid_plot35)
+med_exp_pa_est_sdid_plot_data_aux_list <- list(med_exp_pa_est_sdid_plot_data_aux1,med_exp_pa_est_sdid_plot_data_aux2,med_exp_pa_est_sdid_plot_data_aux3,
+                                               med_exp_pa_est_sdid_plot_data_aux4,med_exp_pa_est_sdid_plot_data_aux5,med_exp_pa_est_sdid_plot_data_aux6,
+                                               med_exp_pa_est_sdid_plot_data_aux7,med_exp_pa_est_sdid_plot_data_aux8,med_exp_pa_est_sdid_plot_data_aux9,
+                                               med_exp_pa_est_sdid_plot_data_aux10,med_exp_pa_est_sdid_plot_data_aux11,med_exp_pa_est_sdid_plot_data_aux12,
+                                               med_exp_pa_est_sdid_plot_data_aux13,med_exp_pa_est_sdid_plot_data_aux14,med_exp_pa_est_sdid_plot_data_aux15,
+                                               med_exp_pa_est_sdid_plot_data_aux16,med_exp_pa_est_sdid_plot_data_aux17,med_exp_pa_est_sdid_plot_data_aux18,
+                                               med_exp_pa_est_sdid_plot_data_aux19,med_exp_pa_est_sdid_plot_data_aux20,med_exp_pa_est_sdid_plot_data_aux21,
+                                               med_exp_pa_est_sdid_plot_data_aux22,med_exp_pa_est_sdid_plot_data_aux23,med_exp_pa_est_sdid_plot_data_aux24,
+                                               med_exp_pa_est_sdid_plot_data_aux25,med_exp_pa_est_sdid_plot_data_aux26,med_exp_pa_est_sdid_plot_data_aux27,
+                                               med_exp_pa_est_sdid_plot_data_aux28,med_exp_pa_est_sdid_plot_data_aux29,med_exp_pa_est_sdid_plot_data_aux30,
+                                               med_exp_pa_est_sdid_plot_data_aux31,med_exp_pa_est_sdid_plot_data_aux32,med_exp_pa_est_sdid_plot_data_aux33,
+                                               med_exp_pa_est_sdid_plot_data_aux34,med_exp_pa_est_sdid_plot_data_aux35)
+rm(med_exp_pa_est_sdid_plot_data_aux1,med_exp_pa_est_sdid_plot_data_aux2,med_exp_pa_est_sdid_plot_data_aux3,
+   med_exp_pa_est_sdid_plot_data_aux4,med_exp_pa_est_sdid_plot_data_aux5,med_exp_pa_est_sdid_plot_data_aux6,
+   med_exp_pa_est_sdid_plot_data_aux7,med_exp_pa_est_sdid_plot_data_aux8,med_exp_pa_est_sdid_plot_data_aux9,
+   med_exp_pa_est_sdid_plot_data_aux10,med_exp_pa_est_sdid_plot_data_aux11,med_exp_pa_est_sdid_plot_data_aux12,
+   med_exp_pa_est_sdid_plot_data_aux13,med_exp_pa_est_sdid_plot_data_aux14,med_exp_pa_est_sdid_plot_data_aux15,
+   med_exp_pa_est_sdid_plot_data_aux16,med_exp_pa_est_sdid_plot_data_aux17,med_exp_pa_est_sdid_plot_data_aux18,
+   med_exp_pa_est_sdid_plot_data_aux19,med_exp_pa_est_sdid_plot_data_aux20,med_exp_pa_est_sdid_plot_data_aux21,
+   med_exp_pa_est_sdid_plot_data_aux22,med_exp_pa_est_sdid_plot_data_aux23,med_exp_pa_est_sdid_plot_data_aux24,
+   med_exp_pa_est_sdid_plot_data_aux25,med_exp_pa_est_sdid_plot_data_aux26,med_exp_pa_est_sdid_plot_data_aux27,
+   med_exp_pa_est_sdid_plot_data_aux28,med_exp_pa_est_sdid_plot_data_aux29,med_exp_pa_est_sdid_plot_data_aux30,
+   med_exp_pa_est_sdid_plot_data_aux31,med_exp_pa_est_sdid_plot_data_aux32,med_exp_pa_est_sdid_plot_data_aux33,
+   med_exp_pa_est_sdid_plot_data_aux34,med_exp_pa_est_sdid_plot_data_aux35)
+rm(med_exp_pa_est_sdid_plot1,med_exp_pa_est_sdid_plot2,med_exp_pa_est_sdid_plot3,
+   med_exp_pa_est_sdid_plot4,med_exp_pa_est_sdid_plot5,med_exp_pa_est_sdid_plot6,
+   med_exp_pa_est_sdid_plot7,med_exp_pa_est_sdid_plot8,med_exp_pa_est_sdid_plot9,
+   med_exp_pa_est_sdid_plot10,med_exp_pa_est_sdid_plot11,med_exp_pa_est_sdid_plot12,
+   med_exp_pa_est_sdid_plot13,med_exp_pa_est_sdid_plot14,med_exp_pa_est_sdid_plot15,
+   med_exp_pa_est_sdid_plot16,med_exp_pa_est_sdid_plot17,med_exp_pa_est_sdid_plot18,
+   med_exp_pa_est_sdid_plot19,med_exp_pa_est_sdid_plot20,med_exp_pa_est_sdid_plot21,
+   med_exp_pa_est_sdid_plot22,med_exp_pa_est_sdid_plot23,med_exp_pa_est_sdid_plot24,
+   med_exp_pa_est_sdid_plot25,med_exp_pa_est_sdid_plot26,med_exp_pa_est_sdid_plot27,
+   med_exp_pa_est_sdid_plot28,med_exp_pa_est_sdid_plot29,med_exp_pa_est_sdid_plot30,
+   med_exp_pa_est_sdid_plot31,med_exp_pa_est_sdid_plot32,med_exp_pa_est_sdid_plot33,
+   med_exp_pa_est_sdid_plot34,med_exp_pa_est_sdid_plot35)
+for(i in 1:35) {
+  assign(paste0("med_exp_pa_est_sdid_plot_data_long", i), data.frame(med_exp_pa_est_sdid_plot_data_aux_list[[i]]$data[[1]]$x, med_exp_pa_est_sdid_plot_data_aux_list[[i]]$data[[1]]$y, med_exp_pa_est_sdid_plot_data_aux_list[[i]]$data[[1]]$group))
+}
+med_exp_pa_est_sdid_plot_data_long_list <- list(med_exp_pa_est_sdid_plot_data_long1,med_exp_pa_est_sdid_plot_data_long2,med_exp_pa_est_sdid_plot_data_long3,
+                                                med_exp_pa_est_sdid_plot_data_long4,med_exp_pa_est_sdid_plot_data_long5,med_exp_pa_est_sdid_plot_data_long6,
+                                                med_exp_pa_est_sdid_plot_data_long7,med_exp_pa_est_sdid_plot_data_long8,med_exp_pa_est_sdid_plot_data_long9,
+                                                med_exp_pa_est_sdid_plot_data_long10,med_exp_pa_est_sdid_plot_data_long11,med_exp_pa_est_sdid_plot_data_long12,
+                                                med_exp_pa_est_sdid_plot_data_long13,med_exp_pa_est_sdid_plot_data_long14,med_exp_pa_est_sdid_plot_data_long15,
+                                                med_exp_pa_est_sdid_plot_data_long16,med_exp_pa_est_sdid_plot_data_long17,med_exp_pa_est_sdid_plot_data_long18,
+                                                med_exp_pa_est_sdid_plot_data_long19,med_exp_pa_est_sdid_plot_data_long20,med_exp_pa_est_sdid_plot_data_long21,
+                                                med_exp_pa_est_sdid_plot_data_long22,med_exp_pa_est_sdid_plot_data_long23,med_exp_pa_est_sdid_plot_data_long24,
+                                                med_exp_pa_est_sdid_plot_data_long25,med_exp_pa_est_sdid_plot_data_long26,med_exp_pa_est_sdid_plot_data_long27,
+                                                med_exp_pa_est_sdid_plot_data_long28,med_exp_pa_est_sdid_plot_data_long29,med_exp_pa_est_sdid_plot_data_long30,
+                                                med_exp_pa_est_sdid_plot_data_long31,med_exp_pa_est_sdid_plot_data_long32,med_exp_pa_est_sdid_plot_data_long33,
+                                                med_exp_pa_est_sdid_plot_data_long34,med_exp_pa_est_sdid_plot_data_long35)
+rm(med_exp_pa_est_sdid_plot_data_long1,med_exp_pa_est_sdid_plot_data_long2,med_exp_pa_est_sdid_plot_data_long3,
+   med_exp_pa_est_sdid_plot_data_long4,med_exp_pa_est_sdid_plot_data_long5,med_exp_pa_est_sdid_plot_data_long6,
+   med_exp_pa_est_sdid_plot_data_long7,med_exp_pa_est_sdid_plot_data_long8,med_exp_pa_est_sdid_plot_data_long9,
+   med_exp_pa_est_sdid_plot_data_long10,med_exp_pa_est_sdid_plot_data_long11,med_exp_pa_est_sdid_plot_data_long12,
+   med_exp_pa_est_sdid_plot_data_long13,med_exp_pa_est_sdid_plot_data_long14,med_exp_pa_est_sdid_plot_data_long15,
+   med_exp_pa_est_sdid_plot_data_long16,med_exp_pa_est_sdid_plot_data_long17,med_exp_pa_est_sdid_plot_data_long18,
+   med_exp_pa_est_sdid_plot_data_long19,med_exp_pa_est_sdid_plot_data_long20,med_exp_pa_est_sdid_plot_data_long21,
+   med_exp_pa_est_sdid_plot_data_long22,med_exp_pa_est_sdid_plot_data_long23,med_exp_pa_est_sdid_plot_data_long24,
+   med_exp_pa_est_sdid_plot_data_long25,med_exp_pa_est_sdid_plot_data_long26,med_exp_pa_est_sdid_plot_data_long27,
+   med_exp_pa_est_sdid_plot_data_long28,med_exp_pa_est_sdid_plot_data_long29,med_exp_pa_est_sdid_plot_data_long30,
+   med_exp_pa_est_sdid_plot_data_long31,med_exp_pa_est_sdid_plot_data_long32,med_exp_pa_est_sdid_plot_data_long33,
+   med_exp_pa_est_sdid_plot_data_long34,med_exp_pa_est_sdid_plot_data_long35)
+med_exp_pa_est_sdid_plot_data_long_list <- lapply(med_exp_pa_est_sdid_plot_data_long_list, function(x) {
+  colnames(x) <- c('year', 'outcome', 'treated')  
+  x$treated <- x$treated - 1
+  return(x)
+}
+)
+for(i in 1:35) {
+  assign(paste0("med_exp_pa_est_sdid_plot_data_wide", i), reshape(data=med_exp_pa_est_sdid_plot_data_long_list[[i]],
+                                                                  idvar = "year",
+                                                                  v.names = "outcome",
+                                                                  timevar = "treated",
+                                                                  direction = "wide"))
+}
+med_exp_pa_est_sdid_plot_data_wide_list <- list(med_exp_pa_est_sdid_plot_data_wide1,med_exp_pa_est_sdid_plot_data_wide2,med_exp_pa_est_sdid_plot_data_wide3,
+                                                med_exp_pa_est_sdid_plot_data_wide4,med_exp_pa_est_sdid_plot_data_wide5,med_exp_pa_est_sdid_plot_data_wide6,
+                                                med_exp_pa_est_sdid_plot_data_wide7,med_exp_pa_est_sdid_plot_data_wide8,med_exp_pa_est_sdid_plot_data_wide9,
+                                                med_exp_pa_est_sdid_plot_data_wide10,med_exp_pa_est_sdid_plot_data_wide11,med_exp_pa_est_sdid_plot_data_wide12,
+                                                med_exp_pa_est_sdid_plot_data_wide13,med_exp_pa_est_sdid_plot_data_wide14,med_exp_pa_est_sdid_plot_data_wide15,
+                                                med_exp_pa_est_sdid_plot_data_wide16,med_exp_pa_est_sdid_plot_data_wide17,med_exp_pa_est_sdid_plot_data_wide18,
+                                                med_exp_pa_est_sdid_plot_data_wide19,med_exp_pa_est_sdid_plot_data_wide20,med_exp_pa_est_sdid_plot_data_wide21,
+                                                med_exp_pa_est_sdid_plot_data_wide22,med_exp_pa_est_sdid_plot_data_wide23,med_exp_pa_est_sdid_plot_data_wide24,
+                                                med_exp_pa_est_sdid_plot_data_wide25,med_exp_pa_est_sdid_plot_data_wide26,med_exp_pa_est_sdid_plot_data_wide27,
+                                                med_exp_pa_est_sdid_plot_data_wide28,med_exp_pa_est_sdid_plot_data_wide29,med_exp_pa_est_sdid_plot_data_wide30,
+                                                med_exp_pa_est_sdid_plot_data_wide31,med_exp_pa_est_sdid_plot_data_wide32,med_exp_pa_est_sdid_plot_data_wide33,
+                                                med_exp_pa_est_sdid_plot_data_wide34,med_exp_pa_est_sdid_plot_data_wide35)
+rm(med_exp_pa_est_sdid_plot_data_wide1,med_exp_pa_est_sdid_plot_data_wide2,med_exp_pa_est_sdid_plot_data_wide3,
+   med_exp_pa_est_sdid_plot_data_wide4,med_exp_pa_est_sdid_plot_data_wide5,med_exp_pa_est_sdid_plot_data_wide6,
+   med_exp_pa_est_sdid_plot_data_wide7,med_exp_pa_est_sdid_plot_data_wide8,med_exp_pa_est_sdid_plot_data_wide9,
+   med_exp_pa_est_sdid_plot_data_wide10,med_exp_pa_est_sdid_plot_data_wide11,med_exp_pa_est_sdid_plot_data_wide12,
+   med_exp_pa_est_sdid_plot_data_wide13,med_exp_pa_est_sdid_plot_data_wide14,med_exp_pa_est_sdid_plot_data_wide15,
+   med_exp_pa_est_sdid_plot_data_wide16,med_exp_pa_est_sdid_plot_data_wide17,med_exp_pa_est_sdid_plot_data_wide18,
+   med_exp_pa_est_sdid_plot_data_wide19,med_exp_pa_est_sdid_plot_data_wide20,med_exp_pa_est_sdid_plot_data_wide21,
+   med_exp_pa_est_sdid_plot_data_wide22,med_exp_pa_est_sdid_plot_data_wide23,med_exp_pa_est_sdid_plot_data_wide24,
+   med_exp_pa_est_sdid_plot_data_wide25,med_exp_pa_est_sdid_plot_data_wide26,med_exp_pa_est_sdid_plot_data_wide27,
+   med_exp_pa_est_sdid_plot_data_wide28,med_exp_pa_est_sdid_plot_data_wide29,med_exp_pa_est_sdid_plot_data_wide30,
+   med_exp_pa_est_sdid_plot_data_wide31,med_exp_pa_est_sdid_plot_data_wide32,med_exp_pa_est_sdid_plot_data_wide33,
+   med_exp_pa_est_sdid_plot_data_wide34,med_exp_pa_est_sdid_plot_data_wide35)
+med_exp_pa_est_sdid_plot_data_wide_list <- lapply(med_exp_pa_est_sdid_plot_data_wide_list, function(x) {
+  x$diff <- x$outcome.1 - x$outcome.0
+  return(x)
+}
+)
+
+##### Spaghetti and Placebo Distribution Plots #####
+# Spaghetti plots #
+med_exp_est_did_plot_data_wide_pa$did_facet_title <- "Diff-in-Diff"
+med_exp_est_sc_plot_data_wide_pa$sc_facet_title <- "Synthetic Control"
+med_exp_est_sdid_plot_data_wide_pa$sdid_facet_title <- "Synthetic Diff-in-Diff"
+med_exp_est_did_plot_data_wide_pa$diff_relative <- med_exp_est_did_plot_data_wide_pa$diff - med_exp_est_did_plot_data_wide_pa$diff[16]
+for(i in 1:35) {
+  med_exp_pa_est_did_plot_data_wide_list[[i]]$diff_relative <- med_exp_pa_est_did_plot_data_wide_list[[i]]$diff - med_exp_pa_est_did_plot_data_wide_list[[i]]$diff[16]
+}
+med_exp_pa_spag_did_plot <- ggplot(med_exp_est_did_plot_data_wide_pa, aes(year,diff_relative)) +
+  geom_vline(xintercept = 1995, size = .75, color = "grey70", alpha = 0.75) +
+  geom_hline(yintercept = 0, size = .75, color = "grey70", alpha = 0.75) +
+  geom_line(data = med_exp_pa_est_did_plot_data_wide_list[[1]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = med_exp_pa_est_did_plot_data_wide_list[[2]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = med_exp_pa_est_did_plot_data_wide_list[[3]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = med_exp_pa_est_did_plot_data_wide_list[[4]], color = "#F8766D", alpha = 0.4) +
+  #geom_line(data = med_exp_pa_est_did_plot_data_wide_list[[5]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = med_exp_pa_est_did_plot_data_wide_list[[6]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = med_exp_pa_est_did_plot_data_wide_list[[7]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = med_exp_pa_est_did_plot_data_wide_list[[8]], color = "#F8766D", alpha = 0.4) +    
+  geom_line(data = med_exp_pa_est_did_plot_data_wide_list[[9]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = med_exp_pa_est_did_plot_data_wide_list[[10]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = med_exp_pa_est_did_plot_data_wide_list[[11]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = med_exp_pa_est_did_plot_data_wide_list[[12]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = med_exp_pa_est_did_plot_data_wide_list[[13]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = med_exp_pa_est_did_plot_data_wide_list[[14]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = med_exp_pa_est_did_plot_data_wide_list[[15]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = med_exp_pa_est_did_plot_data_wide_list[[16]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = med_exp_pa_est_did_plot_data_wide_list[[17]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = med_exp_pa_est_did_plot_data_wide_list[[18]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = med_exp_pa_est_did_plot_data_wide_list[[19]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = med_exp_pa_est_did_plot_data_wide_list[[20]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = med_exp_pa_est_did_plot_data_wide_list[[21]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = med_exp_pa_est_did_plot_data_wide_list[[22]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = med_exp_pa_est_did_plot_data_wide_list[[23]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = med_exp_pa_est_did_plot_data_wide_list[[24]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = med_exp_pa_est_did_plot_data_wide_list[[25]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = med_exp_pa_est_did_plot_data_wide_list[[26]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = med_exp_pa_est_did_plot_data_wide_list[[27]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = med_exp_pa_est_did_plot_data_wide_list[[28]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = med_exp_pa_est_did_plot_data_wide_list[[29]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = med_exp_pa_est_did_plot_data_wide_list[[30]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = med_exp_pa_est_did_plot_data_wide_list[[31]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = med_exp_pa_est_did_plot_data_wide_list[[32]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = med_exp_pa_est_did_plot_data_wide_list[[33]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = med_exp_pa_est_did_plot_data_wide_list[[34]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = med_exp_pa_est_did_plot_data_wide_list[[35]], color = "#F8766D", alpha = 0.4) +
+  geom_line(size = 1.25, color = "#00BFC4") +
+  labs(y= "Gap in Total Expenditure \n (Per Capita)") +
+  facet_grid(. ~ did_facet_title) +
+  theme(aspect.ratio=1,
+        panel.spacing.x=unit(1, "lines"),
+        panel.background = element_blank(),
+        panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank(), 
+        panel.grid.major.y = element_line(size=.25, color='grey90'),
+        panel.grid.minor.y = element_blank(),
+        axis.text.x = element_text(angle = 45, hjust=1, size = 8),
+        axis.text.y = element_text(size = 8),
+        axis.title.y = element_text(size=8),
+        axis.title.x = element_blank(),
+        strip.background = element_rect(fill="grey70", size=1),
+        strip.text = element_text(size=8, face="bold", color = "white"),
+        axis.ticks = element_line(color = "grey70"),
+        panel.border = element_rect(color = "grey70", fill = NA, size = 0.5)
+  )
+med_exp_pa_spag_sc_plot <- ggplot(med_exp_est_sc_plot_data_wide_pa, aes(year,diff)) +
+  geom_vline(xintercept = 1995, size = .75, color = "grey70", alpha = 0.75) +
+  geom_hline(yintercept = 0, size = .75, color = "grey70", alpha = 0.75) +
+  geom_line(data = med_exp_pa_est_sc_plot_data_wide_list[[1]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = med_exp_pa_est_sc_plot_data_wide_list[[2]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = med_exp_pa_est_sc_plot_data_wide_list[[3]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = med_exp_pa_est_sc_plot_data_wide_list[[4]], color = "#F8766D", alpha = 0.4) +
+  #geom_line(data = med_exp_pa_est_sc_plot_data_wide_list[[5]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = med_exp_pa_est_sc_plot_data_wide_list[[6]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = med_exp_pa_est_sc_plot_data_wide_list[[7]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = med_exp_pa_est_sc_plot_data_wide_list[[8]], color = "#F8766D", alpha = 0.4) +    
+  geom_line(data = med_exp_pa_est_sc_plot_data_wide_list[[9]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = med_exp_pa_est_sc_plot_data_wide_list[[10]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = med_exp_pa_est_sc_plot_data_wide_list[[11]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = med_exp_pa_est_sc_plot_data_wide_list[[12]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = med_exp_pa_est_sc_plot_data_wide_list[[13]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = med_exp_pa_est_sc_plot_data_wide_list[[14]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = med_exp_pa_est_sc_plot_data_wide_list[[15]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = med_exp_pa_est_sc_plot_data_wide_list[[16]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = med_exp_pa_est_sc_plot_data_wide_list[[17]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = med_exp_pa_est_sc_plot_data_wide_list[[18]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = med_exp_pa_est_sc_plot_data_wide_list[[19]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = med_exp_pa_est_sc_plot_data_wide_list[[20]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = med_exp_pa_est_sc_plot_data_wide_list[[21]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = med_exp_pa_est_sc_plot_data_wide_list[[22]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = med_exp_pa_est_sc_plot_data_wide_list[[23]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = med_exp_pa_est_sc_plot_data_wide_list[[24]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = med_exp_pa_est_sc_plot_data_wide_list[[25]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = med_exp_pa_est_sc_plot_data_wide_list[[26]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = med_exp_pa_est_sc_plot_data_wide_list[[27]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = med_exp_pa_est_sc_plot_data_wide_list[[28]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = med_exp_pa_est_sc_plot_data_wide_list[[29]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = med_exp_pa_est_sc_plot_data_wide_list[[30]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = med_exp_pa_est_sc_plot_data_wide_list[[31]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = med_exp_pa_est_sc_plot_data_wide_list[[32]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = med_exp_pa_est_sc_plot_data_wide_list[[33]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = med_exp_pa_est_sc_plot_data_wide_list[[34]], color = "#F8766D", alpha = 0.4) +
+  geom_line(aes(y = diff, color = "Placebos"),data = med_exp_pa_est_sc_plot_data_wide_list[[35]], alpha = 0.4) +
+  geom_line(aes(y = diff, color = "Pennsylvania"),data = med_exp_est_sc_plot_data_wide_pa, size = 1.25) +
+  scale_color_manual(values = c("Placebos" = "#F8766D", "Pennsylvania" = "#00BFC4")) +
+  labs(x= "Year") +
+  facet_grid(. ~ sc_facet_title) +
+  theme(aspect.ratio=1,
+        panel.spacing.x=unit(1, "lines"),
+        panel.background = element_blank(),
+        panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank(), 
+        panel.grid.major.y = element_line(size=.25, color='grey90'),
+        panel.grid.minor.y = element_blank(),
+        axis.text.x = element_text(angle = 45, hjust=1, size = 8),
+        axis.text.y = element_text(size = 8),
+        axis.title.y = element_blank(),
+        axis.title.x = element_text(size=8),
+        strip.background = element_rect(fill="grey70", size=1),
+        strip.text = element_text(size=8, face="bold", color = "white"),
+        legend.position='top', 
+        legend.text = element_text(size=8.5),
+        legend.direction='horizontal',
+        legend.key = element_blank(),
+        legend.title = element_blank(),
+        axis.ticks = element_line(color = "grey70"),
+        panel.border = element_rect(color = "grey70", fill = NA, size = 0.5)
+  )
+med_exp_est_sdid_plot_data_wide_pa$diff_relative <- med_exp_est_sdid_plot_data_wide_pa$diff - med_exp_est_sdid_plot_data_wide_pa$diff[16]
+for(i in 1:35) {
+  med_exp_pa_est_sdid_plot_data_wide_list[[i]]$diff_relative <- med_exp_pa_est_sdid_plot_data_wide_list[[i]]$diff - med_exp_pa_est_sdid_plot_data_wide_list[[i]]$diff[16]
+}
+med_exp_pa_spag_sdid_plot <- ggplot(med_exp_est_sdid_plot_data_wide_pa, aes(year,diff_relative)) +
+  geom_vline(xintercept = 1995, size = .75, color = "grey70", alpha = 0.75) +
+  geom_hline(yintercept = 0, size = .75, color = "grey70", alpha = 0.75) +
+  geom_line(data = med_exp_pa_est_sdid_plot_data_wide_list[[1]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = med_exp_pa_est_sdid_plot_data_wide_list[[2]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = med_exp_pa_est_sdid_plot_data_wide_list[[3]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = med_exp_pa_est_sdid_plot_data_wide_list[[4]], color = "#F8766D", alpha = 0.4) +
+  #geom_line(data = med_exp_pa_est_sdid_plot_data_wide_list[[5]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = med_exp_pa_est_sdid_plot_data_wide_list[[6]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = med_exp_pa_est_sdid_plot_data_wide_list[[7]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = med_exp_pa_est_sdid_plot_data_wide_list[[8]], color = "#F8766D", alpha = 0.4) +    
+  geom_line(data = med_exp_pa_est_sdid_plot_data_wide_list[[9]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = med_exp_pa_est_sdid_plot_data_wide_list[[10]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = med_exp_pa_est_sdid_plot_data_wide_list[[11]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = med_exp_pa_est_sdid_plot_data_wide_list[[12]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = med_exp_pa_est_sdid_plot_data_wide_list[[13]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = med_exp_pa_est_sdid_plot_data_wide_list[[14]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = med_exp_pa_est_sdid_plot_data_wide_list[[15]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = med_exp_pa_est_sdid_plot_data_wide_list[[16]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = med_exp_pa_est_sdid_plot_data_wide_list[[17]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = med_exp_pa_est_sdid_plot_data_wide_list[[18]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = med_exp_pa_est_sdid_plot_data_wide_list[[19]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = med_exp_pa_est_sdid_plot_data_wide_list[[20]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = med_exp_pa_est_sdid_plot_data_wide_list[[21]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = med_exp_pa_est_sdid_plot_data_wide_list[[22]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = med_exp_pa_est_sdid_plot_data_wide_list[[23]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = med_exp_pa_est_sdid_plot_data_wide_list[[24]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = med_exp_pa_est_sdid_plot_data_wide_list[[25]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = med_exp_pa_est_sdid_plot_data_wide_list[[26]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = med_exp_pa_est_sdid_plot_data_wide_list[[27]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = med_exp_pa_est_sdid_plot_data_wide_list[[28]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = med_exp_pa_est_sdid_plot_data_wide_list[[29]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = med_exp_pa_est_sdid_plot_data_wide_list[[30]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = med_exp_pa_est_sdid_plot_data_wide_list[[31]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = med_exp_pa_est_sdid_plot_data_wide_list[[32]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = med_exp_pa_est_sdid_plot_data_wide_list[[33]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = med_exp_pa_est_sdid_plot_data_wide_list[[34]], color = "#F8766D", alpha = 0.4) +
+  geom_line(data = med_exp_pa_est_sdid_plot_data_wide_list[[35]], color = "#F8766D", alpha = 0.4) +
+  geom_line(size = 1.25, color = "#00BFC4") +
+  facet_grid(. ~ sdid_facet_title) +
+  theme(aspect.ratio=1,
+        panel.spacing.x=unit(1, "lines"),
+        panel.background = element_blank(),
+        panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank(), 
+        panel.grid.major.y = element_line(size=.25, color='grey90'),
+        panel.grid.minor.y = element_blank(),
+        axis.text.x = element_text(angle = 45, hjust=1, size = 8),
+        axis.text.y = element_text(size = 8),
+        axis.title.y = element_blank(),
+        axis.title.x = element_blank(),
+        strip.background = element_rect(fill="grey70", size=1),
+        strip.text = element_text(size=8, face="bold", color = "white"),
+        axis.ticks = element_line(color = "grey70"),
+        panel.border = element_rect(color = "grey70", fill = NA, size = 0.5)
+  )
+# Placebo Distribution Plots #
+med_exp_pa_est_did_vec <- c(med_exp_est_did_pa)
+for (i in c(1:4,6:35)) {
+  med_exp_pa_est_did_vec_aux <- med_exp_pa_est_did_list[[i]][1]
+  med_exp_pa_est_did_vec <- c(med_exp_pa_est_did_vec,med_exp_pa_est_did_vec_aux)
+}
+med_exp_pa_est_did_df <- data.frame(med_exp_pa_est_did_vec)
+med_exp_pa_hist_did_plot_aux <- ggplot(data = NULL, aes(x = med_exp_pa_est_did_vec)) +
+  geom_histogram(data = med_exp_pa_est_did_df, aes(x = med_exp_pa_est_did_vec, y = ..count..) ,alpha = .5, color = "#F8766D", fill = "#F8766D", bins = 25) +
+  labs(y= "Frequency") +  
+  theme(aspect.ratio=1,
+        panel.spacing.x=unit(1, "lines"),
+        panel.background = element_blank(),
+        panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank(), 
+        panel.grid.major.y = element_line(size=.25, color='grey90'),
+        panel.grid.minor.y = element_blank(),
+        axis.text.x = element_text(angle = 45, hjust=1, size = 8),
+        axis.text.y = element_text(size = 8),
+        axis.title.y = element_text(size = 8),
+        axis.title.x = element_blank(),
+        strip.background = element_rect(fill="grey70", size=1),
+        strip.text = element_text(size=8, face="bold", color = "white"),
+        axis.ticks = element_line(color = "grey70"),
+        panel.border = element_rect(color = "grey70", fill = NA, size = 0.5)
+  )
+med_exp_pa_hist_did_plot1_ylim <- ggplot_build(med_exp_pa_hist_did_plot_aux)$layout$panel_scales_y[[1]]$range$range[2]
+med_exp_pa_hist_did_plot <- med_exp_pa_hist_did_plot_aux +
+  expand_limits(y=med_exp_pa_hist_did_plot1_ylim*1.025) +
+  geom_segment(aes(x = c(med_exp_pa_est_did_vec[1], mean(med_exp_pa_est_did_vec[2:35])), xend = c(med_exp_pa_est_did_vec[1],mean(med_exp_pa_est_did_vec[2:35])), y = c(0,0), yend = c(med_exp_pa_hist_did_plot1_ylim,med_exp_pa_hist_did_plot1_ylim)),
+               color = c("#00BFC4","grey50"), alpha = c(.75,.75), size = c(.75,.75)) +
+  geom_text(aes(x = c(med_exp_pa_est_did_vec[1], mean(med_exp_pa_est_did_vec[2:35])), y = c(med_exp_pa_hist_did_plot1_ylim,med_exp_pa_hist_did_plot1_ylim), label = c(paste0("hat(tau)[tr]==",round(med_exp_pa_est_did_vec[1], 2)),paste0("bar(tau)[controls]==",round(mean(med_exp_pa_est_did_vec[2:35]),2)))),
+            parse = TRUE, vjust = c(-.3,-.5), hjust = c(.65,.5), color = c("#00BFC4","grey40"), size = c(2,2))
+
+med_exp_pa_est_sc_vec <- c(med_exp_est_sc_pa)
+for (i in c(1:4,6:35)) {
+  med_exp_pa_est_sc_vec_aux <- med_exp_pa_est_sc_list[[i]][1]
+  med_exp_pa_est_sc_vec <- c(med_exp_pa_est_sc_vec,med_exp_pa_est_sc_vec_aux)
+}
+med_exp_pa_est_sc_df <- data.frame(med_exp_pa_est_sc_vec)
+med_exp_pa_hist_sc_plot_aux <- ggplot(data = NULL, aes(x = med_exp_pa_est_sc_vec)) +
+  geom_histogram(data = med_exp_pa_est_sc_df, aes(x = med_exp_pa_est_sc_vec, y = ..count..) ,alpha = .5, color = "#F8766D", fill = "#F8766D", bins = 25) +
+  labs(x= expression("Average Treatment Effect"~(hat(tau)))) +  
+  theme(aspect.ratio=1,
+        panel.spacing.x=unit(1, "lines"),
+        panel.background = element_blank(),
+        panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank(), 
+        panel.grid.major.y = element_line(size=.25, color='grey90'),
+        panel.grid.minor.y = element_blank(),
+        axis.text.x = element_text(angle = 45, hjust=1, size = 8),
+        axis.text.y = element_text(size = 8),
+        axis.title.x = element_text(size=8),
+        axis.title.y = element_blank(),
+        strip.background = element_rect(fill="grey70", size=1),
+        strip.text = element_text(size=8, face="bold", color = "white"),
+        axis.ticks = element_line(color = "grey70"),
+        panel.border = element_rect(color = "grey70", fill = NA, size = 0.5)
+  )
+med_exp_pa_hist_sc_plot1_ylim <- ggplot_build(med_exp_pa_hist_sc_plot_aux)$layout$panel_scales_y[[1]]$range$range[2]
+med_exp_pa_hist_sc_plot <- med_exp_pa_hist_sc_plot_aux +
+  expand_limits(y=med_exp_pa_hist_sc_plot1_ylim*1.025) +
+  geom_segment(aes(x = c(med_exp_pa_est_sc_vec[1], mean(med_exp_pa_est_sc_vec[2:35])), xend = c(med_exp_pa_est_sc_vec[1],mean(med_exp_pa_est_sc_vec[2:35])), y = c(0,0), yend = c(med_exp_pa_hist_sc_plot1_ylim,med_exp_pa_hist_sc_plot1_ylim)),
+               color = c("#00BFC4","grey50"), alpha = c(.75,.75), size = c(.75,.75)) +
+  geom_text(aes(x = c(med_exp_pa_est_sc_vec[1], mean(med_exp_pa_est_sc_vec[2:35])), y = c(med_exp_pa_hist_sc_plot1_ylim,med_exp_pa_hist_sc_plot1_ylim), label = c(paste0("hat(tau)[tr]==",round(med_exp_pa_est_sc_vec[1], 2)),paste0("bar(tau)[controls]==",round(mean(med_exp_pa_est_sc_vec[2:35]),2)))),
+            parse = TRUE, vjust = c(-.3,-.5), color = c("#00BFC4","grey40"), size = c(2,2))
+
+med_exp_pa_est_sdid_vec <- c(med_exp_est_sdid_pa)
+for (i in c(1:4,6:35)) {
+  med_exp_pa_est_sdid_vec_aux <- med_exp_pa_est_sdid_list[[i]][1]
+  med_exp_pa_est_sdid_vec <- c(med_exp_pa_est_sdid_vec,med_exp_pa_est_sdid_vec_aux)
+}
+med_exp_pa_est_sdid_df <- data.frame(med_exp_pa_est_sdid_vec)
+med_exp_pa_hist_sdid_plot_aux <- ggplot(data = NULL, aes(x = med_exp_pa_est_sdid_vec)) +
+  geom_histogram(data = med_exp_pa_est_sdid_df, aes(x = med_exp_pa_est_sdid_vec, y = ..count..) ,alpha = .5, color = "#F8766D", fill = "#F8766D", bins = 25) +
+  theme(aspect.ratio=1,
+        panel.spacing.x=unit(1, "lines"),
+        panel.background = element_blank(),
+        panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank(), 
+        panel.grid.major.y = element_line(size=.25, color='grey90'),
+        panel.grid.minor.y = element_blank(),
+        axis.text.x = element_text(angle = 45, hjust=1, size = 8),
+        axis.text.y = element_text(size = 8),
+        axis.title.x = element_blank(),
+        axis.title.y = element_blank(),
+        strip.background = element_rect(fill="grey70", size=1),
+        strip.text = element_text(size=8, face="bold", color = "white"),
+        axis.ticks = element_line(color = "grey70"),
+        panel.border = element_rect(color = "grey70", fill = NA, size = 0.5)
+  )
+med_exp_pa_hist_sdid_plot1_ylim <- ggplot_build(med_exp_pa_hist_sdid_plot_aux)$layout$panel_scales_y[[1]]$range$range[2]
+med_exp_pa_hist_sdid_plot <- med_exp_pa_hist_sdid_plot_aux +
+  expand_limits(y=med_exp_pa_hist_sdid_plot1_ylim*1.025) +
+  geom_segment(aes(x = c(med_exp_pa_est_sdid_vec[1], mean(med_exp_pa_est_sdid_vec[2:35])), xend = c(med_exp_pa_est_sdid_vec[1],mean(med_exp_pa_est_sdid_vec[2:35])), y = c(0,0), yend = c(med_exp_pa_hist_sdid_plot1_ylim,med_exp_pa_hist_sdid_plot1_ylim)),
+               color = c("#00BFC4","grey50"), alpha = c(.75,.75), size = c(.75,.75)) +
+  geom_text(aes(x = c(med_exp_pa_est_sdid_vec[1], mean(med_exp_pa_est_sdid_vec[2:35])), y = c(med_exp_pa_hist_sdid_plot1_ylim,med_exp_pa_hist_sdid_plot1_ylim), label = c(paste0("hat(tau)[tr]==",round(med_exp_pa_est_sdid_vec[1], 2)),paste0("bar(tau)[controls]==",round(mean(med_exp_pa_est_sdid_vec[2:35]),2)))),
+            parse = TRUE, vjust = c(-.3,-.5), hjust = c(.6,.5), color = c("#00BFC4","grey40"), size = c(2,2))
+pdf(file='SynthDID_Figs_and_Tables/med_exp_spag_dist_plots_PA.pdf', paper = "USr", width = 10.9, height = 8.4)
+(med_exp_pa_spag_dist_plots_PA <- med_exp_pa_spag_did_plot + med_exp_pa_spag_sc_plot + med_exp_pa_spag_sdid_plot + med_exp_pa_hist_did_plot + med_exp_pa_hist_sc_plot + med_exp_pa_hist_sdid_plot + plot_layout(ncol = 3))
+dev.off()
+
